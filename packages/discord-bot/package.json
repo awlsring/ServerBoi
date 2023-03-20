@@ -1,0 +1,9 @@
+{
+  "name": "@serverboi/discord-bot",
+  "version": "1.0.0",
+  "description": "The package containing some utility functions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

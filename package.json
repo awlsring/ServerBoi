@@ -1,0 +1,25 @@
+{
+  "name": "serverboi",
+  "version": "1.0.0",
+  "description": "A monorepo in TypeScript",
+  "private": true,
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "build:model": "cd models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-ssdk-codegen && yarn install && yarn build"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "prettier": "^2.8.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "typescript": "^5.0.2"
+  }
+}

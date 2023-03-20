@@ -1,0 +1,16 @@
+{
+  "name": "@serverboi/api",
+  "version": "1.0.0",
+  "description": "The package containing some utility functions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "run": "node dist/index.js"
+  },
+  "dependencies": {
+    "@aws-smithy/server-common": "^1.0.0-alpha.9",
+    "@aws-smithy/server-node": "^1.0.0-alpha.9",
+    "@serverboi/ssdk": "^1.0.0",
+    "@serverboi/services": "^1.0.0"
+  }
+}

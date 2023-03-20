@@ -1,0 +1,17 @@
+{
+  "name": "@serverboi/services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@prisma/client": "^4.11.0",
+    "steam-server-query": "^1.1.3"
+  },
+  "scripts": {
+    "generate": "npx prisma generate",
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
