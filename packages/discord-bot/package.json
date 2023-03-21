@@ -2,8 +2,30 @@
   "name": "@serverboi/discord-bot",
   "version": "1.0.0",
   "description": "The package containing some utility functions",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "start": "node dist/server.js",
+    "commands:deregister": "ts-node --project tsconfig.json scripts/deregister-commands.ts",
+    "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts"
+  },
+  "dependencies": {
+    "discord-api-types": "^0.37.36",
+    "discord-interactions": "^3.3.0",
+    "discord-verify": "^1.0.0",
+    "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "fastify": "^4.15.0",
+    "fastify-formbody": "^5.3.0",
+    "fastify-raw-body": "^4.2.0",
+    "http": "^0.0.1-security",
+    "node-fetch": "^3.3.1",
+    "raw-body": "^2.5.2",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "ts-node": "^10.9.1"
   }
 }
