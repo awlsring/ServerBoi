@@ -1,19 +1,11 @@
 import fastify, { FastifyReply, FastifyRequest, } from 'fastify'
 import rawBody from 'fastify-raw-body';
-import { APIInteraction, InteractionType, APIInteractionResponse, InteractionResponseType} from "discord-api-types/v10"
-import { PingInteraction } from './interactions/ping';
+import { APIInteraction, InteractionResponseType} from "discord-api-types/v10"
 import { verifyKey } from 'discord-interactions';
-import { RouteApplicationCommand } from './interactions/route-application-command';
 import dotenv from 'dotenv';
+import { InteractionClient } from './interactions/client';
+import { TrackCommand } from './interactions/objects/commands/server/track';
 dotenv.config();
-
-type Request = FastifyRequest<{
-  Body: APIInteraction;
-  Headers: {
-    'x-signature-ed25519': string;
-    'x-signature-timestamp': string;
-  };
-}>;
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 const PORT: number = Number(process.env.PORT) || 7033
@@ -31,6 +23,12 @@ async function main() {
   
   await server.register(rawBody, {
     runFirst: true,
+  });
+
+  const interactions = new InteractionClient({
+    token: process.env.DISCORD_BOT_TOKEN!,
+    version: "v10",
+    commands: [ TrackCommand ]
   });
   
   server.get('/ping', async => {
@@ -58,18 +56,7 @@ async function main() {
   
   server.post('/', async (request: FastifyRequest, response: FastifyReply) => {
     const message: APIInteraction = request.body as APIInteraction;
-  
-    switch (message.type) {
-      case InteractionType.Ping:
-        await PingInteraction(message, response);
-        return
-      case InteractionType.ApplicationCommand:
-        await RouteApplicationCommand(message, response);
-      default:
-        server.log.error("Unknown Type");
-        response.status(400).send({ error: "Unknown Type" });
-        return
-    }
+    await interactions.handle(message, response);
   });
   
   server.listen({ port: PORT }, (err, address) => {

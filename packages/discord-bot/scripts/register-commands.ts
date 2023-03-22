@@ -1,5 +1,7 @@
-import fetch from "node-fetch";
 import dotenv from 'dotenv';
+
+import { ServerCommandGroup } from "../src/interactions/objects/commands/server/group";
+
 dotenv.config();
 
 const token = process.env.DISCORD_TOKEN
@@ -13,7 +15,7 @@ const response = fetch(
       "Authorization": `Bot ${token}`,
     },
     method: "PUT",
-    body: JSON.stringify([]),
+    body: JSON.stringify([ServerCommandGroup]),
   }
 );
 
