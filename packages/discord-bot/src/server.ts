@@ -5,6 +5,10 @@ import { verifyKey } from 'discord-interactions';
 import dotenv from 'dotenv';
 import { InteractionClient } from './interactions/client';
 import { TrackCommand } from './interactions/objects/commands/server/track';
+import { SteamQueryInformationModal } from './interactions/objects/modals/steam-query-info';
+import { ServerTrackInitialModal } from './interactions/objects/modals/track-server-init';
+import { QuerySelectMenu } from './interactions/objects/menus/query-select';
+import { ChannelSelectMenu } from './interactions/objects/menus/channel-select-menu';
 dotenv.config();
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -28,7 +32,9 @@ async function main() {
   const interactions = new InteractionClient({
     token: process.env.DISCORD_BOT_TOKEN!,
     version: "v10",
-    commands: [ TrackCommand ]
+    commands: [ TrackCommand ],
+    selectMenus: [ QuerySelectMenu, ChannelSelectMenu ],
+    modals: [ ServerTrackInitialModal, SteamQueryInformationModal ],
   });
   
   server.get('/ping', async => {
