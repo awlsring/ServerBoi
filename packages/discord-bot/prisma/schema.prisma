@@ -17,8 +17,9 @@ model TrackServer {
   name      String
   application String 
   address   String
+  ownerId String
   queryType String?
   queryAddress String?
   queryPort Int?
-  ownerId String
+  channelId String?
 }

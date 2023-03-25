@@ -14,7 +14,7 @@ export interface SelectMenuComponentOptions {
 
 export class SelectMenuComponent {
   readonly selectType: ComponentType;
-  readonly customId: string;
+  readonly identifier: string;
   readonly placeholder: string
   readonly minSelectableValues: number
   readonly maxSelectableValues: number
@@ -24,7 +24,7 @@ export class SelectMenuComponent {
 
   constructor(options: SelectMenuComponentOptions) {
     this.selectType = options.selectType
-    this.customId = options.customId
+    this.identifier = options.customId
     this.placeholder = options.placeholder
     this.minSelectableValues = options.minSelectableValues
     this.maxSelectableValues = options.maxSelectableValues
@@ -39,7 +39,7 @@ export class SelectMenuComponent {
       components: [
         {
           type: this.selectType.valueOf(),
-          custom_id: this.customId,
+          custom_id: this.identifier,
           options: this.options,
           channel_types: this.channelTypes,
           placeholder: this.placeholder,

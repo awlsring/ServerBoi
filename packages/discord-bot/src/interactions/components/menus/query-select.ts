@@ -29,6 +29,11 @@ export const QuerySelectMenu = new SelectMenuComponent({
   enact: async (context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction) => {
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
     console.log(`Selected values: ${selectedValue}`)
+
+    console.log(`Updating request ID ${interaction.message!.interaction!.id}`)
+    await context.trackServerDao.update(interaction.message!.interaction!.id, {
+      queryType: selectedValue
+    })
     
     if (selectedValue == "STEAM") {
       let response = {

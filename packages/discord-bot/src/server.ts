@@ -1,14 +1,16 @@
 import fastify, { FastifyReply, FastifyRequest, } from 'fastify'
 import rawBody from 'fastify-raw-body';
-import { APIInteraction, InteractionResponseType} from "discord-api-types/v10"
+import { APIInteraction, InteractionResponseType, InteractionType } from "discord-api-types/v10"
 import { verifyKey } from 'discord-interactions';
 import dotenv from 'dotenv';
 import { InteractionClient } from './interactions/client';
-import { TrackCommand } from './interactions/objects/commands/server/track';
-import { SteamQueryInformationModal } from './interactions/objects/modals/steam-query-info';
-import { ServerTrackInitialModal } from './interactions/objects/modals/track-server-init';
-import { QuerySelectMenu } from './interactions/objects/menus/query-select';
-import { ChannelSelectMenu } from './interactions/objects/menus/channel-select-menu';
+import { TrackCommand } from './interactions/components/commands/server/track';
+import { SteamQueryInformationModal } from './interactions/components/modals/steam-query-info';
+import { ServerTrackInitialModal } from './interactions/components/modals/track-server-init';
+import { QuerySelectMenu } from './interactions/components/menus/query-select';
+import { ChannelSelectMenu } from './interactions/components/menus/channel-select-menu';
+import { StartTrackServerButton } from './interactions/components/button/start-track';
+import { ResubmitQueryButton } from './interactions/components/button/resubmit-steam-query';
 dotenv.config();
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -32,9 +34,15 @@ async function main() {
   const interactions = new InteractionClient({
     token: process.env.DISCORD_BOT_TOKEN!,
     version: "v10",
-    commands: [ TrackCommand ],
-    selectMenus: [ QuerySelectMenu, ChannelSelectMenu ],
-    modals: [ ServerTrackInitialModal, SteamQueryInformationModal ],
+    components: [
+      TrackCommand,
+      QuerySelectMenu,
+      ChannelSelectMenu,
+      ServerTrackInitialModal,
+      SteamQueryInformationModal,
+      StartTrackServerButton,
+      ResubmitQueryButton,
+    ],
   });
   
   server.get('/ping', async => {
@@ -61,8 +69,11 @@ async function main() {
   });
   
   server.post('/', async (request: FastifyRequest, response: FastifyReply) => {
-    const message: APIInteraction = request.body as APIInteraction;
-    await interactions.handle(message, response);
+    const interaction: APIInteraction = request.body as APIInteraction;
+    if (interaction.type === InteractionType.Ping) {
+      return interactions.pong(response);
+    }
+    await interactions.handle(interaction, response);
   });
   
   server.listen({ port: PORT }, (err, address) => {

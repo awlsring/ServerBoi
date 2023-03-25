@@ -1,5 +1,6 @@
 import { APIModalInteractionResponseCallbackData, APIModalSubmitInteraction } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
+import { Component } from "../component";
 
 export interface TextModalComponentOptions {
   readonly customId: string;
@@ -18,23 +19,23 @@ export interface ModalComponentOptions {
   enact: (context: InteractionContext, interaction: APIModalSubmitInteraction) => Promise<void>;
 }
 
-export class ModalComponent {
+export class ModalComponent implements Component {
   readonly title: string;
-  readonly customId: string;
+  readonly identifier: string;
   readonly textInputs: TextModalComponentOptions[]
   readonly enact: (context: InteractionContext, interaction: APIModalSubmitInteraction) => Promise<void>;
 
   constructor(options: ModalComponentOptions) {
     this.textInputs = options.textInputs
     this.title = options.title
-    this.customId = options.customId
+    this.identifier = options.customId
     this.enact = options.enact
   }
 
   toApiData(): APIModalInteractionResponseCallbackData {
     return {
       title: this.title,
-      custom_id: this.customId,
+      custom_id: this.identifier,
       components: this.textInputs.map((textInput) => {
         return {
           type: 1,

@@ -26,7 +26,7 @@ export const ServerTrackInitialModal = new ModalComponent({
     },
     {
       customId: "address",
-      placeholder: "dns or ip address of application",
+      placeholder: "DNS or IP address of application",
       label: "Address",
       style: 1,
       minLength: 1,
@@ -35,15 +35,47 @@ export const ServerTrackInitialModal = new ModalComponent({
     },
   ],
   enact: async (context, interaction) => {
+
+    let application = undefined
+    let name = undefined
+    let address = undefined
+    
     interaction.data.components.forEach(component => {
       component.components.forEach(c => {
         console.log(`Type: ${c.type}, Custom ID: ${c.custom_id}, Value: ${c.value}`)
+        switch (c.custom_id) {
+          case "application":
+            application = c.value
+            break;
+          case "name":
+            name = c.value
+            break;
+          case "address":
+            address = c.value
+            break;
+        }
       })
     })
+
+    if (!application || !name || !address || !interaction.member) {
+      console.log("error")
+      return
+    }
+
+    console.log(`Creating track server request: ${interaction.message?.interaction?.id} ${application}, ${name}, ${address}, ${interaction.member.user.id}`)
+    await context.trackServerDao.create({
+      id: interaction.message!.interaction!.id,
+      application: application,
+      name: name,
+      address: address,
+      ownerId: interaction.member.user.id,
+    })
+
+    console.log("returning response")
     context.response.send({
-      type: InteractionResponseType.ChannelMessageWithSource,
+      type: InteractionResponseType.UpdateMessage,
       data: {
-        content: "Enacting track command",
+        content: "Select the query type to use for the server.",
         components: [
           QuerySelectMenu.toApiData()
         ],

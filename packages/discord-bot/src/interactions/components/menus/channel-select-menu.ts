@@ -13,6 +13,11 @@ export const ChannelSelectMenu = new SelectMenuComponent({
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
     console.log(`Selected value: ${selectedValue}`)
 
+    console.log(`Updating request ID ${interaction.message!.interaction!.id}`)
+    await context.trackServerDao.update(interaction.message!.interaction!.id, {
+      channelId: selectedValue
+    })
+
     const response = {
       type: InteractionResponseType.UpdateMessage,
       data: {
