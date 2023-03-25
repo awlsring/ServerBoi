@@ -11,6 +11,7 @@ import { QuerySelectMenu } from './interactions/components/menus/query-select';
 import { ChannelSelectMenu } from './interactions/components/menus/channel-select-menu';
 import { StartTrackServerButton } from './interactions/components/button/start-track';
 import { ResubmitQueryButton } from './interactions/components/button/resubmit-steam-query';
+import { ServerBoiService } from './service/serverboi';
 dotenv.config();
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -44,6 +45,9 @@ async function main() {
       ResubmitQueryButton,
     ],
   });
+
+  // init singleton
+  ServerBoiService.getInstance(process.env.SERVERBOI_ENDPOINT, process.env.SERVERBOI_TOKEN);
   
   server.get('/ping', async => {
     return InteractionResponseType.Pong

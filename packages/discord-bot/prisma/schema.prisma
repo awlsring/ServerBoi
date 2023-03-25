@@ -23,3 +23,13 @@ model TrackServer {
   queryPort Int?
   channelId String?
 }
+
+model ServerCard {
+  id       String      @id @default(uuid())
+  addedAt DateTime @default(now())
+  channelId String
+  ownerId String
+  admins String[]
+  alertUsers String[]
+  alertChannels String[]
+}

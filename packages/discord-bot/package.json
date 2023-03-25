@@ -10,6 +10,7 @@
     "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts"
   },
   "dependencies": {
+    "@serverboi/client": "^1.0.0",
     "discord-api-types": "^0.37.36",
     "discord-interactions": "^3.3.0",
     "discord-verify": "^1.0.0",

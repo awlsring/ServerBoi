@@ -26,6 +26,9 @@
         "path": "./packages/ssdk"
         },
         {
+        "path": "./packages/client"
+        },
+        {
         "path": "./packages/services"
         }
     ]

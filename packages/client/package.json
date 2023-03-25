@@ -1,11 +1,11 @@
 {
-  "name": "@serverboi/ssdk",
+  "name": "@serverboi/client",
   "version": "1.0.0",
   "description": "The package containing some utility functions",
   "main": "dist/index.js",
   "scripts": {
-    "generate": "cd ../../models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-ssdk-codegen",
-    "extract": "cp -R ../../models/api/build/smithyprojections/api/typescript/typescript-ssdk-codegen/src/* ./src",
+    "generate": "cd ../../models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-codegen",
+    "extract": "cp -R ../../models/api/build/smithyprojections/api/typescript/typescript-codegen/src/* ./src",
     "build": "yarn generate && yarn extract && yarn install && tsc --build"
   },
   "dependencies": {
@@ -33,7 +33,13 @@
     "@aws-sdk/util-defaults-mode-node": "3.58.0",
     "@aws-sdk/util-utf8-browser": "3.55.0",
     "@aws-sdk/util-utf8-node": "3.55.0",
-    "@aws-smithy/server-common": "1.0.0-alpha.5"
+    "@aws-smithy/server-common": "1.0.0-alpha.5",
+    "@aws-sdk/middleware-host-header": "3.58.0",
+    "@aws-sdk/middleware-logger": "3.55.0",
+    "@aws-sdk/middleware-user-agent": "3.58.0",
+    "@aws-sdk/node-config-provider": "3.58.0",
+    "@aws-sdk/util-user-agent-browser": "3.58.0",
+    "@aws-sdk/util-user-agent-node": "3.58.0"
   },
   "devDependencies": {
       "@tsconfig/recommended": "1.0.1",
