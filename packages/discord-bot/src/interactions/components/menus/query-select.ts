@@ -1,12 +1,12 @@
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao"
+import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo"
 import { InteractionContext } from "../../context"
 import { SteamQueryInformationModal } from "../modals/steam-query-info"
 import { ChannelSelectMenu } from "./channel-select-menu"
 import { SelectMenuComponent } from "./menu"
 
 export interface QuerySelectMenuOptions {
-  readonly trackServerDao: TrackServerRequestDao
+  readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class QuerySelectMenu extends SelectMenuComponent {
@@ -33,7 +33,7 @@ export class QuerySelectMenu extends SelectMenuComponent {
   protected static readonly minSelectableValues = 1;
   protected static readonly maxSelectableValues = 1;
 
-  private readonly trackServerDao: TrackServerRequestDao
+  private readonly trackServerDao: TrackServerRequestRepo
 
   constructor(options: QuerySelectMenuOptions) {
     super()

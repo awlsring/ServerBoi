@@ -1,15 +1,15 @@
 import { Capabilities } from "@serverboi/client"
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, APISelectMenuOption, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { ServerCardDao } from "../../../persistence/server-card/dao"
-import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao"
+import { ServerCardRepo } from "../../../persistence/server-card-repo"
+import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo"
 import { ServerBoiService } from "../../../service/serverboi"
 import { InteractionContext } from "../../context"
 import { SelectMenuComponent } from "./menu"
 
 export interface ChannelSelectMenuOptions {
   readonly serverBoiService: ServerBoiService
-  readonly trackServerDao: TrackServerRequestDao
-  readonly serverCardDao: ServerCardDao
+  readonly trackServerDao: TrackServerRequestRepo
+  readonly ServerCardRepo: ServerCardRepo
 }
 
 export class ChannelSelectMenu extends SelectMenuComponent {
@@ -21,14 +21,14 @@ export class ChannelSelectMenu extends SelectMenuComponent {
   protected static readonly maxSelectableValues = 1;
 
   private readonly serverboi: ServerBoiService
-  private readonly trackServerDao: TrackServerRequestDao
-  private readonly serverCardDao: ServerCardDao
+  private readonly trackServerDao: TrackServerRequestRepo
+  private readonly ServerCardRepo: ServerCardRepo
 
   constructor(options: ChannelSelectMenuOptions) {
     super()
     this.serverboi = options.serverBoiService
     this.trackServerDao = options.trackServerDao
-    this.serverCardDao = options.serverCardDao
+    this.ServerCardRepo = options.ServerCardRepo
   }
 
   public async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
@@ -56,7 +56,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
     // impl...
     
     // add card to dao
-    await this.serverCardDao.create({
+    await this.ServerCardRepo.create({
       serverId: server.id!,
       channelId: selectedValue,
       ownerId: finalizedRequest.ownerId,

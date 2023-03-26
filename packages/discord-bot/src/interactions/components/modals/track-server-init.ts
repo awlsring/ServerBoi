@@ -1,11 +1,11 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
-import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao";
+import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo";
 import { InteractionContext } from "../../context";
 import { QuerySelectMenu } from "../menus/query-select";
 import { ModalComponent } from "./modals";
 
 export interface ServerTrackInitialModalOptions {
-  readonly trackServerDao: TrackServerRequestDao
+  readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class ServerTrackInitialModal extends ModalComponent {
@@ -41,7 +41,7 @@ export class ServerTrackInitialModal extends ModalComponent {
     },
   ]
 
-  private readonly requestDao = new TrackServerRequestDao();
+  private readonly requestDao = new TrackServerRequestRepo();
 
   constructor(options: ServerTrackInitialModalOptions) {
     super()

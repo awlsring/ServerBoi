@@ -1,9 +1,9 @@
 import { PrismaClient, ServerCard } from '@prisma/client';
-import { ServerCardDto, NewServerCardDto } from './dto';
+import { ServerCardDto, NewServerCardDto } from '../dto/server-card-dto';
 
 const prisma = new PrismaClient();
 
-export class ServerCardDao {
+export class ServerCardRepo {
   async create(request: NewServerCardDto): Promise<ServerCardDto> {
     const createdServer = await prisma.serverCard.create({
       data: {

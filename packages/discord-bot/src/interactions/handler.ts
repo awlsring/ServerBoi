@@ -1,7 +1,7 @@
 import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
 import { InteractionHttpClient } from "./http/client";
-import { TrackServerRequestDao } from "../persistence/track-server-request/dao";
+import { TrackServerRequestRepo } from "../persistence/track-server-request-repo";
 import { Component } from "./components/component";
 import { Logger } from "../logger/logger";
 
@@ -14,7 +14,7 @@ export interface InteractionHandlerOptions {
 
 export class InteractionHandler {
   private readonly httpClient: InteractionHttpClient;
-  private readonly serverRequestDao: TrackServerRequestDao = new TrackServerRequestDao();
+  private readonly serverRequestDao: TrackServerRequestRepo = new TrackServerRequestRepo();
   private readonly components: Map<string, Component>;
   private readonly log: Logger;
   constructor(options: InteractionHandlerOptions) {

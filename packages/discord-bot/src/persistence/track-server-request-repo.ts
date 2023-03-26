@@ -1,9 +1,9 @@
 import { PrismaClient, TrackServer } from '@prisma/client';
-import { NewTrackServerRequestDto, TrackServerRequestDto } from './dto';
+import { NewTrackServerRequestDto, TrackServerRequestDto } from '../dto/track-server-request-dto';
 
 const prisma = new PrismaClient();
 
-export class TrackServerRequestDao {
+export class TrackServerRequestRepo {
   async create(request: NewTrackServerRequestDto): Promise<TrackServerRequestDto> {
     const createdServer = await prisma.trackServer.create({
       data: {

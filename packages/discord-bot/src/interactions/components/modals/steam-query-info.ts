@@ -1,12 +1,12 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
-import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao";
+import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo";
 import { InteractionContext } from "../../context";
 import { ResubmitQueryButton } from "../button/resubmit-steam-query";
 import { ChannelSelectMenu } from "../menus/channel-select-menu";
 import { ModalComponent } from "./modals";
 
 export interface SteamQueryInformationModalOptions {
-  readonly trackServerDao: TrackServerRequestDao
+  readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class SteamQueryInformationModal extends ModalComponent {
@@ -33,7 +33,7 @@ export class SteamQueryInformationModal extends ModalComponent {
     },
   ]
 
-  private readonly requestDao = new TrackServerRequestDao();
+  private readonly requestDao = new TrackServerRequestRepo();
 
   constructor(options: SteamQueryInformationModalOptions) {
     super()
