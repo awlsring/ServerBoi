@@ -36,14 +36,11 @@ export class TrackServerRequestDao {
     return users.map((trackServer) => this.toDto(trackServer));
   }
 
-  async update(id: string, trackServer: any): Promise<TrackServerRequestDto | null> {
+  async update(id: string, trackServer: any): Promise<TrackServerRequestDto> {
     const updatedServer = await prisma.trackServer.update({
       where: { id: id },
       data: trackServer,
     });
-    if (!updatedServer) {
-      return null;
-    }
     return this.toDto(updatedServer);
   }
 

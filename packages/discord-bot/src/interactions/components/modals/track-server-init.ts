@@ -1,7 +1,12 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao";
 import { InteractionContext } from "../../context";
 import { QuerySelectMenu } from "../menus/query-select";
 import { ModalComponent } from "./modals";
+
+export interface ServerTrackInitialModalOptions {
+  readonly trackServerDao: TrackServerRequestDao
+}
 
 export class ServerTrackInitialModal extends ModalComponent {
   public static readonly identifier = "track-server-init";
@@ -36,6 +41,13 @@ export class ServerTrackInitialModal extends ModalComponent {
     },
   ]
 
+  private readonly requestDao = new TrackServerRequestDao();
+
+  constructor(options: ServerTrackInitialModalOptions) {
+    super()
+    this.requestDao = options.trackServerDao
+  }
+
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
 
     let application = undefined
@@ -44,7 +56,6 @@ export class ServerTrackInitialModal extends ModalComponent {
     
     interaction.data.components.forEach(component => {
       component.components.forEach(c => {
-        console.log(`Type: ${c.type}, Custom ID: ${c.custom_id}, Value: ${c.value}`)
         switch (c.custom_id) {
           case "application":
             application = c.value
@@ -60,12 +71,12 @@ export class ServerTrackInitialModal extends ModalComponent {
     })
 
     if (!application || !name || !address || !interaction.member) {
-      console.log("error")
+      context.logger.error("All required fields not provided.")
       return
     }
 
-    console.log(`Creating track server request: ${interaction.message?.interaction?.id} ${application}, ${name}, ${address}, ${interaction.member.user.id}`)
-    await context.trackServerDao.create({
+    context.logger.info(`Creating track server request: ${interaction.message?.interaction?.id} ${application}, ${name}, ${address}, ${interaction.member.user.id}`)
+    await this.requestDao.create({
       id: interaction.message!.interaction!.id,
       application: application,
       name: name,
@@ -73,7 +84,6 @@ export class ServerTrackInitialModal extends ModalComponent {
       ownerId: interaction.member.user.id,
     })
 
-    console.log("returning response")
     context.response.send({
       type: InteractionResponseType.UpdateMessage,
       data: {

@@ -27,6 +27,7 @@ model TrackServer {
 model ServerCard {
   id       String      @id @default(uuid())
   addedAt DateTime @default(now())
+  serverId String
   channelId String
   ownerId String
   admins String[]

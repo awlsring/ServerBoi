@@ -2,6 +2,7 @@ import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteracti
 import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao"
 import { InteractionContext } from "../../context"
 import { SteamQueryInformationModal } from "../modals/steam-query-info"
+import { ChannelSelectMenu } from "./channel-select-menu"
 import { SelectMenuComponent } from "./menu"
 
 export interface QuerySelectMenuOptions {
@@ -41,9 +42,9 @@ export class QuerySelectMenu extends SelectMenuComponent {
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
-    console.log(`Selected values: ${selectedValue}`)
+    context.logger.info(`Selected values: ${selectedValue}`)
 
-    console.log(`Updating request ID ${interaction.message!.interaction!.id}`)
+    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.trackServerDao.update(interaction.message!.interaction!.id, {
       queryType: selectedValue
     })
@@ -54,6 +55,17 @@ export class QuerySelectMenu extends SelectMenuComponent {
         data: SteamQueryInformationModal.toApiData()
       }
       await context.response.send(response)
+    } else {
+      await context.response.send({
+        type: InteractionResponseType.UpdateMessage,
+        data: {
+          content: "Select the channel to send the server information to.",
+          components: [
+            ChannelSelectMenu.toApiData()
+          ],
+          flags: MessageFlags.Ephemeral,
+        }
+      })
     }
   }
 }

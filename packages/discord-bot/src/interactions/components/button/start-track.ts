@@ -14,7 +14,7 @@ export class StartTrackServerButton extends ButtonComponent {
   };
 
   public async enact(context: InteractionContext, _: any) {
-    console.log("Enacting start track server button");
+    context.logger.info("Enacting start track server button");
     context.response.send({
       type: InteractionResponseType.MODAL,
       data: ServerTrackInitialModal.toApiData(),

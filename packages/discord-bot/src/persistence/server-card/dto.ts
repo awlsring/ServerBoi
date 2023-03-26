@@ -5,11 +5,12 @@ export interface ServerAlertsDto {
 
 export interface ServerCardDto {
   id: string;
+  serverId: string;
   addedAt: Date;
   channelId: string;
   ownerId: string;
-  admins: string[];
-  alerts: ServerAlertsDto;
+  admins?: string[];
+  alerts?: ServerAlertsDto;
 }
 
 export type NewServerCardDto = Omit<ServerCardDto, 'id' | 'addedAt'>;

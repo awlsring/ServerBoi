@@ -57,6 +57,7 @@ export class ServerCardDao {
     return {
       id: card.id,
       addedAt: new Date(card.addedAt),
+      serverId: card.serverId,
       channelId: card.channelId,
       ownerId: card.ownerId,
       admins: card.admins,

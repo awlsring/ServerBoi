@@ -1,8 +1,13 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao";
 import { InteractionContext } from "../../context";
 import { ResubmitQueryButton } from "../button/resubmit-steam-query";
 import { ChannelSelectMenu } from "../menus/channel-select-menu";
 import { ModalComponent } from "./modals";
+
+export interface SteamQueryInformationModalOptions {
+  readonly trackServerDao: TrackServerRequestDao
+}
 
 export class SteamQueryInformationModal extends ModalComponent {
   public static readonly identifier = "steam-query-info";
@@ -28,16 +33,20 @@ export class SteamQueryInformationModal extends ModalComponent {
     },
   ]
 
-  async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+  private readonly requestDao = new TrackServerRequestDao();
 
+  constructor(options: SteamQueryInformationModalOptions) {
+    super()
+    this.requestDao = options.trackServerDao
+  }
+
+  async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
     let steamQueryAddress: string | undefined = undefined
     let steamQueryPort: string | undefined = undefined
-
     let errorMessage = undefined
 
     interaction.data.components.forEach(component => {
       component.components.forEach(c => {
-        console.log(`Type: ${c.type}, Custom ID: ${c.custom_id}, Value: ${c.value}`)
         switch (c.custom_id) {
           case "steam-query-address":
             steamQueryAddress = c.value
@@ -75,7 +84,7 @@ export class SteamQueryInformationModal extends ModalComponent {
       return
     }
 
-    await context.trackServerDao.update(interaction.message!.interaction!.id, {
+    await this.requestDao.update(interaction.message!.interaction!.id, {
       queryPort: Number(steamQueryPort),
       queryAddress: steamQueryAddress,
     })

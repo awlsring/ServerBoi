@@ -7,6 +7,7 @@ export interface TrackServerRequestDto {
   queryType?: string;
   queryPort?: number;
   queryAddress?: string;
+  channelId?: string;
 }
 
 export interface NewTrackServerRequestDto {

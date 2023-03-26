@@ -3,7 +3,7 @@ import rawBody from 'fastify-raw-body';
 import { APIInteraction, InteractionResponseType, InteractionType } from "discord-api-types/v10"
 import { verifyKey } from 'discord-interactions';
 import dotenv from 'dotenv';
-import { InteractionClient } from './interactions/client';
+import { InteractionHandler } from './interactions/handler';
 import { TrackCommand } from './interactions/components/commands/server/track';
 import { SteamQueryInformationModal } from './interactions/components/modals/steam-query-info';
 import { ServerTrackInitialModal } from './interactions/components/modals/track-server-init';
@@ -38,7 +38,7 @@ async function main() {
   const requestDao = new TrackServerRequestDao();
   const cardDao = new ServerCardDao();
   
-  const interactions = new InteractionClient({
+  const interactions = new InteractionHandler({
     token: process.env.DISCORD_BOT_TOKEN!,
     version: "v10",
     components: [
@@ -49,11 +49,12 @@ async function main() {
         trackServerDao: requestDao,
         serverCardDao: cardDao,
       }),
-      new ServerTrackInitialModal(),
-      new SteamQueryInformationModal(),
+      new ServerTrackInitialModal({ trackServerDao: requestDao }),
+      new SteamQueryInformationModal({ trackServerDao: requestDao }),
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
     ],
+    logger: server.log,
   });
 
   

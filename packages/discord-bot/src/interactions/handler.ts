@@ -3,22 +3,26 @@ import { FastifyReply } from "fastify";
 import { InteractionHttpClient } from "./http/client";
 import { TrackServerRequestDao } from "../persistence/track-server-request/dao";
 import { Component } from "./components/component";
+import { Logger } from "../logger/logger";
 
-export interface InteractionClientOptions {
+export interface InteractionHandlerOptions {
   token: string;
+  logger: Logger;
   components?: Component[];
   version?: string;
 }
 
-export class InteractionClient {
+export class InteractionHandler {
   private readonly httpClient: InteractionHttpClient;
   private readonly serverRequestDao: TrackServerRequestDao = new TrackServerRequestDao();
   private readonly components: Map<string, Component>;
-  constructor(options: InteractionClientOptions) {
+  private readonly log: Logger;
+  constructor(options: InteractionHandlerOptions) {
     this.httpClient = new InteractionHttpClient({
       token: options.token,
       version: options.token ?? "v10",
     });
+    this.log = options.logger;
     this.components = new Map();
     options.components?.forEach((component) => {
       this.components.set(component.getIdentifier(), component);
@@ -29,7 +33,7 @@ export class InteractionClient {
     return {
       http: this.httpClient,
       response: response,
-      trackServerDao: this.serverRequestDao,
+      logger: this.log,
     };
   }
 

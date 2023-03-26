@@ -1,9 +1,23 @@
 import { FastifyReply } from "fastify";
-import { TrackServerRequestDao } from "../persistence/track-server-request/dao";
+import { Logger } from "../logger/logger";
 import { InteractionHttpClient } from "./http/client";
 
 export interface InteractionContext {
   readonly http: InteractionHttpClient;
   readonly response: FastifyReply;
-  readonly trackServerDao: TrackServerRequestDao;
+  readonly logger: Logger;
+}
+
+export class BaseInteractionContext implements InteractionContext {
+  logger: Logger;
+
+  constructor(
+    readonly http: InteractionHttpClient,
+    readonly response: FastifyReply,
+    logger: Logger
+  ) {
+    this.http = http;
+    this.response = response;
+    this.logger = logger;
+  }
 }
