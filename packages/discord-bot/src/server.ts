@@ -12,6 +12,8 @@ import { ChannelSelectMenu } from './interactions/components/menus/channel-selec
 import { StartTrackServerButton } from './interactions/components/button/start-track';
 import { ResubmitQueryButton } from './interactions/components/button/resubmit-steam-query';
 import { ServerBoiService } from './service/serverboi';
+import { TrackServerRequestDao } from './persistence/track-server-request/dao';
+import { ServerCardDao } from './persistence/server-card/dao';
 dotenv.config();
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -31,23 +33,29 @@ async function main() {
   await server.register(rawBody, {
     runFirst: true,
   });
-
+  
+  const serverboi = new ServerBoiService(process.env.SERVERBOI_ENDPOINT!, process.env.SERVERBOI_TOKEN!);
+  const requestDao = new TrackServerRequestDao();
+  const cardDao = new ServerCardDao();
+  
   const interactions = new InteractionClient({
     token: process.env.DISCORD_BOT_TOKEN!,
     version: "v10",
     components: [
-      TrackCommand,
-      QuerySelectMenu,
-      ChannelSelectMenu,
-      ServerTrackInitialModal,
-      SteamQueryInformationModal,
-      StartTrackServerButton,
-      ResubmitQueryButton,
+      new TrackCommand(),
+      new QuerySelectMenu({ trackServerDao: requestDao }),
+      new ChannelSelectMenu({
+        serverBoiService: serverboi,
+        trackServerDao: requestDao,
+        serverCardDao: cardDao,
+      }),
+      new ServerTrackInitialModal(),
+      new SteamQueryInformationModal(),
+      new StartTrackServerButton(),
+      new ResubmitQueryButton(),
     ],
   });
 
-  // init singleton
-  ServerBoiService.getInstance(process.env.SERVERBOI_ENDPOINT, process.env.SERVERBOI_TOKEN);
   
   server.get('/ping', async => {
     return InteractionResponseType.Pong

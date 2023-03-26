@@ -1,15 +1,16 @@
-import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { APIApplicationCommandInteraction, ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { InteractionContext } from "../../../context";
 import { StartTrackServerButton } from "../../button/start-track";
 import { CommandComponent } from "../command";
 
-export const TrackCommand = new CommandComponent({
-  identifier: "track",
-  data: {
+export class TrackCommand extends CommandComponent {
+  public static readonly identifier = "track";
+  public static readonly data = {
     name: "track",
     description: "Track a server",
     type: ApplicationCommandOptionType.Subcommand,
-  },
-  enact: async (context, _) => {
+  };
+  async enact(context: InteractionContext, interaction: APIApplicationCommandInteraction) {
     console.log("Enacting track command");
     await context.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -27,4 +28,4 @@ export const TrackCommand = new CommandComponent({
       }
     });
   }
-});
+}

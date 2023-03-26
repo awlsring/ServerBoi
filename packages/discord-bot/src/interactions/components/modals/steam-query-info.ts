@@ -1,12 +1,13 @@
-import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { InteractionContext } from "../../context";
 import { ResubmitQueryButton } from "../button/resubmit-steam-query";
 import { ChannelSelectMenu } from "../menus/channel-select-menu";
 import { ModalComponent } from "./modals";
 
-export const SteamQueryInformationModal = new ModalComponent({
-  title: "Steam Query Information",
-  customId: "steam-query-info",
-  textInputs: [
+export class SteamQueryInformationModal extends ModalComponent {
+  public static readonly identifier = "steam-query-info";
+  protected static readonly title = "Steam Query Information";
+  protected static readonly textInputs = [
     {
       customId: "steam-query-address",
       placeholder: "Steam Query Address. Leave blank if this should be the same as the previous address",
@@ -25,8 +26,9 @@ export const SteamQueryInformationModal = new ModalComponent({
       maxLength: 5,
       required: true,
     },
-  ],
-  enact: async (context, interaction) => {
+  ]
+
+  async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
 
     let steamQueryAddress: string | undefined = undefined
     let steamQueryPort: string | undefined = undefined
@@ -89,4 +91,4 @@ export const SteamQueryInformationModal = new ModalComponent({
       }
     });
   }
-})
+}

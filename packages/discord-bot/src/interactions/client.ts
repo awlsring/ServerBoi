@@ -21,7 +21,7 @@ export class InteractionClient {
     });
     this.components = new Map();
     options.components?.forEach((component) => {
-      this.components.set(component.identifier, component);
+      this.components.set(component.getIdentifier(), component);
     });
   }
 
@@ -93,7 +93,7 @@ export class InteractionClient {
     console.log(`Interaction name: ${interactionName}`)
     const component = this.components.get(interactionName);
     if (component) {
-      console.log(`Component found: ${component.identifier}. Enacting...`)
+      console.log(`Component found: ${component.getIdentifier()}. Enacting...`)
       await component.enact(context, interaction);
     } else {
       console.log("No registered component found for interaction")

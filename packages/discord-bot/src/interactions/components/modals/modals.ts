@@ -2,7 +2,7 @@ import { APIModalInteractionResponseCallbackData, APIModalSubmitInteraction } fr
 import { InteractionContext } from "../../context"
 import { Component } from "../component";
 
-export interface TextModalComponentOptions {
+export interface TextModal {
   readonly customId: string;
   readonly placeholder: string
   readonly label: string
@@ -12,27 +12,13 @@ export interface TextModalComponentOptions {
   readonly required: boolean
 }
 
-export interface ModalComponentOptions {
-  readonly title: string;
-  readonly customId: string;
-  readonly textInputs: TextModalComponentOptions[]
-  enact: (context: InteractionContext, interaction: APIModalSubmitInteraction) => Promise<void>;
-}
+export abstract class ModalComponent extends Component {
+  public static readonly identifier: string;
+  protected static readonly title: string;
+  protected static readonly textInputs: TextModal[]
+  abstract enact(context: InteractionContext, interaction: APIModalSubmitInteraction): Promise<void>;
 
-export class ModalComponent implements Component {
-  readonly title: string;
-  readonly identifier: string;
-  readonly textInputs: TextModalComponentOptions[]
-  readonly enact: (context: InteractionContext, interaction: APIModalSubmitInteraction) => Promise<void>;
-
-  constructor(options: ModalComponentOptions) {
-    this.textInputs = options.textInputs
-    this.title = options.title
-    this.identifier = options.customId
-    this.enact = options.enact
-  }
-
-  toApiData(): APIModalInteractionResponseCallbackData {
+  static toApiData(): APIModalInteractionResponseCallbackData {
     return {
       title: this.title,
       custom_id: this.identifier,

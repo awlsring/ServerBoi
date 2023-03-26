@@ -1,5 +1,6 @@
 import { ChannelType, APISelectMenuOption, APIMessageSelectMenuInteractionData, ComponentType, APIMessageComponentSelectMenuInteraction, APIActionRowComponent, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
+import { Component } from "../component";
 
 export interface SelectMenuComponentOptions {
   readonly selectType: ComponentType;
@@ -9,31 +10,19 @@ export interface SelectMenuComponentOptions {
   readonly placeholder: string
   readonly minSelectableValues: number
   readonly maxSelectableValues: number
-  enact: (context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction) => Promise<void>;
 }
 
-export class SelectMenuComponent {
-  readonly selectType: ComponentType;
-  readonly identifier: string;
-  readonly placeholder: string
-  readonly minSelectableValues: number
-  readonly maxSelectableValues: number
-  readonly options?: APISelectMenuOption[];
-  readonly channelTypes?: ChannelType[];
-  readonly enact: (context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction) => Promise<void>;
+export abstract class SelectMenuComponent extends Component {
+  protected static readonly selectType: ComponentType;
+  protected static readonly placeholder: string
+  protected static readonly minSelectableValues: number
+  protected static readonly maxSelectableValues: number
+  protected static options?: APISelectMenuOption[] = undefined
+  protected static channelTypes?: ChannelType[] = undefined
+  
+  abstract enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void>;
 
-  constructor(options: SelectMenuComponentOptions) {
-    this.selectType = options.selectType
-    this.identifier = options.customId
-    this.placeholder = options.placeholder
-    this.minSelectableValues = options.minSelectableValues
-    this.maxSelectableValues = options.maxSelectableValues
-    this.options = options.options
-    this.channelTypes = options.channelTypes
-    this.enact = options.enact
-  }
-
-  toApiData() {
+  static toApiData() {
     return {
       type: 1,
       components: [
@@ -50,5 +39,3 @@ export class SelectMenuComponent {
     }
   }
 }
-
-

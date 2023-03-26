@@ -1,11 +1,12 @@
-import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { InteractionContext } from "../../context";
 import { QuerySelectMenu } from "../menus/query-select";
 import { ModalComponent } from "./modals";
 
-export const ServerTrackInitialModal = new ModalComponent({
-  title: "Track Server",
-  customId: "track-server-init",
-  textInputs: [
+export class ServerTrackInitialModal extends ModalComponent {
+  public static readonly identifier = "track-server-init";
+  protected static readonly title = "Track Server";
+  protected static readonly textInputs = [
     {
       customId: "application",
       placeholder: "Application name",
@@ -33,8 +34,9 @@ export const ServerTrackInitialModal = new ModalComponent({
       maxLength: 64,
       required: true,
     },
-  ],
-  enact: async (context, interaction) => {
+  ]
+
+  async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
 
     let application = undefined
     let name = undefined
@@ -83,4 +85,4 @@ export const ServerTrackInitialModal = new ModalComponent({
       }
     });
   }
-})
+}

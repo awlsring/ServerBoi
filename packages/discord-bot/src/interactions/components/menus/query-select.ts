@@ -1,12 +1,17 @@
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
+import { TrackServerRequestDao } from "../../../persistence/track-server-request/dao"
 import { InteractionContext } from "../../context"
 import { SteamQueryInformationModal } from "../modals/steam-query-info"
 import { SelectMenuComponent } from "./menu"
 
-export const QuerySelectMenu = new SelectMenuComponent({
-  selectType: ComponentType.StringSelect,
-  customId: "query-select",
-  options: [
+export interface QuerySelectMenuOptions {
+  readonly trackServerDao: TrackServerRequestDao
+}
+
+export class QuerySelectMenu extends SelectMenuComponent {
+  public static readonly identifier = "query-select";
+  protected static readonly selectType = ComponentType.StringSelect;
+  protected static readonly options = [
     {
       label: "Steam",
       value: "STEAM",
@@ -22,16 +27,24 @@ export const QuerySelectMenu = new SelectMenuComponent({
       value: "NONE",
       description: "Do not query the server",
     },
-  ],
-  placeholder: "Select server query type",
-  minSelectableValues: 1,
-  maxSelectableValues: 1,
-  enact: async (context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction) => {
+  ];
+  protected static readonly placeholder = "Select server query type";
+  protected static readonly minSelectableValues = 1;
+  protected static readonly maxSelectableValues = 1;
+
+  private readonly trackServerDao: TrackServerRequestDao
+
+  constructor(options: QuerySelectMenuOptions) {
+    super()
+    this.trackServerDao = options.trackServerDao
+  }
+
+  async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
     console.log(`Selected values: ${selectedValue}`)
 
     console.log(`Updating request ID ${interaction.message!.interaction!.id}`)
-    await context.trackServerDao.update(interaction.message!.interaction!.id, {
+    await this.trackServerDao.update(interaction.message!.interaction!.id, {
       queryType: selectedValue
     })
     
@@ -44,4 +57,3 @@ export const QuerySelectMenu = new SelectMenuComponent({
     }
   }
 }
-)

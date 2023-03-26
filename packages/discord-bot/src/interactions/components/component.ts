@@ -1,7 +1,10 @@
 import { APIInteraction } from "discord-api-types/v10";
 import { InteractionContext } from "../context";
 
-export interface Component {
-  identifier: string;
-  enact(context: InteractionContext, interaction: APIInteraction): Promise<void>;
+export abstract class Component {
+  static readonly identifier: string;
+  getIdentifier(): string {
+    return (this.constructor as typeof Component).identifier;
+  }
+  abstract enact(context: InteractionContext, interaction: APIInteraction): Promise<void>;
 }
