@@ -25,7 +25,7 @@ model TrackServer {
 }
 
 model ServerCard {
-  id       String      @id @default(uuid())
+  messageId       String      @unique
   addedAt DateTime @default(now())
   serverId String
   channelId String

@@ -13,9 +13,9 @@ export class ServerCardRepo {
     return this.toDto(createdServer);
   }
 
-  async findById(id: string): Promise<ServerCardDto | null> {
+  async findById(messageId: string): Promise<ServerCardDto | null> {
     const serverCard = await prisma.serverCard.findUnique({
-      where: { id },
+      where: { messageId },
     });
     if (!serverCard) {
       return null;
@@ -32,9 +32,9 @@ export class ServerCardRepo {
     return users.map((serverCard) => this.toDto(serverCard));
   }
 
-  async update(id: string, serverCard: any): Promise<ServerCardDto | null> {
+  async update(messageId: string, serverCard: any): Promise<ServerCardDto | null> {
     const updatedServer = await prisma.serverCard.update({
-      where: { id: id },
+      where: { messageId: messageId },
       data: serverCard,
     });
     if (!updatedServer) {
@@ -43,9 +43,9 @@ export class ServerCardRepo {
     return this.toDto(updatedServer);
   }
 
-  async delete(id: string): Promise<ServerCardDto | null> {
+  async delete(messageId: string): Promise<ServerCardDto | null> {
     const deletedServer = await prisma.serverCard.delete({
-      where: { id },
+      where: { messageId },
     });
     if (!deletedServer) {
       return null;
@@ -55,7 +55,7 @@ export class ServerCardRepo {
 
   private toDto(card: ServerCard): ServerCardDto {
     return {
-      id: card.id,
+      messageId: card.messageId,
       addedAt: new Date(card.addedAt),
       serverId: card.serverId,
       channelId: card.channelId,

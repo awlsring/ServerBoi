@@ -1,5 +1,5 @@
 import { ServerStatus } from "@serverboi/client";
-import { EmbedType, APIButtonComponent, APIStringSelectComponent, APISelectMenuOption} from "discord-api-types/v10";
+import { EmbedType, APIButtonComponent, APIStringSelectComponent, APISelectMenuOption, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent} from "discord-api-types/v10";
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
 import { Embed, EmbedOptions } from "./embed";
@@ -19,12 +19,23 @@ export interface ServerActionsOptions {
   stopEnabled: boolean;
   moreActions: ServerEmbedMoreActions[];
 }
+
 export class ServerEmbed extends Embed {
   constructor(options: EmbedOptions) {
     super({
       type: EmbedType.Rich,
       ...options
     });
+  }
+
+  protected static getUpdateTime(): string {
+    const date = new Date();
+
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds} UTC`;
   }
 
   protected static determineColor(status: string): ServerEmbedColor {
@@ -56,7 +67,7 @@ export class ServerEmbed extends Embed {
           opts.push({
             label: `Remove`,
             value: `remove`,
-            description: `stop tracking server`,
+            description: `Stop tracking server`,
             default: false
           })
           break
@@ -75,11 +86,32 @@ export class ServerEmbed extends Embed {
     }
   }
 
-  private serverActions(options: ServerActionsOptions): Array<APIButtonComponent | APIStringSelectComponent> {
+  private serverActions(options: ServerActionsOptions): APIActionRowComponent<APIMessageActionRowComponent>[] {
     return [
-      StartServerButton.formButton(options.startEnabled),
-      StopServerButton.formButton(options.stopEnabled),
-      this.makeMoreActionsSelect(options.moreActions)
+      {
+        type: 1,
+        components: [
+          StartServerButton.formButton(options.startEnabled),
+          StopServerButton.formButton(options.stopEnabled),
+        ],
+      },
+      {
+        type: 1,
+        components: [
+          this.makeMoreActionsSelect(options.moreActions)
+        ]
+      }
     ]
+  }
+
+  public toMessage(startEnabled: boolean, stopEnabled: boolean, actions?: ServerEmbedMoreActions[]): RESTPostAPIChannelMessageJSONBody {
+    return {
+      embeds: [this.toApiData()],
+      components: this.serverActions({
+        startEnabled: startEnabled,
+        stopEnabled: stopEnabled,
+        moreActions: actions ?? [ServerEmbedMoreActions.Remove]
+      })
+    }
   }
 }

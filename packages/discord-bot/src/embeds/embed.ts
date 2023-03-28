@@ -1,48 +1,4 @@
-import { EmbedType } from 'discord-api-types/v10';
-
-export interface EmbedFooter {
-  readonly text: string;
-  readonly iconUrl?: string;
-  readonly proxyIconUrl?: string;
-}
-
-export interface EmbedImage {
-  readonly url?: string;
-  readonly proxyUrl?: string;
-  readonly height?: number;
-  readonly width?: number;
-}
-
-export interface EmbedThumbnail {
-  readonly url?: string;
-  readonly proxyUrl?: string;
-  readonly height?: number;
-  readonly width?: number;
-}
-
-export interface EmbedVideo {
-  readonly url?: string;
-  readonly height?: number;
-  readonly width?: number;
-}
-
-export interface EmbedProvider {
-  readonly name?: string;
-  readonly url?: string;
-}
-
-export interface EmbedAuthor {
-  readonly name?: string;
-  readonly url?: string;
-  readonly iconUrl?: string;
-  readonly proxyIconUrl?: string;
-}
-
-export interface EmbedField {
-  readonly name: string;
-  readonly value: string;
-  readonly inline?: boolean;
-}
+import { APIEmbed, APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedProvider, APIEmbedThumbnail, APIEmbedVideo, EmbedType } from 'discord-api-types/v10';
 
 export class EmbedOptions {
   public readonly title?: string;
@@ -51,13 +7,13 @@ export class EmbedOptions {
   public readonly url?: string;
   public readonly timestamp?: Date;
   public readonly color?: number;
-  public readonly footer?: EmbedFooter;
-  public readonly image?: EmbedImage;
-  public readonly thumbnail?: EmbedThumbnail;
-  public readonly video?: EmbedVideo;
-  public readonly provider?: EmbedProvider;
-  public readonly author?: EmbedAuthor;
-  public readonly fields?: EmbedField[];
+  public readonly footer?: APIEmbedFooter;
+  public readonly image?: APIEmbedImage;
+  public readonly thumbnail?: APIEmbedThumbnail;
+  public readonly video?: APIEmbedVideo;
+  public readonly provider?: APIEmbedProvider;
+  public readonly author?: APIEmbedAuthor;
+  public readonly fields?: APIEmbedField[];
 }
 
 export class Embed {
@@ -67,13 +23,13 @@ export class Embed {
   public readonly url?: string;
   public readonly timestamp?: Date;
   public readonly color?: number;
-  public readonly footer?: EmbedFooter;
-  public readonly image?: EmbedImage;
-  public readonly thumbnail?: EmbedThumbnail;
-  public readonly video?: EmbedVideo;
-  public readonly provider?: EmbedProvider;
-  public readonly author?: EmbedAuthor;
-  public readonly fields?: EmbedField[];
+  public readonly footer?: APIEmbedFooter;
+  public readonly image?: APIEmbedImage;
+  public readonly thumbnail?: APIEmbedThumbnail;
+  public readonly video?: APIEmbedVideo;
+  public readonly provider?: APIEmbedProvider;
+  public readonly author?: APIEmbedAuthor;
+  public readonly fields?: APIEmbedField[];
 
   constructor(options: EmbedOptions) {
     this.title = options.title;
@@ -91,13 +47,13 @@ export class Embed {
     this.fields = options.fields;
   }
 
-  public toApiData(): EmbedOptions {
+  public toApiData(): APIEmbed {
     return {
       title: this.title,
       type: this.type,
       description: this.description,
       url: this.url,
-      timestamp: this.timestamp,
+      timestamp: this.timestamp?.toISOString(),
       color: this.color,
       footer: this.footer,
       image: this.image,

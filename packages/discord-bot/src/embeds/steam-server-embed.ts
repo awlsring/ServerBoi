@@ -1,7 +1,12 @@
 import { Capabilities } from "@serverboi/client";
-import { EmbedType } from "discord-api-types/v10";
-import { EmbedField } from "./embed";
+import { APIEmbedField, EmbedType } from "discord-api-types/v10";
+import { platform } from "os";
 import { ServerEmbed } from "./server-embed";
+
+export interface ServerPlatform {
+  readonly name: string;
+  readonly location: string;
+}
 
 export interface SteamServerEmbedOptions {
   readonly serverId: string;
@@ -15,11 +20,12 @@ export interface SteamServerEmbedOptions {
   readonly maxPlayers: number;
   readonly ownerId: string;
   readonly capabilities: Capabilities[];
+  readonly platform: ServerPlatform;
 }
 
 export class SteamServerEmbed extends ServerEmbed {
   constructor(options: SteamServerEmbedOptions) {
-    const fields: EmbedField[] = [
+    const fields: APIEmbedField[] = [
       {
         name: "Status",
         value: SteamServerEmbed.formStatusString(options.status),
@@ -32,7 +38,7 @@ export class SteamServerEmbed extends ServerEmbed {
       },
       {
         name: "Address",
-        value: options.address,
+        value: `\`${options.address}\``,
         inline: true
       },
       {
@@ -58,7 +64,7 @@ export class SteamServerEmbed extends ServerEmbed {
       color: SteamServerEmbed.determineColor(options.status),
       fields: fields,
       footer: {
-        text: `Owner: ${options.ownerId} | Running on K8S in DWS | Last Update: ${new Date().toLocaleString()}`
+        text: `Owner: ${options.ownerId} | 🌐 Hosted on ${options.platform.name} in ${options.platform.location} | 🕛 Updated: ${SteamServerEmbed.getUpdateTime()}`
       },
       thumbnail: {
         url: options.thumbnailUrl
