@@ -39,7 +39,7 @@ async function main() {
   const cardDao = new ServerCardRepo();
   
   const interactions = new InteractionHandler({
-    token: process.env.DISCORD_BOT_TOKEN!,
+    token: process.env.DISCORD_TOKEN!,
     version: "v10",
     components: [
       new TrackCommand(),

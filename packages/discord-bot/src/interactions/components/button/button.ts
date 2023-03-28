@@ -1,4 +1,4 @@
-import { ButtonStyle, APIMessageButtonInteractionData, APIMessageComponentButtonInteraction } from "discord-api-types/v10"
+import { ButtonStyle, APIMessageComponentButtonInteraction } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
 import { Component } from "../component";
 
