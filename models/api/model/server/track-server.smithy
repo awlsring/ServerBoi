@@ -15,6 +15,9 @@ operation TrackServer {
 @input
 structure TrackServerInput {
     @required
+    scope: String
+    
+    @required
     application: String
 
     @required
@@ -26,11 +29,12 @@ structure TrackServerInput {
     @required
     owner: String,
 
+    @required
+    query: TrackServerQueryInput
+
     platform: TrackServerPlatformInput
 
     capabilities: ServerCapabilities
-
-    query: TrackServerQueryInput
 }
 
 

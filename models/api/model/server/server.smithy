@@ -39,6 +39,7 @@ structure ServerSummary {
     @required
     query: ServerQuerySummary,
 
+    @required
     location: String,
 
     @required
