@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "generate": "cd ../../models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-codegen",
-    "extract": "cp -R ../../models/api/build/smithyprojections/api/typescript/typescript-codegen/src/* ./src",
+    "extract": "mkdir -p src && cp -R ../../models/api/build/smithyprojections/api/typescript/typescript-codegen/src/* ./src",
     "build": "yarn generate && yarn extract && yarn install && tsc --build"
   },
   "dependencies": {
