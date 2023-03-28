@@ -20,7 +20,7 @@ export class InteractionHandler {
   constructor(options: InteractionHandlerOptions) {
     this.httpClient = new InteractionHttpClient({
       token: options.token,
-      version: options.token ?? "v10",
+      version: options.version ?? "v10",
     });
     this.log = options.logger;
     this.components = new Map();

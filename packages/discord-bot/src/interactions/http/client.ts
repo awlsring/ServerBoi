@@ -140,7 +140,7 @@ export class InteractionHttpClient {
       body.flags = 64;
     }
     const response = await this.request(
-      `webhooks/${applicationId}/${interactionToken}/messages/${messageId}`,
+      `/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`,
       {
         method: 'PATCH',
         body: JSON.stringify(body),
@@ -160,12 +160,20 @@ export class InteractionHttpClient {
       body.flags = 64;
     }
     const response = await this.request(
-      `webhooks/${applicationId}/${interactionToken}/messages/${messageId}`,
+      `/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`,
       {
         method: 'DELETE',
         body: JSON.stringify(body),
       },
     );
+    return response.json();
+  }
+
+  async createMessage(channelId: string, body: Record<string, any>,) {
+    const response = await this.request(`/channels/${channelId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
     return response.json();
   }
 }
