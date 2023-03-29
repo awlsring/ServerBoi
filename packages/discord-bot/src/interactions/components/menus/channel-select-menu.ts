@@ -74,6 +74,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       serverName: server.name!,
       status: server.status?.status!,
       address: server.address!,
+      steamPort: server.query?.port!,
       location: {
         city: server.location?.city!,
         country: server.location?.country!,
@@ -81,8 +82,8 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         emoji: server.location?.emoji!,
       },
       game: server.application!,
-      players: 0,
-      maxPlayers: 0,
+      players: server.status?.steam?.players!,
+      maxPlayers: server.status?.steam?.maxPlayers!,
       owner: interaction.member?.user.username!,
       capabilities: [],
       platform: {

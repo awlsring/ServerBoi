@@ -19,6 +19,7 @@ export interface SteamServerEmbedOptions {
   readonly serverName: string;
   readonly status: string;
   readonly address: string;
+  readonly steamPort: number;
   readonly location: ServerLocation;
   readonly game: string;
   readonly players: number;
@@ -82,7 +83,7 @@ export class SteamServerEmbed extends ServerEmbed {
     super({
       type: EmbedType.Rich,
       title: `${options.serverName} (${options.serverId})`,
-      description: `Connect: steam://connect/${options.address}`,
+      description: `Connect: steam://connect/${options.address}:${options.steamPort}`,
       color: SteamServerEmbed.determineColor(options.status),
       fields: fields,
       thumbnail: {
