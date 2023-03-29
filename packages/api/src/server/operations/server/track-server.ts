@@ -1,22 +1,23 @@
 import { Operation } from "@aws-smithy/server-common";
 import { TrackServerServerInput, TrackServerServerOutput, ServerSummary } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
-import { ServerService } from "@serverboi/services"
+import { ServerController } from "@serverboi/services"
 
 export const TrackServerOperation: Operation<TrackServerServerInput, TrackServerServerOutput, ServiceContext> = async (input, context) => {
   console.log(`Received TrackServer operation`);
   console.log(`Input: ${JSON.stringify(input)}`);
   console.log(`Context: ${JSON.stringify(context)}`);
 
-  const serverService = ServerService.getInstance();
+  const controller = ServerController.getInstance();
   try {
-    const server = await serverService.trackServer({
+    const server = await controller.trackServer({
+      scopeId: input.scope!,
       name: input.name!,
       address: input.address!,
-      platform: {
-        type: input.platform!.type!,
-        data: input.platform?.data,
-      },
+      platform: input.platform ? {
+        type: input.platform.type!,
+        data: input.platform.data,
+      } : undefined,
       query: {
         type: input.query!.type!,
         address: input.query?.address,
@@ -33,6 +34,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       address: server.address,
       status: {
         status: server.status.status,
+        steam: server.status.steam,
       },
       platform: {
         type: server.platform.type,
@@ -48,6 +50,12 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       added: server.added.getMilliseconds(),
       lastUpdated: server.lastUpdated?.getMilliseconds(),
       owner: server.owner,
+      location: {
+        country: server.location.country,
+        region: server.location.region,
+        city: server.location.city,
+        emoji: server.location.emoji,
+      },
     };
     return {
       summary: summary
@@ -56,5 +64,4 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
     console.log(e);
     throw new Error(`Unable to make server`);
   }
-
 };

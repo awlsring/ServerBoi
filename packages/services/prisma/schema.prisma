@@ -25,6 +25,9 @@ model Server {
   queryType String
   queryAddress String?
   queryPort Int?
-  location String?
+  city String
+  country String
+  region String
+  countryEmoji String
   @@id([scopeId, serverId])
 }

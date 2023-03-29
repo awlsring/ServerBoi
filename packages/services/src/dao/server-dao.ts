@@ -7,23 +7,30 @@ export class ServerDao {
   async create(server: NewServerDto): Promise<ServerDto> {
     const createdServer = await prisma.server.create({
       data: {
+        scopeId: server.scopeId,
+        serverId: server.serverId,
         name: server.name,
         application: server.application,
         address: server.address,
         capabilities: server.capabilities,
         ownerId: server.owner,
-        location: server.location,
+        city: server.location.city,
+        country: server.location.country,
+        region: server.location.region,
+        countryEmoji: server.location.emoji,
         queryType: server.query.type,
-        platformData: server.platform.data,
-        platform: server.platform.type,
+        queryAddress: server.query.address,
+        queryPort: server.query.port,
+        platformData: server.platform?.data,
+        platform: server.platform?.type ? server.platform.type : "UNKNOWN",
       }
     });
     return this.toDto(createdServer);
   }
 
-  async findById(id: string): Promise<ServerDto | null> {
+  async findById(scopeId: string, serverId: string): Promise<ServerDto | null> {
     const server = await prisma.server.findUnique({
-      where: { id },
+      where: { scopeId_serverId: { scopeId, serverId } },
     });
     if (!server) {
       return null;
@@ -40,9 +47,9 @@ export class ServerDao {
     return users.map((server) => this.toDto(server));
   }
 
-  async update(id: string, server: Server): Promise<ServerDto | null> {
+  async update(scopeId: string, serverId: string, server: Server): Promise<ServerDto | null> {
     const updatedServer = await prisma.server.update({
-      where: { id },
+      where: { scopeId_serverId: { scopeId, serverId } },
       data: server,
     });
     if (!updatedServer) {
@@ -51,9 +58,9 @@ export class ServerDao {
     return this.toDto(updatedServer);
   }
 
-  async delete(id: string): Promise<ServerDto | null> {
+  async delete(scopeId: string, serverId: string): Promise<ServerDto | null> {
     const deletedServer = await prisma.server.delete({
-      where: { id },
+      where: { scopeId_serverId: { scopeId, serverId } },
     });
     if (!deletedServer) {
       return null;
@@ -63,7 +70,8 @@ export class ServerDao {
 
   private toDto(server: Server): ServerDto {
     return {
-      id: server.id,
+      scopeId: server.scopeId,
+      serverId: server.serverId,
       name: server.name,
       application: server.application,
       address: server.address,
@@ -79,7 +87,12 @@ export class ServerDao {
         address: server.queryAddress ?? undefined,
         port: server.queryPort ?? undefined,
       },
-      location: server.location ?? undefined,
+      location: {
+        city: server.city,
+        country: server.country,
+        region: server.region,
+        emoji: server.countryEmoji,
+      },
       lastUpdated: server.updatedAt ? new Date(server.updatedAt) : undefined,
     };
   }

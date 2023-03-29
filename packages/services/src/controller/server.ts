@@ -1,19 +1,20 @@
 import { ServerDao } from "../dao/server-dao";
-// import { UserDao } from "../dao/user-dao";
 import { SteamQuerent } from "../query/steam-query";
 import { HttpQuerent } from "../query/http-query";
 import { Querent, Status } from "../query/common";
 import { ServerDto } from "../dto/server-dto";
+import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 
-export class ServerService {
-  private static instance: ServerService;
+export class ServerController {
+  private static instance: ServerController;
   private serverDao: ServerDao = new ServerDao();
+  private ipLookup = new IPAPIClient();
 
-  public static getInstance(): ServerService {
-    if (!ServerService.instance) {
-      ServerService.instance = new ServerService();
+  public static getInstance(): ServerController {
+    if (!ServerController.instance) {
+      ServerController.instance = new ServerController();
     }
-    return ServerService.instance;
+    return ServerController.instance;
   }
 
   private async queryServer(type: string, address: string, port?: number): Promise<Status> {
@@ -34,29 +35,52 @@ export class ServerService {
     return querent.Query();
   }
 
+  private async determineLocation(address: string): Promise<ServerLocation> {
+    return await this.ipLookup.getIPInfo(address);
+  }
+
+  private generateServerId(): string {
+    return Math.random().toString(36).substr(2, 6).toUpperCase();
+  }
+
+  private unpackId(id: string): { scopeId: string, serverId: string } {
+    const [scopeId, serverId] = id.split("-");
+    return { scopeId, serverId };
+  }
+
   async trackServer(input: TrackServerInput): Promise<Server> {
+    const location = await this.determineLocation(input.address);
+
     const serverDto = await this.serverDao.create({
+      scopeId: input.scopeId,
+      serverId: this.generateServerId(),
       name: input.name,
       application: input.application,
       address: input.address,
       capabilities: input.capabilities,
       owner: input.owner,
-      location: input.location,
+      location: {
+        city: location.city,
+        country: location.country,
+        region: location.region,
+        emoji: location.emoji,
+      },
       query: {
         type: input.query.type,
         address: input.query.address,
         port: input.query.port,
       },
-      platform: {
+      platform: input.platform ? {
         type: input.platform.type,
         data: input.platform.data,
-      }
+      } : undefined,
     });
     return this.enhanceServer(serverDto);
   }
 
   async untrackServer(id: string): Promise<void> {
-    await this.serverDao.delete(id);
+    const { scopeId, serverId } = this.unpackId(id);
+    await this.serverDao.delete(scopeId, serverId);
   }
 
   private async enhanceServer(server: ServerDto): Promise<Server> {
@@ -64,6 +88,7 @@ export class ServerService {
     const status = await this.queryServer(server.query.type, queryAddress, server.query.port);
     return {
       ...server,
+      id: `${server.scopeId}-${server.serverId}`,
       status,
       query: {
         type: server.query.type,
@@ -74,7 +99,8 @@ export class ServerService {
   }
 
   async getServer(id: string): Promise<Server> {
-    const serverDto = await this.serverDao.findById(id);
+    const { scopeId, serverId } = this.unpackId(id);
+    const serverDto = await this.serverDao.findById(scopeId, serverId);
     if (!serverDto) {
       throw new Error("Server not found");
     }
@@ -91,11 +117,12 @@ export class ServerService {
 }
 
 export interface TrackServerInput {
+  readonly scopeId: string;
   readonly name: string;
   readonly application: string;
   readonly address: string;
   readonly capabilities: string[];
-  readonly platform: Platform;
+  readonly platform?: Platform;
   readonly query: Query;
   readonly owner: string;
   readonly location?: string;
@@ -103,17 +130,19 @@ export interface TrackServerInput {
 
 export interface Server {
   readonly id: string;
+  readonly scopeId: string;
+  readonly serverId: string;
   readonly name: string;
   readonly application: string;
   readonly address: string;
   readonly capabilities: string[];
   readonly platform: Platform;
+  readonly location: ServerLocation;
   readonly query: Query;
   readonly owner: string;
   readonly status: Status;
   readonly added: Date;
   readonly lastUpdated?: Date;
-  readonly location?: string;
 }
 
 export interface Platform {

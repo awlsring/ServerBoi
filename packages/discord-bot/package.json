@@ -4,12 +4,14 @@
   "description": "The package containing some utility functions",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc --build",
+    "generate": "npx prisma generate",
+    "build": "yarn generate && tsc --build",
     "start": "node dist/server.js",
     "commands:deregister": "ts-node --project tsconfig.json scripts/deregister-commands.ts",
     "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts"
   },
   "dependencies": {
+    "@prisma/client": "^4.11.0",
     "@serverboi/client": "^1.0.0",
     "discord-api-types": "^0.37.36",
     "discord-interactions": "^3.3.0",

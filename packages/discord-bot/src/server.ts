@@ -17,7 +17,7 @@ import { ServerCardRepo } from './persistence/server-card-repo';
 dotenv.config();
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
-const PORT: number = Number(process.env.PORT) || 7033
+const PORT: number = Number(process.env.PORT) || 7032
 
 if (!PUBLIC_KEY) {
   console.error('PUBLIC_KEY is not set');

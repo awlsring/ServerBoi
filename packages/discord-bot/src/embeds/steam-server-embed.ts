@@ -1,6 +1,5 @@
 import { Capabilities } from "@serverboi/client";
 import { APIEmbedField, EmbedType } from "discord-api-types/v10";
-import { platform } from "os";
 import { ServerEmbed } from "./server-embed";
 
 export interface ServerPlatform {
@@ -8,22 +7,45 @@ export interface ServerPlatform {
   readonly location: string;
 }
 
+export interface ServerLocation {
+  readonly city: string;
+  readonly country: string;
+  readonly region: string;
+  readonly emoji: string;
+}
+
 export interface SteamServerEmbedOptions {
   readonly serverId: string;
   readonly serverName: string;
-  readonly thumbnailUrl: string;
   readonly status: string;
   readonly address: string;
-  readonly location: string;
+  readonly location: ServerLocation;
   readonly game: string;
   readonly players: number;
   readonly maxPlayers: number;
-  readonly ownerId: string;
+  readonly owner: string;
   readonly capabilities: Capabilities[];
   readonly platform: ServerPlatform;
 }
 
 export class SteamServerEmbed extends ServerEmbed {
+
+  private static getThumbnailUrl(application: string): string {
+    switch (application.toLocaleLowerCase()) {
+      case "valheim":
+        return "https://preview.redd.it/f6nbziz4ghh61.gif?width=858&auto=webp&s=27ca2c36dc194caaa1a789f4a2547f9e716c95bf";
+      default:
+        return "https://giphy.com/embed/ITRemFlr5tS39AzQUL";
+    }
+  }
+
+  private static formLocationString(location: ServerLocation): string {
+    if (location.country.toLocaleLowerCase() === "us") {
+      return `${location.emoji} ${location.city}, ${location.region}`;
+    }
+    return `${location.emoji} ${location.city}, ${location.country}`;
+  }
+
   constructor(options: SteamServerEmbedOptions) {
     const fields: APIEmbedField[] = [
       {
@@ -43,7 +65,7 @@ export class SteamServerEmbed extends ServerEmbed {
       },
       {
         name: "Location",
-        value: options.location,
+        value: SteamServerEmbed.formLocationString(options.location),
         inline: true
       },
       {
@@ -63,11 +85,11 @@ export class SteamServerEmbed extends ServerEmbed {
       description: `Connect: steam://connect/${options.address}`,
       color: SteamServerEmbed.determineColor(options.status),
       fields: fields,
-      footer: {
-        text: `Owner: ${options.ownerId} | 🌐 Hosted on ${options.platform.name} in ${options.platform.location} | 🕛 Updated: ${SteamServerEmbed.getUpdateTime()}`
-      },
       thumbnail: {
-        url: options.thumbnailUrl
+        url: SteamServerEmbed.getThumbnailUrl(options.game)
+      },
+      footer: {
+        text: `Owner: ${options.owner} | 🌐 Hosted on ${options.platform.name} in ${options.platform.location} | 🕛 Updated: ${SteamServerEmbed.getUpdateTime()}`
       },
     });
   }

@@ -42,13 +42,13 @@
     "@aws-sdk/util-user-agent-node": "3.58.0"
   },
   "devDependencies": {
-      "@tsconfig/recommended": "1.0.1",
-      "concurrently": "7.0.0",
-      "downlevel-dts": "0.7.0",
-      "rimraf": "^3.0.0",
-      "typedoc": "^0.21.9",
-      "@aws-sdk/service-client-documentation-generator": "3.58.0",
-      "@types/jest": "latest",
-      "@types/node": "^12.7.5"
+    "@tsconfig/recommended": "1.0.1",
+    "concurrently": "7.0.0",
+    "downlevel-dts": "0.7.0",
+    "rimraf": "^3.0.0",
+    "typedoc": "^0.21.9",
+    "@aws-sdk/service-client-documentation-generator": "3.58.0",
+    "@types/jest": "latest",
+    "@types/node": "^12.7.5"
   }
 }

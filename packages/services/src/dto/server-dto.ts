@@ -10,8 +10,16 @@ export interface ServerQueryDto {
   port?: number;
 }
 
+export interface ServerLocationDto {
+  readonly city: string;
+  readonly country: string;
+  readonly region: string;
+  readonly emoji: string;
+}
+
 export interface ServerDto {
-  id: string;
+  scopeId: string;
+  serverId: string;
   name: string;
   application: string;
   address: string;
@@ -19,18 +27,20 @@ export interface ServerDto {
   platform: ServerPlatformDto;
   owner: string;
   added: Date;
-  location?: string;
+  location: ServerLocationDto;
   query: ServerQueryDto;
   lastUpdated?: Date;
 }
 
 export interface NewServerDto {
+  scopeId: string;
+  serverId: string;
   name: string;
   application: string;
   address: string;
   capabilities: string[];
-  platform: ServerPlatformDto;
+  platform?: ServerPlatformDto;
   query: ServerQueryDto;
+  location: ServerLocationDto;
   owner: string;
-  location?: string;
 }

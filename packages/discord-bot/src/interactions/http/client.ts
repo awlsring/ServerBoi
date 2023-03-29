@@ -1,3 +1,5 @@
+import { APIUser } from "discord-api-types/v10"
+
 export interface InteractionHttpClientOptions {
   readonly token: string;
   readonly version: string;
@@ -146,7 +148,7 @@ export class InteractionHttpClient {
         body: JSON.stringify(body),
       },
     );
-    return response.json();
+    return await response.json();
   }
 
   async deleteFollowupMessage(
@@ -166,7 +168,7 @@ export class InteractionHttpClient {
         body: JSON.stringify(body),
       },
     );
-    return response.json();
+    return await response.json();
   }
 
   async createMessage(channelId: string, body: Record<string, any>,) {
@@ -174,6 +176,11 @@ export class InteractionHttpClient {
       method: 'POST',
       body: JSON.stringify(body),
     });
-    return response.json();
+    return await response.json();
+  }
+
+  async getUser(userId: string): Promise<APIUser> {
+    const response = await this.request(`/users/${userId}`);
+    return await response.json();
   }
 }

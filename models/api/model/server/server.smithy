@@ -22,16 +22,16 @@ structure ServerSummary {
     name: String,
 
     @required
-    application: String
+    application: String,
 
     @required
     address: String,
 
     @required
-    status: ServerStatusSummary
+    status: ServerStatusSummary,
 
     @required
-    capabilities: ServerCapabilities
+    capabilities: ServerCapabilities,
 
     @required
     platform: ServerPlatformSummary,
@@ -40,7 +40,7 @@ structure ServerSummary {
     query: ServerQuerySummary,
 
     @required
-    location: String,
+    location: ServerLocationSummary,
 
     @required
     added: Long,
@@ -49,6 +49,20 @@ structure ServerSummary {
 
     @required
     owner: String,
+}
+
+structure ServerLocationSummary {
+    @required
+    city: String,
+
+    @required
+    region: String,
+
+    @required
+    country: String,
+
+    @required
+    emoji: String,
 }
 
 structure ServerPlatformSummary {
@@ -62,7 +76,34 @@ structure ServerStatusSummary {
     @required
     status: ServerStatus,
 
-    data: String,
+    steam: SteamStatusSummary,
+}
+
+structure SteamStatusSummary {
+    @required
+    name: String,
+
+    @required
+    map: String,
+
+    @required
+    game: String,
+
+    @required
+    gameId: Integer,
+
+    @required
+    players: Integer,
+
+    @required
+    maxPlayers: Integer,
+
+    @required
+    visibility: Integer,
+}
+
+structure HTTPStatusSummary {
+
 }
 
 structure ServerQuerySummary {
