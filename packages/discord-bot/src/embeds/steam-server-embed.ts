@@ -47,6 +47,14 @@ export class SteamServerEmbed extends ServerEmbed {
     return `${location.emoji} ${location.city}, ${location.country}`;
   }
 
+  private static formSteamConnectString(address: string, port: number): string {
+    let steamAddress = address;
+    if (address.includes(":")) {
+      steamAddress = address.split(":")[0];
+    }
+    return `Connect: steam://connect/${steamAddress}:${port}`;
+  }
+
   constructor(options: SteamServerEmbedOptions) {
     const fields: APIEmbedField[] = [
       {
@@ -83,7 +91,7 @@ export class SteamServerEmbed extends ServerEmbed {
     super({
       type: EmbedType.Rich,
       title: `${options.serverName} (${options.serverId})`,
-      description: `Connect: steam://connect/${options.address}:${options.steamPort}`,
+      description: SteamServerEmbed.formSteamConnectString(options.address, options.steamPort),
       color: SteamServerEmbed.determineColor(options.status),
       fields: fields,
       thumbnail: {
