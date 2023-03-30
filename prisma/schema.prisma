@@ -31,3 +31,28 @@ model Server {
   countryEmoji String
   @@id([scopeId, serverId])
 }
+
+model TrackServer {
+  id       String @unique
+  startedAt DateTime @default(now())
+  endedAt DateTime? @updatedAt
+  name      String
+  application String 
+  address   String
+  ownerId String
+  queryType String?
+  queryAddress String?
+  queryPort Int?
+  channelId String?
+}
+
+model ServerCard {
+  messageId       String      @unique
+  addedAt DateTime @default(now())
+  serverId String
+  channelId String
+  ownerId String
+  admins String[]
+  alertUsers String[]
+  alertChannels String[]
+}
