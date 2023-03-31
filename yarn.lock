@@ -754,6 +754,7 @@
   dependencies:
     "@prisma/client" "^4.11.0"
     "@serverboi/client" "^1.0.0"
+    "@serverboi/discord-common" "^1.0.0"
     discord-api-types "^0.37.36"
     discord-interactions "^3.3.0"
     discord-verify "^1.0.0"
@@ -791,6 +792,7 @@
     discord-interactions "^3.3.0"
     dotenv "^16.0.3"
     http "^0.0.1-security"
+    js-yaml "^4.1.0"
     node-fetch "^3.3.1"
     raw-body "^2.5.2"
     tweetnacl "^1.0.3"
@@ -927,6 +929,11 @@
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
+
+"@types/js-yaml@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmjs.org/@types/js-yaml/-/js-yaml-4.0.5.tgz"
+  integrity sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==
 
 "@types/json-schema@^7.0.9":
   version "7.0.11"

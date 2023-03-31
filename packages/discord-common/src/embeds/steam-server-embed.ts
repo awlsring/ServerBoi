@@ -89,6 +89,7 @@ export class SteamServerEmbed extends ServerEmbed {
       }
     ]
     super({
+      owner: options.owner,
       type: EmbedType.Rich,
       title: `${options.serverName} (${options.serverId})`,
       description: SteamServerEmbed.formSteamConnectString(options.address, options.steamPort),
@@ -98,7 +99,7 @@ export class SteamServerEmbed extends ServerEmbed {
         url: SteamServerEmbed.getThumbnailUrl(options.game)
       },
       footer: {
-        text: `Owner: ${options.owner} | 🌐 Hosted on ${options.platform.name} in ${options.platform.location} | 🕛 Updated: ${SteamServerEmbed.getUpdateTime()}`
+        text: `🌐 Hosted on ${options.platform.name} in ${options.platform.location} | 🕛 Updated: ${SteamServerEmbed.getUpdateTime()}`
       },
     });
   }

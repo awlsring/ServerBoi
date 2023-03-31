@@ -179,6 +179,14 @@ export class InteractionHttpClient {
     return await response.json();
   }
 
+  async editMessage(channelId: string, messageId: string, body: Record<string, any>,) {
+    const response = await this.request(`/channels/${channelId}/messages/${messageId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    });
+    return await response.json();
+  }
+
   async getUser(userId: string): Promise<APIUser> {
     const response = await this.request(`/users/${userId}`);
     return await response.json();

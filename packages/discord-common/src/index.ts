@@ -1,6 +1,7 @@
 export * from "./embeds/embed";
 export * from "./embeds/server-embed";
 export * from "./embeds/steam-server-embed";
+export * from "./embeds/server-embed.interface";
 export * from "./interactions/components/button/server/stop-server";
 export * from "./interactions/components/button/server/start-server";
 export * from "./interactions/components/button/server/server-button";
@@ -21,5 +22,7 @@ export * from "./interactions/context";
 export * from "./logger/logger";
 export * from "./persistence/server-card-repo";
 export * from "./persistence/track-server-request-repo";
+export * from "./dto/server-card-dto";
+export * from "./dto/track-server-request-dto";
 export * from "./service/serverboi";
 export * from "./http/client";

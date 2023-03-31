@@ -20,12 +20,19 @@ export interface ServerActionsOptions {
   moreActions: ServerEmbedMoreActions[];
 }
 
+export interface ServerEmbedOptions extends EmbedOptions {
+  owner: string;
+}
+
 export class ServerEmbed extends Embed {
-  constructor(options: EmbedOptions) {
+  readonly ownerId: string;
+
+  constructor(options: ServerEmbedOptions) {
     super({
       type: EmbedType.Rich,
       ...options
     });
+    this.ownerId = options.owner;
   }
 
   protected static getUpdateTime(): string {
@@ -106,12 +113,16 @@ export class ServerEmbed extends Embed {
 
   public toMessage(startEnabled: boolean, stopEnabled: boolean, actions?: ServerEmbedMoreActions[]): RESTPostAPIChannelMessageJSONBody {
     return {
+      content: `Owner: <@${this.ownerId}>`,
       embeds: [this.toApiData()],
       components: this.serverActions({
         startEnabled: startEnabled,
         stopEnabled: stopEnabled,
         moreActions: actions ?? [ServerEmbedMoreActions.Remove]
-      })
+      }),
+      allowed_mentions: {
+        users: []
+      }
     }
   }
 }
