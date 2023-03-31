@@ -30,6 +30,12 @@
         },
         {
         "path": "./packages/services"
+        },
+        {
+        "path": "./packages/discord-common"
+        },
+        {
+        "path": "./packages/embed-refresher"
         }
     ]
 }

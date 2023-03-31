@@ -1,9 +1,6 @@
+import { Component, Logger, TrackServerRequestRepo, InteractionHttpClient } from "@serverboi/discord-common";
 import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
-import { InteractionHttpClient } from "./http/client";
-import { TrackServerRequestRepo } from "../persistence/track-server-request-repo";
-import { Component } from "./components/component";
-import { Logger } from "../logger/logger";
 
 export interface InteractionHandlerOptions {
   token: string;

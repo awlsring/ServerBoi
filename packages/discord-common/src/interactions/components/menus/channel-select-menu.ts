@@ -6,8 +6,6 @@ import { TrackServerRequestRepo } from "../../../persistence/track-server-reques
 import { ServerBoiService } from "../../../service/serverboi"
 import { InteractionContext } from "../../context"
 import { SelectMenuComponent } from "./menu"
-import { StartServerButton } from "../button/server/start-server"
-import { StopServerButton } from "../button/server/stop-server"
 
 export interface ChannelSelectMenuOptions {
   readonly serverBoiService: ServerBoiService

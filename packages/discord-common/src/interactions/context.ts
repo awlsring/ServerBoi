@@ -1,6 +1,6 @@
 import { FastifyReply } from "fastify";
 import { Logger } from "../logger/logger";
-import { InteractionHttpClient } from "./http/client";
+import { InteractionHttpClient } from "../http/client";
 
 export interface InteractionContext {
   readonly http: InteractionHttpClient;
