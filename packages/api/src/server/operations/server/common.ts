@@ -1,19 +1,19 @@
-import { Server } from "@serverboi/services";
-import { ServerSummary } from "@serverboi/ssdk";
+import { ServerDto, ServerStatusDto, SteamStatusData } from "@serverboi/services";
+import { ServerQueryType, ServerStatus, ServerStatusSummary, ServerSummary } from "@serverboi/ssdk";
 
-export function serverToSummary(server: Server): ServerSummary {
+export function serverToSummary(server: ServerDto): ServerSummary {
   return {
-    id: server.id,
+    id: `${server.scopeId}-${server.serverId}`,
     name: server.name,
-    address: server.address,
-    status: {
-      status: server.status.status,
-      steam: server.status.steam,
+    connectivity: {
+      address: server.address,
+      port: server.port,
     },
-    platform: {
-      type: server.platform.type,
-      data: server.platform.data,
-    },
+    status: serverStatusToSummary(server.status),
+    provider: server.provider ? {
+      type: server.provider?.type,
+      name: server.provider?.name,
+    } : undefined,
     query: {
       type: server.query.type,
       address: server.query.address,
@@ -31,4 +31,29 @@ export function serverToSummary(server: Server): ServerSummary {
     lastUpdated: server.lastUpdated?.getTime(),
     owner: server.owner,
   };
+}
+
+function serverStatusToSummary(status?: ServerStatusDto): ServerStatusSummary {
+  if (!status) {
+    return {
+      type: ServerQueryType.NONE,
+      status: ServerStatus.UNREACHABLE,
+    };
+  }
+
+  const base = {
+    type: status.type!,
+    status: status.status!,
+  };
+
+  switch (status.type) {
+    case ServerQueryType.STEAM:
+      const steam: SteamStatusData = JSON.parse(status.data!)
+      return {
+        ...base,
+        steam: steam
+      };
+    default:
+      return base;
+  }     
 }

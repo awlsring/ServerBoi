@@ -8,7 +8,7 @@ use smithy.framework#ValidationException
 operation GetServer {
     input: GetServerInput,
     output: GetServerOutput,
-        errors: [
+    errors: [
         ValidationException,
         InternalServerError,
         ResourceNotFoundError,

@@ -1,5 +1,5 @@
 import { Operation } from "@aws-smithy/server-common";
-import { TrackServerServerInput, TrackServerServerOutput, ServerSummary, InternalServerError } from "@serverboi/ssdk";
+import { TrackServerServerInput, TrackServerServerOutput, InternalServerError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
 import { ServerController } from "@serverboi/services"
 import { serverToSummary } from "./common";
@@ -15,10 +15,18 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
     const server = await controller.trackServer({
       scopeId: input.scope!,
       name: input.name!,
-      address: input.address!,
-      platform: input.platform ? {
-        type: input.platform.type!,
-        data: input.platform.data,
+      address: input.connectivity!.address!,
+      port: input.connectivity!.port!,
+      provider: input.provider ? {
+        id: input.provider.id!,
+        name: input.provider.name!,
+        type: input.provider.type!,
+        owner: input.owner!,
+      } : undefined,
+      providerServerData: input.providerServerData ? {
+        identifier: input.providerServerData.identifier!,
+        location: input.providerServerData.location,
+        data: input.providerServerData.data,
       } : undefined,
       query: {
         type: input.query!.type!,

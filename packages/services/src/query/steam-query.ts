@@ -1,7 +1,8 @@
 import { queryGameServerInfo } from "steam-server-query";
-import { Querent, QueryData, Status } from "./common";
+import { ServerStatusDto } from "../dto/server-dto";
+import { Querent } from "./common";
 
-export interface SteamStatus {
+export interface SteamStatusData {
   name: string;
   map: string;
   game: string;
@@ -12,6 +13,7 @@ export interface SteamStatus {
 }
 
 export class SteamQuerent implements Querent {
+  private readonly type = "STEAM";
   private readonly address: string;
   private readonly port: number;
   constructor(address: string, port: number) {
@@ -22,38 +24,33 @@ export class SteamQuerent implements Querent {
     this.port = port;
   }
 
-  private tmp(d: any) {
-      return JSON.parse(JSON.stringify(d, (key, value) =>
-          typeof value === 'bigint'
-              ? value.toString()
-              : value // return everything else unchanged
-      ));
-  }
-
-  async Query(): Promise<Status> {
+  async Query(): Promise<ServerStatusDto> {
     const queryAddress = `${this.address}:${this.port}`;
     try {
       const query = await queryGameServerInfo(queryAddress);
-      console.log(`Query: ${JSON.stringify(this.tmp(query))}`);
-      const status: Status = {
+      const steamData: SteamStatusData = {
+        name: query.name,
+        map: query.map,
+        gameId: Number(query.gameId),
+        game: query.game,
+        players: query.players,
+        maxPlayers: query.maxPlayers,
+        visibility: query.visibility,
+      }
+
+      const status: ServerStatusDto = {
+        type: this.type,
         status: "RUNNING",
-        steam: {
-          name: query.name,
-          map: query.map,
-          gameId: Number(query.gameId),
-          game: query.game,
-          players: query.players,
-          maxPlayers: query.maxPlayers,
-          visibility: query.visibility,
-        },
+        data: JSON.stringify(steamData),
       };
-      console.log(`Status: ${JSON.stringify(status)}`);
+
       return status;
 
     } catch (e) {
       console.log(`Error querying ${this.address}:${this.port}`);
       console.log(e);
       return {
+        type: this.type,
         status: "UNREACHABLE",
       };
     }

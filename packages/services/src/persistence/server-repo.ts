@@ -1,15 +1,19 @@
-import { PrismaClient, Server } from '@prisma/client';
+import { PrismaClient, Provider, ProviderServerData, Server, Status } from '@prisma/client';
 import { NewServerDto, ServerDto } from '../dto/server-dto';
+import { PrismaRepoOptions } from './prisma-repo-options';
 
-export interface PrismaRepoOptions {
-  readonly user: string;
-  readonly password: string;
-  readonly host: string;
-  readonly port: number;
-  readonly database: string;
+type ServerFull = Server & {
+  provider: Provider | null;
+  providerData: ProviderServerData | null;
+  status: Status | null;
 }
 
-export class ServerDao {
+export class ServerRepo {
+  readonly defaultInclude = {
+    provider: true,
+    providerData: true,
+    status: true,
+  }
   readonly prisma: PrismaClient;
   constructor(options: PrismaRepoOptions) {
     this.prisma = new PrismaClient({
@@ -23,12 +27,14 @@ export class ServerDao {
 
   async create(server: NewServerDto): Promise<ServerDto> {
     const createdServer = await this.prisma.server.create({
+      include: this.defaultInclude,
       data: {
         scopeId: server.scopeId,
         serverId: server.serverId,
         name: server.name,
         application: server.application,
         address: server.address,
+        port: server.port,
         capabilities: server.capabilities,
         ownerId: server.owner,
         city: server.location.city,
@@ -38,8 +44,15 @@ export class ServerDao {
         queryType: server.query.type,
         queryAddress: server.query.address,
         queryPort: server.query.port,
-        platformData: server.platform?.data,
-        platform: server.platform?.type ? server.platform.type : "UNKNOWN",
+        providerId: server.provider?.id,
+        providerData: server.provider ? {
+          create: {
+            providerId: server.provider?.id,
+            identifier: server.providerServerData!.identifier,
+            location: server.providerServerData!.location,
+            data: server.providerServerData!.data,
+          }
+        } : undefined,
       }
     });
     return this.toDto(createdServer);
@@ -48,6 +61,7 @@ export class ServerDao {
   async findById(scopeId: string, serverId: string): Promise<ServerDto | null> {
     const server = await this.prisma.server.findUnique({
       where: { scopeId_serverId: { scopeId, serverId } },
+      include: this.defaultInclude,
     });
     if (!server) {
       return null;
@@ -58,6 +72,7 @@ export class ServerDao {
 
   async findAll(amount?: number, skip?: number): Promise<ServerDto[]> {
     const users = await this.prisma.server.findMany({
+      include: this.defaultInclude,
       skip,
       take: amount,
     });
@@ -66,6 +81,7 @@ export class ServerDao {
 
   async update(scopeId: string, serverId: string, server: Server): Promise<ServerDto | null> {
     const updatedServer = await this.prisma.server.update({
+      include: this.defaultInclude,
       where: { scopeId_serverId: { scopeId, serverId } },
       data: server,
     });
@@ -77,6 +93,7 @@ export class ServerDao {
 
   async delete(scopeId: string, serverId: string): Promise<ServerDto | null> {
     const deletedServer = await this.prisma.server.delete({
+      include: this.defaultInclude,
       where: { scopeId_serverId: { scopeId, serverId } },
     });
     if (!deletedServer) {
@@ -85,7 +102,7 @@ export class ServerDao {
     return this.toDto(deletedServer);
   }
 
-  private toDto(server: Server): ServerDto {
+  private toDto(server: ServerFull): ServerDto {
     return {
       scopeId: server.scopeId,
       serverId: server.serverId,
@@ -95,15 +112,22 @@ export class ServerDao {
       capabilities: server.capabilities,
       owner: server.ownerId,
       added: new Date(server.addedAt),
-      platform: {
-        type: server.platform,
-        data: server.platformData ?? undefined,
-      },
+      provider: server.provider ? {
+        id: server.providerId!,
+        name: server.provider.name,
+        type: server.provider.type,
+        owner: server.provider?.ownerId,
+      } : undefined,
       query: {
         type: server.queryType,
         address: server.queryAddress ?? undefined,
         port: server.queryPort ?? undefined,
       },
+      status: server.status ? {
+        type: server.status.type,
+        status: server.status.status,
+        data: server.status.data ?? undefined,
+      } : undefined,
       location: {
         city: server.city,
         country: server.country,

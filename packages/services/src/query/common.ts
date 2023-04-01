@@ -1,13 +1,7 @@
-import { SteamStatus } from "./steam-query";
-
-export interface Status {
-  readonly status: string;
-  readonly data?: QueryData;
-  readonly steam?: SteamStatus;
-}
+import { ServerStatusDto } from "../dto/server-dto";
 
 export interface QueryData {}
 
 export interface Querent {
-  Query(): Promise<Status>;
+  Query(): Promise<ServerStatusDto>;
 }

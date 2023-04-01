@@ -3,6 +3,7 @@ export interface TrackServerRequestDto {
   name: string;
   application: string;
   address: string;
+  port: number;
   ownerId: string;
   queryType?: string;
   queryPort?: number;
@@ -15,5 +16,6 @@ export interface NewTrackServerRequestDto {
   name: string;
   application: string;
   address: string;
+  port: number;
   ownerId: string;
 }

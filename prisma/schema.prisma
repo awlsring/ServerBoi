@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// API
 model Server {
   scopeId String
   serverId       String
@@ -18,9 +19,13 @@ model Server {
   name      String
   application String 
   address   String
+  port Int?
   capabilities String[]
-  platform String
-  platformData String?
+  status Status?
+  provider Provider? @relation(fields: [providerId], references: [id])
+  providerId String?
+  providerData ProviderServerData?
+  providerDataId String?
   ownerId String
   queryType String
   queryAddress String?
@@ -32,6 +37,49 @@ model Server {
   @@id([scopeId, serverId])
 }
 
+model Status {
+  id             String       @id @default(uuid())
+  status String
+  type String
+  server Server @relation(fields: [serverScopeId, serverId], references: [scopeId, serverId])
+  serverScopeId String
+  serverId String
+  @@unique([serverScopeId, serverId])
+  data String?
+}
+
+model Provider {
+  id             String       @id @default(uuid())
+  ownerId        String
+  name           String
+  type String
+  auth ProviderAuth?
+  data ProviderServerData[]
+  servers Server[]
+}
+
+model ProviderServerData {
+  id             String       @id @default(uuid())
+  provider Provider @relation(fields: [providerId], references: [id])
+  providerId String
+  server Server @relation(fields: [serverScopeId, serverId], references: [scopeId, serverId])
+  serverScopeId String
+  serverId String
+  @@unique([serverScopeId, serverId])
+  identifier String
+  location String?
+  data String?
+} 
+
+model ProviderAuth {
+  id             String       @id @default(uuid())
+  provider Provider @relation(fields: [providerId], references: [id])
+  providerId String @unique
+  key String
+  secret String?
+}
+
+// Discord specific
 model TrackServer {
   id       String @unique
   startedAt DateTime @default(now())
@@ -39,6 +87,7 @@ model TrackServer {
   name      String
   application String 
   address   String
+  port Int
   ownerId String
   queryType String?
   queryAddress String?

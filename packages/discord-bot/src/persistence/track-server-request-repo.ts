@@ -21,6 +21,7 @@ export class TrackServerRequestRepo {
         name: request.name,
         application: request.application,
         address: request.address,
+        port: request.port,
         ownerId: request.ownerId,
       }
     });
@@ -70,6 +71,7 @@ export class TrackServerRequestRepo {
       name: trackServer.name,
       application: trackServer.application,
       address: trackServer.address,
+      port: trackServer.port,
       ownerId: trackServer.ownerId,
       queryType: trackServer.queryType ?? undefined,
       queryPort: trackServer.queryPort ?? undefined,

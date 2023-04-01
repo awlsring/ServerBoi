@@ -19,5 +19,8 @@ use aws.protocols#restJson1
 service ServerBoi {
     version: "2023-03-19",
     operations: [ Health ],
-    resources: [ Server ]
+    resources: [ 
+        Server,
+        Provider,
+    ]
 }

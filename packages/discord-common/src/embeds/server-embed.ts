@@ -21,7 +21,7 @@ export interface ServerActionsOptions {
 }
 
 export interface ServerEmbedOptions extends EmbedOptions {
-  owner: string;
+  readonly owner: string;
 }
 
 export class ServerEmbed extends Embed {

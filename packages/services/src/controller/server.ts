@@ -1,13 +1,15 @@
-import { PrismaRepoOptions, ServerDao } from "../dao/server-dao";
+import { ServerRepo } from "../persistence/server-repo";
 import { SteamQuerent } from "../query/steam-query";
 import { HttpQuerent } from "../query/http-query";
-import { Querent, Status } from "../query/common";
-import { ServerDto } from "../dto/server-dto";
+import { Querent } from "../query/common";
+import { ProviderServerDataDto, ServerDto, ServerQueryDto, ServerStatusDto } from "../dto/server-dto";
 import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
+import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
+import { ProviderDto } from "../dto/provider-dto";
 
 export class ServerController {
   private static instance: ServerController;
-  private serverDao: ServerDao;
+  private serverDao: ServerRepo;
   private ipLookup = new IPAPIClient();
 
   public static getInstance(cfg?: PrismaRepoOptions): ServerController {
@@ -21,10 +23,10 @@ export class ServerController {
   }
 
   private constructor(cfg: PrismaRepoOptions) {
-    this.serverDao = new ServerDao(cfg);
+    this.serverDao = new ServerRepo(cfg);
   }
 
-  private async queryServer(type: string, address: string, port?: number): Promise<Status> {
+  private async queryServer(type: string, address: string, port?: number): Promise<ServerStatusDto> {
     let querent: Querent;
     switch (type) {
       case "STEAM":
@@ -55,7 +57,7 @@ export class ServerController {
     return { scopeId, serverId };
   }
 
-  async trackServer(input: TrackServerInput): Promise<Server> {
+  async trackServer(input: TrackServerInput): Promise<ServerDto> {
     const location = await this.determineLocation(input.address);
 
     const serverDto = await this.serverDao.create({
@@ -77,10 +79,8 @@ export class ServerController {
         address: input.query.address,
         port: input.query.port,
       },
-      platform: input.platform ? {
-        type: input.platform.type,
-        data: input.platform.data,
-      } : undefined,
+      provider: input.provider,
+      providerServerData: input.providerServerData,
     });
     return this.enhanceServer(serverDto);
   }
@@ -90,12 +90,11 @@ export class ServerController {
     await this.serverDao.delete(scopeId, serverId);
   }
 
-  private async enhanceServer(server: ServerDto): Promise<Server> {
+  private async enhanceServer(server: ServerDto): Promise<ServerDto> {
     const queryAddress = server.query.address ?? server.address;
     const status = await this.queryServer(server.query.type, queryAddress, server.query.port);
     return {
       ...server,
-      id: `${server.scopeId}-${server.serverId}`,
       status,
       query: {
         type: server.query.type,
@@ -105,7 +104,7 @@ export class ServerController {
     };
   }
 
-  async getServer(id: string): Promise<Server> {
+  async getServer(id: string): Promise<ServerDto> {
     const { scopeId, serverId } = this.unpackId(id);
     const serverDto = await this.serverDao.findById(scopeId, serverId);
     if (!serverDto) {
@@ -114,7 +113,7 @@ export class ServerController {
     return this.enhanceServer(serverDto);
   }
 
-  async listServers(amount?: number, skip?: number): Promise<Server[]> {
+  async listServers(amount?: number, skip?: number): Promise<ServerDto[]> {
     const servers = await this.serverDao.findAll(amount, skip);
     return Promise.all(servers.map(async (server) => {
       return this.enhanceServer(server);
@@ -128,37 +127,11 @@ export interface TrackServerInput {
   readonly name: string;
   readonly application: string;
   readonly address: string;
+  readonly port: number;
   readonly capabilities: string[];
-  readonly platform?: Platform;
-  readonly query: Query;
+  readonly provider?: ProviderDto;
+  readonly providerServerData?: ProviderServerDataDto;
+  readonly query: ServerQueryDto;
   readonly owner: string;
   readonly location?: string;
-}
-
-export interface Server {
-  readonly id: string;
-  readonly scopeId: string;
-  readonly serverId: string;
-  readonly name: string;
-  readonly application: string;
-  readonly address: string;
-  readonly capabilities: string[];
-  readonly platform: Platform;
-  readonly location: ServerLocation;
-  readonly query: Query;
-  readonly owner: string;
-  readonly status: Status;
-  readonly added: Date;
-  readonly lastUpdated?: Date;
-}
-
-export interface Platform {
-  readonly type: string;
-  readonly data?: string;
-}
-
-export interface Query {
-  readonly type: string;
-  readonly address?: string;
-  readonly port?: number;
 }

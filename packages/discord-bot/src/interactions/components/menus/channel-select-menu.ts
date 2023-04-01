@@ -44,12 +44,15 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       scope: interaction.guild_id,
       application: finalizedRequest.application,
       name: finalizedRequest.name,
-      address: finalizedRequest.address,
+      connectivity: {
+        address: finalizedRequest.address,
+        port: finalizedRequest.port,
+      },
       owner: finalizedRequest.ownerId,
       capabilities: [ Capabilities.READ, Capabilities.QUERY ],
       query: {
         type: finalizedRequest.queryType,
-        // address: finalizedRequest.queryAddress,
+        address: finalizedRequest.queryAddress,
         port: finalizedRequest.queryPort,
       }
     })
@@ -71,7 +74,8 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       serverId: serverId,
       serverName: server.name!,
       status: server.status?.status!,
-      address: server.address!,
+      address: server.connectivity?.address!,
+      port: server.connectivity?.port!,
       steamPort: server.query?.port!,
       location: {
         city: server.location?.city!,

@@ -13,7 +13,8 @@ export function serverToEmbed(server: ServerSummary): IServerEmbed {
       serverId: server.id?.split("-")[1]!,
       serverName: server.name!,
       status: server.status?.status!,
-      address: server.address!,
+      address: server.connectivity?.address!,
+      port: server.connectivity?.port!,
       steamPort: server.query?.port!,
       location: {
         city: server.location?.city!,

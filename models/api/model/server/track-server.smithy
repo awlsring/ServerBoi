@@ -26,7 +26,7 @@ structure TrackServerInput {
     name: String,
 
     @required
-    address: String,
+    connectivity: ServerConnectivitySummary,
     
     @required
     owner: String,
@@ -34,15 +34,30 @@ structure TrackServerInput {
     @required
     query: TrackServerQueryInput
 
-    platform: TrackServerPlatformInput
+    provider: TrackServerProviderInput
+
+    providerServerData: TrackServerProviderDataInput
 
     capabilities: ServerCapabilities
 }
 
 
-structure TrackServerPlatformInput {
+structure TrackServerProviderInput {
     @required
-    type: ServerPlatform
+    id: String
+
+    @required
+    name: String
+
+    @required
+    type: ProviderType
+}
+
+structure TrackServerProviderDataInput {
+    @required
+    identifier: String
+
+    location: String
 
     data: String
 }

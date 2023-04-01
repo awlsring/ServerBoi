@@ -3,5 +3,7 @@ export * from "./query/http-query";
 export * from "./query/steam-query";
 export * from "./controller/server";
 export * from "./dto/server-dto";
-export * from "./dao/server-dao";
+export * from "./persistence/server-repo";
+export * from "./persistence/provider-repo";
+export * from "./persistence/prisma-repo-options";
 export * from "./ip-lookup/ip-api";

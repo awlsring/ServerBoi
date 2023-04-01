@@ -25,7 +25,7 @@ structure ServerSummary {
     application: String,
 
     @required
-    address: String,
+    connectivity: ServerConnectivitySummary,
 
     @required
     status: ServerStatusSummary,
@@ -33,8 +33,9 @@ structure ServerSummary {
     @required
     capabilities: ServerCapabilities,
 
-    @required
-    platform: ServerPlatformSummary,
+    provider: ProviderSummary,
+    
+    providerServerData: ServerProviderDataSummary,
     
     @required
     query: ServerQuerySummary,
@@ -51,6 +52,14 @@ structure ServerSummary {
     owner: String,
 }
 
+structure ServerConnectivitySummary {
+    @required
+    address: String,
+
+    @required
+    port: Integer,
+}
+
 structure ServerLocationSummary {
     @required
     city: String,
@@ -65,14 +74,19 @@ structure ServerLocationSummary {
     emoji: String,
 }
 
-structure ServerPlatformSummary {
+structure ServerProviderDataSummary {
     @required
-    type: ServerPlatform,
+    identifier: String
 
-    data: String,
+    location: String
+
+    data: String
 }
 
 structure ServerStatusSummary {
+    @required
+    type: ServerQueryType,
+
     @required
     status: ServerStatus,
 
@@ -137,13 +151,7 @@ enum ServerStatus {
     STOPPING = "STOPPING",
     REBOOTING = "REBOOTING",
     STOPPED = "STOPPED",
-}
-
-enum ServerPlatform {
-    AWS_EC2 = "AWS_EC2",
-    KUBERNETES = "KUBERNETES",
-    DOCKER = "DOCKER",
-    UNDEFINED = "UNDEFINED",
+    UNREACHABLE = "UNREACHABLE",
 }
 
 enum ServerQueryType {

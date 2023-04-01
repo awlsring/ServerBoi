@@ -4,9 +4,9 @@ namespace awlsring.serverboi.api
 use smithy.framework#ValidationException
 
 @readonly
-@http(method: "GET", uri: "/server", code: 200)
-operation ListServers {
-    output: ListServersOutput,
+@http(method: "GET", uri: "/provider", code: 200)
+operation ListProviders {
+    output: ListProvidersOutput,
     errors: [
         ValidationException,
         InternalServerError,
@@ -15,7 +15,7 @@ operation ListServers {
 }
 
 @output
-structure ListServersOutput {
+structure ListProvidersOutput {
     @required
-    summaries: ServerSummaries
+    summaries: ProviderSummaries
 }

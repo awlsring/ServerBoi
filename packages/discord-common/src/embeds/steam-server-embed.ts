@@ -19,7 +19,8 @@ export interface SteamServerEmbedOptions {
   readonly serverName: string;
   readonly status: string;
   readonly address: string;
-  readonly steamPort: number;
+  readonly port: number;
+  readonly steamPort?: number;
   readonly location: ServerLocation;
   readonly game: string;
   readonly players: number;
@@ -47,12 +48,11 @@ export class SteamServerEmbed extends ServerEmbed {
     return `${location.emoji} ${location.city}, ${location.country}`;
   }
 
-  private static formSteamConnectString(address: string, port: number): string {
-    let steamAddress = address;
-    if (address.includes(":")) {
-      steamAddress = address.split(":")[0];
+  private static formSteamConnectString(address: string, port: number, steamPort?: number): string {
+    if (steamPort) {
+      return `Connect: steam://connect/${address}:${steamPort}`;
     }
-    return `Connect: steam://connect/${steamAddress}:${port}`;
+    return `Connect: steam://connect/${address}:${port}`;
   }
 
   constructor(options: SteamServerEmbedOptions) {
@@ -92,7 +92,7 @@ export class SteamServerEmbed extends ServerEmbed {
       owner: options.owner,
       type: EmbedType.Rich,
       title: `${options.serverName} (${options.serverId})`,
-      description: SteamServerEmbed.formSteamConnectString(options.address, options.steamPort),
+      description: SteamServerEmbed.formSteamConnectString(options.address, options.port, options.steamPort),
       color: SteamServerEmbed.determineColor(options.status),
       fields: fields,
       thumbnail: {

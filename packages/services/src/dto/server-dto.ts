@@ -1,13 +1,39 @@
+import { ProviderDto } from "./provider-dto";
 
-export interface ServerPlatformDto {
-  type: string;
-  data?: string;
+export interface ServerDto {
+  readonly scopeId: string;
+  readonly serverId: string;
+  readonly name: string;
+  readonly application: string;
+  readonly address: string;
+  readonly port?: number;
+  readonly capabilities: string[];
+  readonly status?: ServerStatusDto;
+  readonly provider?: ProviderDto;
+  readonly providerServerData?: ProviderServerDataDto;
+  readonly owner: string;
+  readonly added: Date;
+  readonly location: ServerLocationDto;
+  readonly query: ServerQueryDto;
+  readonly lastUpdated?: Date;
+}
+
+export interface ServerStatusDto {
+  readonly type: string;
+  readonly status: string;
+  readonly data?: any;
+}
+
+export interface ProviderServerDataDto {
+  readonly identifier: string;
+  readonly location?: string;
+  readonly data?: any;
 }
 
 export interface ServerQueryDto {
-  type: string;
-  address?: string;
-  port?: number;
+  readonly type: string;
+  readonly address?: string;
+  readonly port?: number;
 }
 
 export interface ServerLocationDto {
@@ -17,30 +43,18 @@ export interface ServerLocationDto {
   readonly emoji: string;
 }
 
-export interface ServerDto {
-  scopeId: string;
-  serverId: string;
-  name: string;
-  application: string;
-  address: string;
-  capabilities: string[];
-  platform: ServerPlatformDto;
-  owner: string;
-  added: Date;
-  location: ServerLocationDto;
-  query: ServerQueryDto;
-  lastUpdated?: Date;
-}
 
 export interface NewServerDto {
-  scopeId: string;
-  serverId: string;
-  name: string;
-  application: string;
-  address: string;
-  capabilities: string[];
-  platform?: ServerPlatformDto;
-  query: ServerQueryDto;
-  location: ServerLocationDto;
-  owner: string;
+  readonly scopeId: string;
+  readonly serverId: string;
+  readonly name: string;
+  readonly application: string;
+  readonly address: string;
+  readonly port?: number;
+  readonly capabilities: string[];
+  readonly provider?: ProviderDto;
+  readonly providerServerData?: ProviderServerDataDto;
+  readonly query: ServerQueryDto;
+  readonly location: ServerLocationDto;
+  readonly owner: string;
 }
