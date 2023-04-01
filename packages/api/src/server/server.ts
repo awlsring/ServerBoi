@@ -11,7 +11,7 @@ import { ServerController } from "@serverboi/services";
 
 const serviceHandler = getServerBoiServiceHandler(new ServiceHandler());
 const cfg = loadConfig();
-new ServerController(cfg.database)
+ServerController.getInstance(cfg.database)
 
 export const server = createServer(async function (
   req: IncomingMessage,

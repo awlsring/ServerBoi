@@ -5,13 +5,13 @@ import { ServerController } from "@serverboi/services"
 import { serverToSummary } from "./common";
 
 export const ListServersOperation: Operation<ListServersServerInput, ListServersServerOutput, ServiceContext> = async (input, context) => {
-  console.log(`Received ListServers operation`);
-  console.log(`Input: ${JSON.stringify(input)}`);
-  console.log(`Context: ${JSON.stringify(context)}`);
-
-  const controller = ServerController.getInstance();
-
   try {
+    console.log(`Received ListServers operation`);
+    console.log(`Input: ${JSON.stringify(input)}`);
+    console.log(`Context: ${JSON.stringify(context)}`);
+
+    const controller = ServerController.getInstance();
+
     const server = await controller.listServers();
     const summaries = server.map((server) => {
       return serverToSummary(server);
@@ -21,7 +21,6 @@ export const ListServersOperation: Operation<ListServersServerInput, ListServers
       summaries: summaries
     }
   } catch (e) {
-    console.log(e);
     throw new InternalServerError({ message: `Error listing servers: ${e}`} );
   }
 };

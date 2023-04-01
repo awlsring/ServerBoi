@@ -36,7 +36,6 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       summary: summary
     }
   } catch (e) {
-    console.log(e);
     throw new InternalServerError({ message: `Error tracking server: ${e}`} );
   }
 };

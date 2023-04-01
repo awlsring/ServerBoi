@@ -10,14 +10,17 @@ export class ServerController {
   private serverDao: ServerDao;
   private ipLookup = new IPAPIClient();
 
-  public static getInstance(): ServerController {
+  public static getInstance(cfg?: PrismaRepoOptions): ServerController {
     if (!ServerController.instance) {
-      throw new Error("ServerController not initialized");
+      if (!cfg) {
+        throw new Error("ServerController not initialized, config needed");
+      }
+      ServerController.instance = new ServerController(cfg);
     }
     return ServerController.instance;
   }
 
-  constructor(cfg: PrismaRepoOptions) {
+  private constructor(cfg: PrismaRepoOptions) {
     this.serverDao = new ServerDao(cfg);
   }
 

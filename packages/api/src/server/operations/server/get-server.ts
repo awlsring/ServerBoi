@@ -25,7 +25,9 @@ export const GetServerOperation: Operation<GetServerServerInput, GetServerServer
       summary: summary
     }
   } catch (e) {
-    console.log(e);
+    if (e instanceof ResourceNotFoundError) {
+      throw e;
+    }
     throw new InternalServerError({ message: `Error getting server: ${e}`} );
   }
 };
