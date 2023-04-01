@@ -1,4 +1,4 @@
-import { ChannelType, APISelectMenuOption, APIMessageSelectMenuInteractionData, ComponentType, APIMessageComponentSelectMenuInteraction, APIActionRowComponent, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
+import { ChannelType, APISelectMenuOption, ComponentType, APIMessageComponentSelectMenuInteraction } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
 import { Component } from "../component";
 

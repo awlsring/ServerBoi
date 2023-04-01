@@ -1,5 +1,5 @@
 import { APIApplicationCommandInteraction, ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
-import { InteractionContext } from "../../../context";
+import { InteractionContext } from "@serverboi/discord-common";
 import { StartTrackServerButton } from "../../button/start-track";
 import { CommandComponent } from "../command";
 

@@ -1,17 +1,17 @@
 import { APIUser } from "discord-api-types/v10"
 
-export interface InteractionHttpClientOptions {
+export interface DiscordHttpClientOptions {
   readonly token: string;
   readonly version: string;
 }
 
-export class InteractionHttpClient {
+export class DiscordHttpClient {
   private readonly token: string;
   private readonly version: string;
   private readonly baseUrl: string
   private lastRequestTime: number;
 
-  constructor(options: InteractionHttpClientOptions) {
+  constructor(options: DiscordHttpClientOptions) {
     this.token = options.token;
     this.version = options.version;
     this.baseUrl = `https://discord.com/api/${this.version}`

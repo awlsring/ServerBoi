@@ -1,9 +1,9 @@
 import { FastifyReply } from "fastify";
 import { Logger } from "../logger/logger";
-import { InteractionHttpClient } from "../http/client";
+import { DiscordHttpClient } from "../http/client";
 
 export interface InteractionContext {
-  readonly http: InteractionHttpClient;
+  readonly http: DiscordHttpClient;
   readonly response: FastifyReply;
   readonly logger: Logger;
 }
@@ -12,7 +12,7 @@ export class BaseInteractionContext implements InteractionContext {
   logger: Logger;
 
   constructor(
-    readonly http: InteractionHttpClient,
+    readonly http: DiscordHttpClient,
     readonly response: FastifyReply,
     logger: Logger
   ) {

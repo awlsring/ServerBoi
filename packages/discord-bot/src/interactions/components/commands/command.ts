@@ -1,6 +1,6 @@
-import { APIApplicationCommandInteraction, APIInteraction, ApplicationCommandOptionType } from "discord-api-types/v10";
-import { InteractionContext } from "../../context";
-import { Component } from "../component";
+import { APIApplicationCommandInteraction, ApplicationCommandOptionType } from "discord-api-types/v10";
+import { InteractionContext } from "@serverboi/discord-common";
+import { Component } from "@serverboi/discord-common";
 
 export interface CommandData {
   name: string;

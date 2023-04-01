@@ -1,7 +1,6 @@
-import { InteractionResponseType } from "discord-interactions";
-import { InteractionContext } from "../../context";
+import { ButtonComponent, InteractionContext } from "@serverboi/discord-common";
+import { InteractionResponseType } from "discord-api-types/v10";
 import { SteamQueryInformationModal } from "../modals/steam-query-info";
-import { ButtonComponent } from "./button";
 
 export class ResubmitQueryButton extends ButtonComponent {
   public static readonly identifier = "resubmit-query-button";
@@ -15,7 +14,7 @@ export class ResubmitQueryButton extends ButtonComponent {
 
   public async enact(context: InteractionContext, _: any) {
     context.response.send({
-      type: InteractionResponseType.MODAL,
+      type: InteractionResponseType.Modal,
       data: SteamQueryInformationModal.toApiData(),
     })
   }

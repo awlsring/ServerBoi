@@ -1,9 +1,9 @@
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
 import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo"
-import { InteractionContext } from "../../context"
+import { InteractionContext } from "@serverboi/discord-common"
 import { SteamQueryInformationModal } from "../modals/steam-query-info"
 import { ChannelSelectMenu } from "./channel-select-menu"
-import { SelectMenuComponent } from "./menu"
+import { SelectMenuComponent } from "@serverboi/discord-common"
 
 export interface QuerySelectMenuOptions {
   readonly trackServerDao: TrackServerRequestRepo

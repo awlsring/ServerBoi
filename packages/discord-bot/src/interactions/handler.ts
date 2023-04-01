@@ -1,4 +1,4 @@
-import { Component, Logger, InteractionHttpClient } from "@serverboi/discord-common";
+import { Component, Logger, DiscordHttpClient } from "@serverboi/discord-common";
 import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
 
@@ -10,11 +10,11 @@ export interface InteractionHandlerOptions {
 }
 
 export class InteractionHandler {
-  private readonly httpClient: InteractionHttpClient;
+  private readonly httpClient: DiscordHttpClient;
   private readonly components: Map<string, Component>;
   private readonly log: Logger;
   constructor(options: InteractionHandlerOptions) {
-    this.httpClient = new InteractionHttpClient({
+    this.httpClient = new DiscordHttpClient({
       token: options.token,
       version: options.version ?? "v10",
     });

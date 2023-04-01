@@ -1,6 +1,6 @@
 import { PrismaClient, TrackServer } from '@prisma/client';
 import { NewTrackServerRequestDto, TrackServerRequestDto } from '../dto/track-server-request-dto';
-import { PrismaRepoOptions } from './prisma-options';
+import { PrismaRepoOptions } from '@serverboi/discord-common';
 
 export class TrackServerRequestRepo {
   readonly prisma: PrismaClient;

@@ -1,9 +1,9 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo";
-import { InteractionContext } from "../../context";
+import { InteractionContext } from "@serverboi/discord-common";
 import { ResubmitQueryButton } from "../button/resubmit-steam-query";
 import { ChannelSelectMenu } from "../menus/channel-select-menu";
-import { ModalComponent } from "./modals";
+import { ModalComponent } from "@serverboi/discord-common";
 
 export interface SteamQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo

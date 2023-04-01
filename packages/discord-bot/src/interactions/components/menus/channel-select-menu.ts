@@ -1,11 +1,11 @@
-import { Capabilities, ServerSummary } from "@serverboi/client"
+import { Capabilities } from "@serverboi/client"
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { SteamServerEmbed } from "../../../embeds/steam-server-embed"
-import { ServerCardRepo } from "../../../persistence/server-card-repo"
+import { SteamServerEmbed } from "@serverboi/discord-common"
+import { ServerCardRepo } from "@serverboi/discord-common"
 import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo"
-import { ServerBoiService } from "../../../service/serverboi"
-import { InteractionContext } from "../../context"
-import { SelectMenuComponent } from "./menu"
+import { ServerBoiService } from "@serverboi/discord-common"
+import { InteractionContext } from "@serverboi/discord-common"
+import { SelectMenuComponent } from "@serverboi/discord-common"
 
 export interface ChannelSelectMenuOptions {
   readonly serverBoiService: ServerBoiService
