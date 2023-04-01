@@ -7,7 +7,11 @@ use smithy.framework#ValidationException
 @http(method: "GET", uri: "/server", code: 200)
 operation ListServers {
     output: ListServersOutput,
-    errors: [ValidationException]
+        errors: [
+        ValidationException,
+        InternalServerError,
+        InvalidInputError
+    ]
 }
 
 @output

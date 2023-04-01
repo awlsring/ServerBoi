@@ -9,7 +9,9 @@ operation UntrackServer {
     input: UntrackServerInput,
     output: UntrackServerOutput,
     errors: [
-        ValidationException
+        ValidationException,
+        InternalServerError,
+        ResourceNotFoundError,
     ]
 }
 

@@ -9,7 +9,10 @@ operation UpdateServer {
     input: UpdateServerInput,
     output: UpdateServerOutput,
     errors: [
-        ValidationException
+        ValidationException,
+        InternalServerError,
+        ResourceNotFoundError,
+        InvalidInputError
     ]
 }
 

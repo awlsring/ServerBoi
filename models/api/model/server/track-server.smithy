@@ -8,7 +8,9 @@ operation TrackServer {
     input: TrackServerInput,
     output: TrackServerOutput,
     errors: [
-        ValidationException
+        ValidationException,
+        InternalServerError,
+        InvalidInputError
     ]
 }
 
