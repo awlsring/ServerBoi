@@ -33,7 +33,7 @@ export class SteamQueryInformationModal extends ModalComponent {
     },
   ]
 
-  private readonly requestDao = new TrackServerRequestRepo();
+  private readonly requestDao: TrackServerRequestRepo;
 
   constructor(options: SteamQueryInformationModalOptions) {
     super()

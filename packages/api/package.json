@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/index.js"
   },
   "dependencies": {
     "@aws-smithy/server-common": "^1.0.0-alpha.9",

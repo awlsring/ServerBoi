@@ -1,9 +1,12 @@
 export class Config {
-  readonly refresher: {
-    readonly interval: number;
+  readonly server: {
+    readonly port?: number;
   };
   readonly discord: {
     readonly token: string;
+    readonly publicKey: string;
+    readonly applicationId: string;
+    readonly apiVersion?: string;
   };
   readonly database: {
     readonly user: string;
@@ -17,7 +20,7 @@ export class Config {
     readonly apiKey: string;
   };
   constructor(data: any) {
-    this.refresher = data.refresher;
+    this.server = data.server;
     this.discord = data.discord;
     this.database = data.database;
     this.serverboi = data.serverboi;

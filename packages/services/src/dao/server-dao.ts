@@ -1,11 +1,28 @@
 import { PrismaClient, Server } from '@prisma/client';
 import { NewServerDto, ServerDto } from '../dto/server-dto';
 
-const prisma = new PrismaClient();
+export interface PrismaRepoOptions {
+  readonly user: string;
+  readonly password: string;
+  readonly host: string;
+  readonly port: number;
+  readonly database: string;
+}
 
 export class ServerDao {
+  readonly prisma: PrismaClient;
+  constructor(options: PrismaRepoOptions) {
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `postgresql://${options.user}:${options.password}@${options.host}:${options.port}/${options.database}`
+        }
+      }
+    });
+  }
+
   async create(server: NewServerDto): Promise<ServerDto> {
-    const createdServer = await prisma.server.create({
+    const createdServer = await this.prisma.server.create({
       data: {
         scopeId: server.scopeId,
         serverId: server.serverId,
@@ -29,7 +46,7 @@ export class ServerDao {
   }
 
   async findById(scopeId: string, serverId: string): Promise<ServerDto | null> {
-    const server = await prisma.server.findUnique({
+    const server = await this.prisma.server.findUnique({
       where: { scopeId_serverId: { scopeId, serverId } },
     });
     if (!server) {
@@ -40,7 +57,7 @@ export class ServerDao {
   }
 
   async findAll(amount?: number, skip?: number): Promise<ServerDto[]> {
-    const users = await prisma.server.findMany({
+    const users = await this.prisma.server.findMany({
       skip,
       take: amount,
     });
@@ -48,7 +65,7 @@ export class ServerDao {
   }
 
   async update(scopeId: string, serverId: string, server: Server): Promise<ServerDto | null> {
-    const updatedServer = await prisma.server.update({
+    const updatedServer = await this.prisma.server.update({
       where: { scopeId_serverId: { scopeId, serverId } },
       data: server,
     });
@@ -59,7 +76,7 @@ export class ServerDao {
   }
 
   async delete(scopeId: string, serverId: string): Promise<ServerDto | null> {
-    const deletedServer = await prisma.server.delete({
+    const deletedServer = await this.prisma.server.delete({
       where: { scopeId_serverId: { scopeId, serverId } },
     });
     if (!deletedServer) {

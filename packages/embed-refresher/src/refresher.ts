@@ -7,13 +7,13 @@ import { ServerBoiService, ServerCardRepo, ServerCardDto, serverToEmbed, Interac
 dotenv.config();
 
 function loadConfig(): Config {
-  const configPath = process.env.CONFIG_PATH ?? './config.yaml';
+  const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
   const data = fs.readFileSync(configPath, 'utf-8');
   return new Config(yaml.load(data));
 }
 
 class Refresher {
-  readonly serverCardRepo = new ServerCardRepo();
+  readonly serverCardRepo: ServerCardRepo;
   readonly serverBoi: ServerBoiService;
   readonly discord: InteractionHttpClient;
 
@@ -31,6 +31,7 @@ class Refresher {
 
   constructor(config: Config) {
     this.serverBoi = new ServerBoiService(config.serverboi.endpoint, config.serverboi.apiKey);
+    this.serverCardRepo = new ServerCardRepo(config.database);
     this.discord = new InteractionHttpClient({
       token: config.discord.token,
       version: "v10"

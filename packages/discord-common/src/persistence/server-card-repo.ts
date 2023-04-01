@@ -1,11 +1,21 @@
 import { PrismaClient, ServerCard } from '@prisma/client';
 import { ServerCardDto, NewServerCardDto } from '../dto/server-card-dto';
-
-const prisma = new PrismaClient();
+import { PrismaRepoOptions } from './prisma-options';
 
 export class ServerCardRepo {
+  readonly prisma: PrismaClient;
+  constructor(options: PrismaRepoOptions) {
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `postgresql://${options.user}:${options.password}@${options.host}:${options.port}/${options.database}`
+        }
+      }
+    });
+  }
+
   async create(request: NewServerCardDto): Promise<ServerCardDto> {
-    const createdServer = await prisma.serverCard.create({
+    const createdServer = await this.prisma.serverCard.create({
       data: {
         ...request,
       }
@@ -14,7 +24,7 @@ export class ServerCardRepo {
   }
 
   async findById(messageId: string): Promise<ServerCardDto | null> {
-    const serverCard = await prisma.serverCard.findUnique({
+    const serverCard = await this.prisma.serverCard.findUnique({
       where: { messageId },
     });
     if (!serverCard) {
@@ -25,7 +35,7 @@ export class ServerCardRepo {
   }
 
   async findAll(amount?: number, skip?: number): Promise<ServerCardDto[]> {
-    const users = await prisma.serverCard.findMany({
+    const users = await this.prisma.serverCard.findMany({
       skip,
       take: amount,
     });
@@ -33,7 +43,7 @@ export class ServerCardRepo {
   }
 
   async update(messageId: string, serverCard: any): Promise<ServerCardDto | null> {
-    const updatedServer = await prisma.serverCard.update({
+    const updatedServer = await this.prisma.serverCard.update({
       where: { messageId: messageId },
       data: serverCard,
     });
@@ -44,7 +54,7 @@ export class ServerCardRepo {
   }
 
   async delete(messageId: string): Promise<ServerCardDto | null> {
-    const deletedServer = await prisma.serverCard.delete({
+    const deletedServer = await this.prisma.serverCard.delete({
       where: { messageId },
     });
     if (!deletedServer) {

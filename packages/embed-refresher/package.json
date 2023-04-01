@@ -5,7 +5,8 @@
   "main": "dist/refresher.js",
   "scripts": {
     "build": "tsc --build",
-    "start": "node dist/refresher.js"
+    "start": "node dist/refresher.js",
+    "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/refresher.js"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",

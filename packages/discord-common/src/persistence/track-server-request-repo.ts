@@ -1,11 +1,21 @@
 import { PrismaClient, TrackServer } from '@prisma/client';
 import { NewTrackServerRequestDto, TrackServerRequestDto } from '../dto/track-server-request-dto';
-
-const prisma = new PrismaClient();
+import { PrismaRepoOptions } from './prisma-options';
 
 export class TrackServerRequestRepo {
+  readonly prisma: PrismaClient;
+  constructor(options: PrismaRepoOptions) {
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `postgresql://${options.user}:${options.password}@${options.host}:${options.port}/${options.database}`
+        }
+      }
+    });
+  }
+  
   async create(request: NewTrackServerRequestDto): Promise<TrackServerRequestDto> {
-    const createdServer = await prisma.trackServer.create({
+    const createdServer = await this.prisma.trackServer.create({
       data: {
         id: request.id,
         name: request.name,
@@ -18,7 +28,7 @@ export class TrackServerRequestRepo {
   }
 
   async findById(id: string): Promise<TrackServerRequestDto | null> {
-    const trackServer = await prisma.trackServer.findUnique({
+    const trackServer = await this.prisma.trackServer.findUnique({
       where: { id },
     });
     if (!trackServer) {
@@ -29,7 +39,7 @@ export class TrackServerRequestRepo {
   }
 
   async findAll(amount?: number, skip?: number): Promise<TrackServerRequestDto[]> {
-    const users = await prisma.trackServer.findMany({
+    const users = await this.prisma.trackServer.findMany({
       skip,
       take: amount,
     });
@@ -37,7 +47,7 @@ export class TrackServerRequestRepo {
   }
 
   async update(id: string, trackServer: any): Promise<TrackServerRequestDto> {
-    const updatedServer = await prisma.trackServer.update({
+    const updatedServer = await this.prisma.trackServer.update({
       where: { id: id },
       data: trackServer,
     });
@@ -45,7 +55,7 @@ export class TrackServerRequestRepo {
   }
 
   async delete(id: string): Promise<TrackServerRequestDto | null> {
-    const deletedServer = await prisma.trackServer.delete({
+    const deletedServer = await this.prisma.trackServer.delete({
       where: { id },
     });
     if (!deletedServer) {

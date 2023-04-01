@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc --build",
     "start": "node dist/server.js",
+    "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/server.js",
     "commands:deregister": "ts-node --project tsconfig.json scripts/deregister-commands.ts",
     "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts"
   },

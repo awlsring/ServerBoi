@@ -2,18 +2,16 @@ import fastify, { FastifyReply, FastifyRequest, } from 'fastify'
 import rawBody from 'fastify-raw-body';
 import { APIInteraction, InteractionResponseType, InteractionType } from "discord-api-types/v10"
 import { verifyKey } from 'discord-interactions';
-import dotenv from 'dotenv';
 import { InteractionHandler } from './interactions/handler';
 import { ChannelSelectMenu, QuerySelectMenu, ResubmitQueryButton, ServerBoiService, ServerCardRepo, ServerTrackInitialModal, StartTrackServerButton, SteamQueryInformationModal, TrackCommand, TrackServerRequestRepo } from '@serverboi/discord-common';
+import { Config } from './config';
+import fs from 'fs';
+import yaml from 'js-yaml';
 
-dotenv.config();
-
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
-const PORT: number = Number(process.env.PORT) || 7032
-
-if (!PUBLIC_KEY) {
-  console.error('PUBLIC_KEY is not set');
-  process.exit(1);
+function loadConfig(): Config {
+  const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
+  const data = fs.readFileSync(configPath, 'utf-8');
+  return new Config(yaml.load(data));
 }
 
 async function main() {
@@ -26,13 +24,14 @@ async function main() {
     runFirst: true,
   });
   
-  const serverboi = new ServerBoiService(process.env.SERVERBOI_ENDPOINT!, process.env.SERVERBOI_TOKEN!);
-  const requestDao = new TrackServerRequestRepo();
-  const cardDao = new ServerCardRepo();
+  const cfg = loadConfig();
+  const serverboi = new ServerBoiService(cfg.serverboi.endpoint, cfg.serverboi.apiKey);
+  const requestDao = new TrackServerRequestRepo(cfg.database);
+  const cardDao = new ServerCardRepo(cfg.database);
   
   const interactions = new InteractionHandler({
-    token: process.env.DISCORD_TOKEN!,
-    version: "v10",
+    token: cfg.discord.token,
+    version: cfg.discord.apiVersion ?? 'v10',
     components: [
       new TrackCommand(),
       new QuerySelectMenu({ trackServerDao: requestDao }),
@@ -64,7 +63,7 @@ async function main() {
         request.rawBody as string,
         signature as string,
         timestamp as string,
-        PUBLIC_KEY!
+        cfg.discord.publicKey
       );
       if (!isValidRequest) {
         server.log.info('Invalid Request');
@@ -81,7 +80,7 @@ async function main() {
     await interactions.handle(interaction, response);
   });
   
-  server.listen({ port: PORT }, (err, address) => {
+  server.listen({ port: cfg.server.port }, (err, address) => {
     if (err) {
       console.error(err)
       process.exit(1)

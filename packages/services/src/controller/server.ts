@@ -1,4 +1,4 @@
-import { ServerDao } from "../dao/server-dao";
+import { PrismaRepoOptions, ServerDao } from "../dao/server-dao";
 import { SteamQuerent } from "../query/steam-query";
 import { HttpQuerent } from "../query/http-query";
 import { Querent, Status } from "../query/common";
@@ -7,14 +7,18 @@ import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 
 export class ServerController {
   private static instance: ServerController;
-  private serverDao: ServerDao = new ServerDao();
+  private serverDao: ServerDao;
   private ipLookup = new IPAPIClient();
 
   public static getInstance(): ServerController {
     if (!ServerController.instance) {
-      ServerController.instance = new ServerController();
+      throw new Error("ServerController not initialized");
     }
     return ServerController.instance;
+  }
+
+  constructor(cfg: PrismaRepoOptions) {
+    this.serverDao = new ServerDao(cfg);
   }
 
   private async queryServer(type: string, address: string, port?: number): Promise<Status> {

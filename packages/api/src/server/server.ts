@@ -6,8 +6,12 @@ import {
 import { ServiceHandler } from "./handler/service";
 import { convertRequest, writeResponse } from "@aws-smithy/server-node";
 import { ServiceContext } from "./handler/context";
+import { loadConfig } from "../config";
+import { ServerController } from "@serverboi/services";
 
 const serviceHandler = getServerBoiServiceHandler(new ServiceHandler());
+const cfg = loadConfig();
+new ServerController(cfg.database)
 
 export const server = createServer(async function (
   req: IncomingMessage,
@@ -16,7 +20,8 @@ export const server = createServer(async function (
   const authHeader = req.headers.authorization;
   const context: ServiceContext = {
     user: "user",
-    key: authHeader
+    key: authHeader,
+    config: cfg,
   };
   const httpRequest = convertRequest(req);
   const httpResponse = await serviceHandler.handle(httpRequest, context);
