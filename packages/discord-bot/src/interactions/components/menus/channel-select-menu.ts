@@ -48,7 +48,6 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         address: finalizedRequest.address,
         port: finalizedRequest.port,
       },
-      owner: finalizedRequest.ownerId,
       capabilities: [ Capabilities.READ, Capabilities.QUERY ],
       query: {
         type: finalizedRequest.queryType,
@@ -83,12 +82,12 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         region: server.location?.region!,
         emoji: server.location?.emoji!,
       },
-      game: server.application!,
+      application: server.application!,
       players: server.status?.steam?.players!,
       maxPlayers: server.status?.steam?.maxPlayers!,
       owner: interaction.member?.user.username!,
       capabilities: [],
-      platform: {
+      provider: {
         name: "K8S",
         location: "DWS",
       }

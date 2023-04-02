@@ -1,8 +1,8 @@
-import { ServerStatus } from "@serverboi/client";
-import { EmbedType, APIStringSelectComponent, APISelectMenuOption, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent} from "discord-api-types/v10";
+import { Capabilities, ServerStatus } from "@serverboi/client";
+import { EmbedType, APIStringSelectComponent, APISelectMenuOption, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
-import { Embed, EmbedOptions } from "./embed";
+import { Embed } from "./embed";
 
 export enum ServerEmbedColor {
   Green = 0x00ff00,
@@ -20,22 +20,58 @@ export interface ServerActionsOptions {
   moreActions: ServerEmbedMoreActions[];
 }
 
-export interface ServerEmbedOptions extends EmbedOptions {
-  readonly owner: string;
+
+export interface ServerLocation {
+  readonly city: string;
+  readonly country: string;
+  readonly region: string;
+  readonly emoji: string;
 }
 
-export class ServerEmbed extends Embed {
+export interface ServerProvider {
+  readonly name: string;
+  readonly location: string;
+}
+
+export interface ServerEmbedOptions {
+  readonly serverId: string;
+  readonly serverName: string;
+  readonly application: string;
+  readonly status: string;
+  readonly address: string;
+  readonly port?: number;
+  readonly location: ServerLocation;
+  readonly owner: string;
+  readonly capabilities: Capabilities[];
+  readonly description: string;
+  readonly fields: APIEmbedField[];
+  readonly provider?: ServerProvider;
+}
+
+export abstract class ServerEmbed {
   readonly ownerId: string;
+  readonly embed: Embed;
 
   constructor(options: ServerEmbedOptions) {
-    super({
-      type: EmbedType.Rich,
-      ...options
-    });
     this.ownerId = options.owner;
+    this.embed = new Embed({
+      type: EmbedType.Rich,
+      title: `${options.serverName} (${options.serverId})`,
+      description: options.description,
+      color: this.determineColor(options.status),
+      fields: options.fields,
+      thumbnail: {
+        url: this.getThumbnailUrl(options.application),
+      },
+      footer: {
+        text: this.formFooter(options.provider),
+      },
+    })
   }
 
-  protected static getUpdateTime(): string {
+  protected abstract getThumbnailUrl(application: string): string;
+
+  protected getUpdateTime(): string {
     const date = new Date();
 
     const hours = date.getUTCHours().toString().padStart(2, '0');
@@ -45,7 +81,7 @@ export class ServerEmbed extends Embed {
     return `${hours}:${minutes}:${seconds} UTC`;
   }
 
-  protected static determineColor(status: string): ServerEmbedColor {
+  protected determineColor(status: string): ServerEmbedColor {
     switch (status) {
       case ServerStatus.RUNNING:
         return ServerEmbedColor.Green;
@@ -63,6 +99,20 @@ export class ServerEmbed extends Embed {
       default:
         return `Unknown`;
     }
+  }
+
+  protected formFooter(provider?: ServerProvider): string {
+    if (!provider) {
+      return `🕛 Updated: ${this.getUpdateTime()}`;
+    }
+    return `🌐 Hosted on ${provider.name} in ${provider.location} | 🕛 Updated: ${this.getUpdateTime()}`;
+  }
+
+  protected static formLocationString(location: ServerLocation): string {
+    if (location.country.toLocaleLowerCase() === "us") {
+      return `${location.emoji} ${location.city}, ${location.region}`;
+    }
+    return `${location.emoji} ${location.city}, ${location.country}`;
   }
 
   private makeMoreActionsSelect(options: ServerEmbedMoreActions[]): APIStringSelectComponent {
@@ -85,7 +135,7 @@ export class ServerEmbed extends Embed {
 
     return {
       custom_id: `server-action-more`,
-      placeholder: `More actions`,
+      placeholder: `Actions`,
       options: opts,
       min_values: 1,
       max_values: 1,
@@ -111,10 +161,14 @@ export class ServerEmbed extends Embed {
     ]
   }
 
+  public toApiData(): APIEmbed {
+    return this.embed.toApiData();
+  }
+
   public toMessage(startEnabled: boolean, stopEnabled: boolean, actions?: ServerEmbedMoreActions[]): RESTPostAPIChannelMessageJSONBody {
     return {
       content: `Owner: <@${this.ownerId}>`,
-      embeds: [this.toApiData()],
+      embeds: [this.embed.toApiData()],
       components: this.serverActions({
         startEnabled: startEnabled,
         stopEnabled: stopEnabled,

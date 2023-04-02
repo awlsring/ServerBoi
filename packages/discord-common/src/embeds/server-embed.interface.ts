@@ -1,4 +1,4 @@
-import { ServerQueryType, ServerSummary } from "@serverboi/client";
+import { ServerQueryType, ServerStatus, ServerSummary } from "@serverboi/client";
 import { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { ServerEmbedMoreActions } from "./server-embed";
 import { SteamServerEmbed } from "./steam-server-embed";
@@ -8,6 +8,7 @@ export interface IServerEmbed {
 }
 
 export function serverToEmbed(server: ServerSummary): IServerEmbed {
+
   if (server.query?.type === ServerQueryType.STEAM) {
     return new SteamServerEmbed({
       serverId: server.id?.split("-")[1]!,
@@ -22,15 +23,16 @@ export function serverToEmbed(server: ServerSummary): IServerEmbed {
         region: server.location?.region!,
         emoji: server.location?.emoji!,
       },
-      game: server.application!,
+      application: server.application!,
       players: server.status?.steam?.players!,
       maxPlayers: server.status?.steam?.maxPlayers!,
       owner: server.owner!,
       capabilities: [],
-      platform: {
-        name: "K8S",
-        location: "DWS",
-      }
+      provider: server.provider ? {
+        name: server.provider?.type!,
+        location: server.providerServerData?.location!,
+      } : undefined,
+
     });
   }
   throw new Error(`Unsupported server type: ${server.query?.type}`);

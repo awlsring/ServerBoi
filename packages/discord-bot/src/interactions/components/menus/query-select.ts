@@ -4,6 +4,7 @@ import { InteractionContext } from "@serverboi/discord-common"
 import { SteamQueryInformationModal } from "../modals/steam-query-info"
 import { ChannelSelectMenu } from "./channel-select-menu"
 import { SelectMenuComponent } from "@serverboi/discord-common"
+import { HTTPQueryInformationModal } from "../modals/http-query-info"
 
 export interface QuerySelectMenuOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -48,24 +49,33 @@ export class QuerySelectMenu extends SelectMenuComponent {
     await this.trackServerDao.update(interaction.message!.interaction!.id, {
       queryType: selectedValue
     })
-    
-    if (selectedValue == "STEAM") {
-      let response = {
-        type: InteractionResponseType.Modal,
-        data: SteamQueryInformationModal.toApiData()
-      }
-      await context.response.send(response)
-    } else {
-      await context.response.send({
-        type: InteractionResponseType.UpdateMessage,
-        data: {
-          content: "Select the channel to send the server information to.",
-          components: [
-            ChannelSelectMenu.toApiData()
-          ],
-          flags: MessageFlags.Ephemeral,
+
+    switch (selectedValue) {
+      case "STEAM":
+        let response = {
+          type: InteractionResponseType.Modal,
+          data: SteamQueryInformationModal.toApiData()
         }
-      })
+        await context.response.send(response)
+        break;
+      case "HTTP":
+        await context.response.send({
+          type: InteractionResponseType.UpdateMessage,
+          data: HTTPQueryInformationModal.toApiData()
+        })
+        break;
+      default:
+        await context.response.send({
+          type: InteractionResponseType.UpdateMessage,
+          data: {
+            content: "Select the channel to send the server information to.",
+            components: [
+              ChannelSelectMenu.toApiData()
+            ],
+            flags: MessageFlags.Ephemeral,
+          }
+        })
+        break;
     }
   }
 }

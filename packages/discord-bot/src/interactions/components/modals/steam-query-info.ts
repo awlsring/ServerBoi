@@ -29,7 +29,7 @@ export class SteamQueryInformationModal extends ModalComponent {
       style: 1,
       minLength: 1,
       maxLength: 5,
-      required: true,
+      required: false,
     },
   ]
 

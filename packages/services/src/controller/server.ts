@@ -31,7 +31,10 @@ export class ServerController {
         querent = new HttpQuerent(address);
         break;
       default:
-        throw new Error("Unsupported query type");
+        return {
+          type: "NONE",
+          status: "UNREACHABLE",
+        }
     }
     return querent.Query();
   }
