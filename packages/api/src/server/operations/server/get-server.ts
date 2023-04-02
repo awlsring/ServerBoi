@@ -1,5 +1,5 @@
 import { Operation } from "@aws-smithy/server-common";
-import { GetServerServerInput, GetServerServerOutput, InternalServerError, ResourceNotFoundError, ServerSummary } from "@serverboi/ssdk";
+import { GetServerServerInput, GetServerServerOutput, InternalServerError, ResourceNotFoundError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
 import { ServerController, ServerDto } from "@serverboi/services"
 import { serverToSummary } from "./common";
@@ -8,13 +8,10 @@ export const GetServerOperation: Operation<GetServerServerInput, GetServerServer
   try {
     console.log(`Received GetServer operation`);
     console.log(`Input: ${JSON.stringify(input)}`);
-    console.log(`Context: ${JSON.stringify(context)}`);
-  
-    const controller = ServerController.getInstance();
-  
+    
     let server: ServerDto;
     try {
-      server = await controller.getServer(input.id!);
+      server = await context.controller.server.getServer(input.id!);
     } catch {
       throw new ResourceNotFoundError({ message: `Server not found` });
     }

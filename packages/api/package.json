@@ -11,7 +11,7 @@
   "dependencies": {
     "@aws-smithy/server-common": "^1.0.0-alpha.9",
     "@aws-smithy/server-node": "^1.0.0-alpha.9",
-    "@serverboi/ssdk": "^1.0.0",
-    "@serverboi/services": "^1.0.0"
+    "@serverboi/services": "^1.0.0",
+    "@serverboi/ssdk": "^1.0.0"
   }
 }

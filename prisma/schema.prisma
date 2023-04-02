@@ -11,6 +11,23 @@ datasource db {
 }
 
 // API
+
+//// Internal
+model UserAuth {
+  key String @unique
+  scope String
+  valid Boolean @default(true)
+}
+
+model ProviderAuth {
+  id             String       @id @default(uuid())
+  provider Provider @relation(fields: [providerId], references: [id])
+  providerId String @unique
+  key String
+  secret String?
+}
+
+//// External
 model Server {
   scopeId String
   serverId       String
@@ -70,14 +87,6 @@ model ProviderServerData {
   location String?
   data String?
 } 
-
-model ProviderAuth {
-  id             String       @id @default(uuid())
-  provider Provider @relation(fields: [providerId], references: [id])
-  providerId String @unique
-  key String
-  secret String?
-}
 
 // Discord specific
 model TrackServer {

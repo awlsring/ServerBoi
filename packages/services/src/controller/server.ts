@@ -8,21 +8,10 @@ import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 
 export class ServerController {
-  private static instance: ServerController;
   private serverDao: ServerRepo;
   private ipLookup = new IPAPIClient();
 
-  public static getInstance(cfg?: PrismaRepoOptions): ServerController {
-    if (!ServerController.instance) {
-      if (!cfg) {
-        throw new Error("ServerController not initialized, config needed");
-      }
-      ServerController.instance = new ServerController(cfg);
-    }
-    return ServerController.instance;
-  }
-
-  private constructor(cfg: PrismaRepoOptions) {
+  constructor(cfg: PrismaRepoOptions) {
     this.serverDao = new ServerRepo(cfg);
   }
 

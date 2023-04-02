@@ -10,9 +10,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
     console.log(`Input: ${JSON.stringify(input)}`);
     console.log(`Context: ${JSON.stringify(context)}`);
 
-    const controller = ServerController.getInstance();
-
-    const server = await controller.trackServer({
+    const server = await context.controller.server.trackServer({
       scopeId: input.scope!,
       name: input.name!,
       address: input.connectivity!.address!,
@@ -21,7 +19,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
         id: input.provider.id!,
         name: input.provider.name!,
         type: input.provider.type!,
-        owner: input.owner!,
+        owner: context.user,
       } : undefined,
       providerServerData: input.providerServerData ? {
         identifier: input.providerServerData.identifier!,
@@ -35,7 +33,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       },
       application: input.application!,
       capabilities: input.capabilities!,
-      owner: input.owner!,
+      owner: context.user,
     });
 
     const summary = serverToSummary(server)

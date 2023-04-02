@@ -10,9 +10,7 @@ export const ListServersOperation: Operation<ListServersServerInput, ListServers
     console.log(`Input: ${JSON.stringify(input)}`);
     console.log(`Context: ${JSON.stringify(context)}`);
 
-    const controller = ServerController.getInstance();
-
-    const server = await controller.listServers();
+    const server = await context.controller.server.listServers();
     const summaries = server.map((server) => {
       return serverToSummary(server);
     });

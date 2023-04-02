@@ -34,28 +34,39 @@ export class ProviderRepo {
     return this.toDto(created);
   }
 
-  async findById(id: string): Promise<ProviderDto | null> {
-    const provider = await this.prisma.provider.findUnique({
-      where: { id },
+  async find(name: string, ownerId: string): Promise<ProviderDto> {
+    const results = await this.prisma.provider.findMany({
+      where: { 
+        name: name,
+        ownerId: ownerId,
+      },
     });
-    if (!provider) {
-      return null;
+
+    if (results.length != 1) {
+      throw new Error("Provider not found");
     }
-    console.log(JSON.stringify(provider, null, 2));
-    return this.toDto(provider);
+
+    console.log(JSON.stringify(results[0], null, 2));
+    return this.toDto(results[0]);
   }
 
-  async findAll(amount?: number, skip?: number): Promise<ProviderDto[]> {
+  async findAll(ownerId: string, amount?: number, skip?: number): Promise<ProviderDto[]> {
     const users = await this.prisma.provider.findMany({
+      where: { 
+        ownerId: ownerId,
+      },
       skip,
       take: amount,
     });
     return users.map((provider) => this.toDto(provider));
   }
 
-  async update(id: string, provider: Provider): Promise<ProviderDto | null> {
+  async update(name: string, ownerId: string, provider: Provider): Promise<ProviderDto | null> {
+    const entry = await this.find(name, ownerId);
     const updated = await this.prisma.provider.update({
-      where: { id },
+      where: { 
+        id: entry.id
+      },
       data: provider,
     });
     if (!updated) {
@@ -64,9 +75,10 @@ export class ProviderRepo {
     return this.toDto(updated);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(name: string, ownerId: string,): Promise<void> {
+    const entry = await this.find(name, ownerId);
     await this.prisma.provider.delete({
-      where: { id },
+      where: { id: entry.id },
     });
   }
 

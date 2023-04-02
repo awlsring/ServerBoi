@@ -29,9 +29,6 @@ structure TrackServerInput {
     connectivity: ServerConnectivitySummary,
     
     @required
-    owner: String,
-
-    @required
     query: TrackServerQueryInput
 
     provider: TrackServerProviderInput
