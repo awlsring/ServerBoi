@@ -22,7 +22,6 @@ const controllerContext: ControllerContext = {
 const userController = new UserAuthController(cfg.database);
 
 async function determineUserScope(auth?: string): Promise<string> {
-  console.log(`Determining user scope for ${auth}`)
   if (!auth) {
     throw new Error("No authorization header");
   }
@@ -54,8 +53,6 @@ export const server = createServer(async function (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & { req: IncomingMessage }
 ) {
-
-  console.log(`Received request: ${req.method} ${req.url}`)
 
   let user: string;
   try {

@@ -31,23 +31,11 @@ structure TrackServerInput {
     @required
     query: TrackServerQueryInput
 
-    provider: TrackServerProviderInput
+    provider: String
 
     providerServerData: TrackServerProviderDataInput
 
     capabilities: ServerCapabilities
-}
-
-
-structure TrackServerProviderInput {
-    @required
-    id: String
-
-    @required
-    name: String
-
-    @required
-    type: ProviderType
 }
 
 structure TrackServerProviderDataInput {

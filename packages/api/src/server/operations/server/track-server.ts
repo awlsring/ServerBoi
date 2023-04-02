@@ -15,12 +15,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       name: input.name!,
       address: input.connectivity!.address!,
       port: input.connectivity!.port!,
-      provider: input.provider ? {
-        id: input.provider.id!,
-        name: input.provider.name!,
-        type: input.provider.type!,
-        owner: context.user,
-      } : undefined,
+      providerName: input.provider,
       providerServerData: input.providerServerData ? {
         identifier: input.providerServerData.identifier!,
         location: input.providerServerData.location,

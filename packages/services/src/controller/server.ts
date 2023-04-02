@@ -6,13 +6,16 @@ import { ProviderServerDataDto, ServerDto, ServerQueryDto, ServerStatusDto } fro
 import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
+import { ProviderRepo } from "../persistence/provider-repo";
 
 export class ServerController {
   private serverDao: ServerRepo;
+  private providerDao: ProviderRepo;
   private ipLookup = new IPAPIClient();
 
   constructor(cfg: PrismaRepoOptions) {
     this.serverDao = new ServerRepo(cfg);
+    this.providerDao = new ProviderRepo(cfg);
   }
 
   private async queryServer(type: string, address: string, port?: number): Promise<ServerStatusDto> {
@@ -49,6 +52,11 @@ export class ServerController {
   async trackServer(input: TrackServerInput): Promise<ServerDto> {
     const location = await this.determineLocation(input.address);
 
+    let provider: ProviderDto | undefined = undefined;
+    if (input.providerName) {
+      provider = await this.providerDao.find(input.providerName, input.owner);
+    }
+
     const serverDto = await this.serverDao.create({
       scopeId: input.scopeId,
       serverId: this.generateServerId(),
@@ -68,7 +76,7 @@ export class ServerController {
         address: input.query.address,
         port: input.query.port,
       },
-      provider: input.provider,
+      provider: provider,
       providerServerData: input.providerServerData,
     });
     return this.enhanceServer(serverDto);
@@ -111,6 +119,7 @@ export class ServerController {
   }
 }
 
+
 export interface TrackServerInput {
   readonly scopeId: string;
   readonly name: string;
@@ -118,7 +127,7 @@ export interface TrackServerInput {
   readonly address: string;
   readonly port: number;
   readonly capabilities: string[];
-  readonly provider?: ProviderDto;
+  readonly providerName?: string;
   readonly providerServerData?: ProviderServerDataDto;
   readonly query: ServerQueryDto;
   readonly owner: string;
