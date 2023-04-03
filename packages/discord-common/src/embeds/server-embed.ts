@@ -120,6 +120,18 @@ export abstract class ServerEmbed {
     return address;
   }
 
+  protected static formApplicationField(application?: string): APIEmbedField {
+    let app = "Unknown";
+    if (application) {
+      app = application;
+    }
+    return {
+      name: "Application",
+      value: app,
+      inline: true
+    }
+  }
+
   protected static formAddressField(connectivity?: ServerConnectivitySummary): APIEmbedField {
     let address = this.fromAddressString(connectivity);
 

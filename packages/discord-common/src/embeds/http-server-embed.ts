@@ -28,8 +28,11 @@ export class HTTPServerEmbed extends ServerEmbed {
   constructor(summary: ServerSummary) {
     const fields: APIEmbedField[] = [
       HTTPServerEmbed.formStatusField(summary.status),
+      HTTPServerEmbed.formBlankField(),
       HTTPServerEmbed.formAddressField(summary.connectivity),
       HTTPServerEmbed.formLocationField(summary.location),
+      HTTPServerEmbed.formBlankField(),
+      HTTPServerEmbed.formApplicationField(summary.application),
     ]
     super({
       owner: summary.owner ?? "Unknown",
