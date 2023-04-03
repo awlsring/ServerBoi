@@ -7,6 +7,7 @@ export * from "./interactions/components/button/server/start-server";
 export * from "./interactions/components/button/server/server-button";
 export * from "./interactions/components/button/button";
 export * from "./interactions/components/menus/menu";
+export * from "./interactions/components/menus/server-more-actions";
 export * from "./interactions/components/modals/modals";
 export * from "./interactions/components/component";
 export * from "./interactions/context";

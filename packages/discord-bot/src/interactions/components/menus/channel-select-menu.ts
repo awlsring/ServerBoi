@@ -70,7 +70,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
     const embed = serverToEmbed(server)
     console.log(`Created embed`)
 
-    const message = await context.http.createMessage(selectedValue, embed.toMessage(false, false))
+    const message = await context.http.createMessage(selectedValue, embed.toMessage())
 
     await this.ServerCardRepo.create({
       messageId: message.id,

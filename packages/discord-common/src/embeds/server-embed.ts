@@ -1,7 +1,8 @@
 import { ServerConnectivitySummary, ServerLocationSummary, ServerStatus, ServerStatusSummary } from "@serverboi/client";
-import { EmbedType, APIStringSelectComponent, APISelectMenuOption, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
+import { EmbedType, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
+import { ServerMoreActionsMenu } from "../interactions/components/menus/server-more-actions";
 import { Embed } from "./embed";
 
 export enum ServerEmbedColor {
@@ -15,9 +16,7 @@ export enum ServerEmbedMoreActions {
 }
 
 export interface ServerActionsOptions {
-  startEnabled: boolean;
-  stopEnabled: boolean;
-  moreActions: ServerEmbedMoreActions[];
+  readonly moreActions: ServerEmbedMoreActions[];
 }
 
 
@@ -43,14 +42,20 @@ export interface ServerEmbedOptions {
   readonly description: string;
   readonly fields: APIEmbedField[];
   readonly provider?: ServerProvider;
+  readonly startEnabled?: boolean;
+  readonly stopEnabled?: boolean;
 }
 
 export abstract class ServerEmbed {
   readonly ownerId: string;
+  readonly startButtonEnabled: boolean;
+  readonly stopButtonEnabled: boolean;
   readonly embed: Embed;
 
   constructor(options: ServerEmbedOptions) {
     this.ownerId = options.owner;
+    this.startButtonEnabled = options.startEnabled ?? false;
+    this.stopButtonEnabled = options.stopEnabled ?? false;
     const id = options.serverId.split("-")[1] ?? "Unknown";
     this.embed = new Embed({
       type: EmbedType.Rich,
@@ -186,63 +191,37 @@ export abstract class ServerEmbed {
     }
   }
 
-  private makeMoreActionsSelect(options: ServerEmbedMoreActions[]): APIStringSelectComponent {
-    const opts: APISelectMenuOption[] = []
-
-    options.forEach((option) => {
-      switch (option) {
-        case ServerEmbedMoreActions.Remove:
-          opts.push({
-            label: `Remove`,
-            value: `remove`,
-            description: `Stop tracking server`,
-            default: false
-          })
-          break
-        default:
-          break
-      }
-    })
-
-    return {
-      custom_id: `server-action-more`,
-      placeholder: `Actions`,
-      options: opts,
-      min_values: 1,
-      max_values: 1,
-      type: 3
-    }
-  }
-
   private serverActions(options: ServerActionsOptions): APIActionRowComponent<APIMessageActionRowComponent>[] {
-    return [
-      {
+    const buttons: APIButtonComponent[] = [];
+    // if (!(!this.startButtonEnabled && !this.startButtonEnabled)) {
+    buttons.push(StartServerButton.formButton(this.startButtonEnabled))
+    buttons.push(StopServerButton.formButton(this.stopButtonEnabled))
+    // }
+    const rows: APIActionRowComponent<APIMessageActionRowComponent>[] = [];
+    if (buttons.length != 0) {
+      rows.push({
         type: 1,
-        components: [
-          StartServerButton.formButton(options.startEnabled),
-          StopServerButton.formButton(options.stopEnabled),
-        ],
-      },
-      {
-        type: 1,
-        components: [
-          this.makeMoreActionsSelect(options.moreActions)
-        ]
-      }
-    ]
+        components: [...buttons],
+      })
+    }
+    rows.push({
+      type: 1,
+      components: [
+        ServerMoreActionsMenu.toApiDataWithOptions(options.moreActions),
+      ]
+    })
+    return rows
   }
 
   public toApiData(): APIEmbed {
     return this.embed.toApiData();
   }
 
-  public toMessage(startEnabled: boolean, stopEnabled: boolean, actions?: ServerEmbedMoreActions[]): RESTPostAPIChannelMessageJSONBody {
+  public toMessage(actions?: ServerEmbedMoreActions[]): RESTPostAPIChannelMessageJSONBody {
     return {
       content: `Owner: <@${this.ownerId}>`,
       embeds: [this.embed.toApiData()],
       components: this.serverActions({
-        startEnabled: startEnabled,
-        stopEnabled: stopEnabled,
         moreActions: actions ?? [ServerEmbedMoreActions.Remove]
       }),
       allowed_mentions: {

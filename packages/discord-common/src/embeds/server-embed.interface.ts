@@ -5,7 +5,7 @@ import { ServerEmbedMoreActions } from "./server-embed";
 import { SteamServerEmbed } from "./steam-server-embed";
 
 export interface IServerEmbed {
-  toMessage(startEnabled: boolean, stopEnabled: boolean, actions?: ServerEmbedMoreActions[] | undefined): RESTPostAPIChannelMessageJSONBody
+  toMessage(actions?: ServerEmbedMoreActions[] | undefined): RESTPostAPIChannelMessageJSONBody
 }
 
 export function serverToEmbed(server: ServerSummary): IServerEmbed {

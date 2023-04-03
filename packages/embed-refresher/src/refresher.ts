@@ -20,7 +20,7 @@ class Refresher {
   async refreshEmbeds(card: ServerCardDto) {
     const server = await this.serverBoi.getServer("refreshed", card.serverId);
     const embed = serverToEmbed(server);
-    await this.discord.editMessage(card.channelId, card.messageId, embed.toMessage(false, false))
+    await this.discord.editMessage(card.channelId, card.messageId, embed.toMessage())
   }
 
   async refreshCards() {

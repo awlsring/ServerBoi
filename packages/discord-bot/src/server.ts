@@ -6,7 +6,7 @@ import { InteractionHandler } from './interactions/handler';
 import { Config } from './config';
 import fs from 'fs';
 import yaml from 'js-yaml';
-import { ServerBoiService, ServerCardRepo } from '@serverboi/discord-common';
+import { ServerBoiService, ServerCardRepo, ServerMoreActionsMenu, StartServerButton, StopServerButton } from '@serverboi/discord-common';
 import { TrackServerRequestRepo } from './persistence/track-server-request-repo';
 import { TrackCommand } from './interactions/components/commands/server/track';
 import { QuerySelectMenu } from './interactions/components/menus/query-select';
@@ -25,7 +25,6 @@ function loadConfig(): Config {
 }
 
 async function main() {
-  
   const server = fastify({
     logger: true,
   });
@@ -56,6 +55,9 @@ async function main() {
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
       new ResubmitBaseInfoButton(),
+      new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
+      new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
+      new ServerMoreActionsMenu({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
     ],
     logger: server.log,
   });

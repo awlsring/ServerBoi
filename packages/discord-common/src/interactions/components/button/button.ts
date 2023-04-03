@@ -3,9 +3,9 @@ import { InteractionContext } from "../../context"
 import { Component } from "../component";
 
 export interface ButtonEmojii {
-  readonly name: string;
-  readonly id: string;
-  readonly animated: boolean;
+  readonly name?: string;
+  readonly id?: string;
+  readonly animated?: boolean;
 }
 
 export abstract class ButtonComponent extends Component {
