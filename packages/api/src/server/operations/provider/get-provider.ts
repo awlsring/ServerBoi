@@ -8,7 +8,6 @@ export const GetProviderOperation: Operation<GetProviderServerInput, GetProvider
   try {
     console.log(`Received GetProvider operation`);
     console.log(`Input: ${JSON.stringify(input)}`);
-    console.log(`Context: ${JSON.stringify(context)}`);
     
     let server: ProviderDto;
     try {

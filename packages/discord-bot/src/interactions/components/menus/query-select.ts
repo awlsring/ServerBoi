@@ -60,7 +60,7 @@ export class QuerySelectMenu extends SelectMenuComponent {
         break;
       case "HTTP":
         await context.response.send({
-          type: InteractionResponseType.UpdateMessage,
+          type: InteractionResponseType.Modal,
           data: HTTPQueryInformationModal.toApiData()
         })
         break;

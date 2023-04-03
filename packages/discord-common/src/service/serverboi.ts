@@ -11,7 +11,6 @@ export class ServerBoiService {
     this.clientCache = new LRUCache<ServerBoiClient>(1000);
 
     setInterval(() => {
-      console.log(`ServerBoiService: clearing expired clients from cache`);
       for (const node of this.clientCache.getCache().values()) {
         if (Date.now() - node.created > this.clientCache.maxAge) {
           console.log("ServerBoiService: clearing expired client from cache", node.key)

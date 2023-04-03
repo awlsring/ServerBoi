@@ -18,17 +18,14 @@ export class ServerController {
     this.providerDao = new ProviderRepo(cfg);
   }
 
-  private async queryServer(type: string, address: string, port?: number): Promise<ServerStatusDto> {
+  private async queryServer(type: string, address: string, port: number): Promise<ServerStatusDto> {
     let querent: Querent;
     switch (type) {
       case "STEAM":
-        if (!port) {
-          throw new Error("Steam query requires port");
-        }
         querent = new SteamQuerent(address, port);
         break;
       case "HTTP":
-        querent = new HttpQuerent(address);
+        querent = new HttpQuerent(address, port);
         break;
       default:
         return {
@@ -98,8 +95,15 @@ export class ServerController {
         queryAddress = server.query.address;
       }
     }
+
+    let queryPort = server.port;
+    if (server.query.port) {
+      if (server.query.port != 0) {
+        queryPort = server.query.port;
+      }
+    }
     
-    const status = await this.queryServer(server.query.type, queryAddress, server.query.port);
+    const status = await this.queryServer(server.query.type, queryAddress, queryPort);
     return {
       ...server,
       status,

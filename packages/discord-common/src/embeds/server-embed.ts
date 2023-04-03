@@ -102,7 +102,20 @@ export abstract class ServerEmbed {
       address = connectivity.address;
     }
     if (connectivity?.port) {
-      address += `:${connectivity.port}`;
+      if (connectivity.port != 80 && connectivity.port != 443) {
+        address += `:${connectivity.port}`;
+      }
+    }
+    if (address.includes("http") || address.includes("https")) {
+      return address;
+    }
+    if (connectivity?.port) {
+      if (connectivity.port == 80) {
+        return `http://${address}`;
+      }
+      if (connectivity.port == 443) {
+        return `https://${address}`;
+      }
     }
     return address;
   }
@@ -118,7 +131,6 @@ export abstract class ServerEmbed {
   }
 
   protected static formStatusField(summary?: ServerStatusSummary): APIEmbedField {
-    console.log(JSON.stringify(summary));
     let status = "Unknown";
     if (summary?.status) {
       switch (summary.status) {

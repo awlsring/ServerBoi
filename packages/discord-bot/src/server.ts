@@ -15,6 +15,8 @@ import { ServerTrackInitialModal } from './interactions/components/modals/track-
 import { SteamQueryInformationModal } from './interactions/components/modals/steam-query-info';
 import { StartTrackServerButton } from './interactions/components/button/start-track';
 import { ResubmitQueryButton } from './interactions/components/button/resubmit-steam-query';
+import { ResubmitBaseInfoButton } from './interactions/components/button/resubmit-base-info';
+import { HTTPQueryInformationModal } from './interactions/components/modals/http-query-info';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -50,8 +52,10 @@ async function main() {
       }),
       new ServerTrackInitialModal({ trackServerDao: requestDao }),
       new SteamQueryInformationModal({ trackServerDao: requestDao }),
+      new HTTPQueryInformationModal({ trackServerDao: requestDao }),
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
+      new ResubmitBaseInfoButton(),
     ],
     logger: server.log,
   });

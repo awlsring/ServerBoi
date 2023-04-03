@@ -30,7 +30,6 @@ export class ServerCardRepo {
     if (!serverCard) {
       return null;
     }
-    console.log(JSON.stringify(serverCard, null, 2));
     return this.toDto(serverCard);
   }
 

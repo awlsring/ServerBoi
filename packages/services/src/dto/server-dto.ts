@@ -6,7 +6,7 @@ export interface ServerDto {
   readonly name: string;
   readonly application: string;
   readonly address: string;
-  readonly port?: number;
+  readonly port: number;
   readonly capabilities: string[];
   readonly status?: ServerStatusDto;
   readonly provider?: ProviderDto;
