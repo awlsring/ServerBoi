@@ -179,10 +179,11 @@ export abstract class ServerEmbed {
   protected static formLocationField(summary?: ServerLocationSummary): APIEmbedField {
     let location = "Unknown";
     if (summary) {
-      if (summary.country?.toLocaleLowerCase() === "us") {
+      if (summary.country === "US") {
         location = `${summary.emoji} ${summary.city}, ${summary.region}`;
+      } else {
+        location = `${summary.emoji} ${summary.city}, ${summary.country}`;
       }
-      location = `${summary.emoji} ${summary.city}, ${summary.country}`;
     }
     return {
       name: "Location",
@@ -192,18 +193,14 @@ export abstract class ServerEmbed {
   }
 
   private serverActions(options: ServerActionsOptions): APIActionRowComponent<APIMessageActionRowComponent>[] {
-    const buttons: APIButtonComponent[] = [];
-    // if (!(!this.startButtonEnabled && !this.startButtonEnabled)) {
-    buttons.push(StartServerButton.formButton(this.startButtonEnabled))
-    buttons.push(StopServerButton.formButton(this.stopButtonEnabled))
-    // }
     const rows: APIActionRowComponent<APIMessageActionRowComponent>[] = [];
-    if (buttons.length != 0) {
-      rows.push({
-        type: 1,
-        components: [...buttons],
-      })
-    }
+    rows.push({
+      type: 1,
+      components: [
+        StartServerButton.formButton(this.startButtonEnabled),
+        StopServerButton.formButton(this.stopButtonEnabled)
+      ],
+    })
     rows.push({
       type: 1,
       components: [
