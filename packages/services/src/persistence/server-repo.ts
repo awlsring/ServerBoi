@@ -109,6 +109,7 @@ export class ServerRepo {
       name: server.name,
       application: server.application,
       address: server.address,
+      port: server.port ?? undefined,
       capabilities: server.capabilities,
       owner: server.ownerId,
       added: new Date(server.addedAt),

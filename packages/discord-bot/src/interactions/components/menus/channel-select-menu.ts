@@ -1,6 +1,6 @@
 import { Capabilities } from "@serverboi/client"
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { SteamServerEmbed } from "@serverboi/discord-common"
+import { serverToEmbed } from "@serverboi/discord-common"
 import { ServerCardRepo } from "@serverboi/discord-common"
 import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo"
 import { ServerBoiService } from "@serverboi/discord-common"
@@ -40,7 +40,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       channelId: selectedValue
     })
 
-    const server = await this.serverboi.trackServer({
+    const server = await this.serverboi.trackServer(context.user, {
       scope: interaction.guild_id,
       application: finalizedRequest.application,
       name: finalizedRequest.name,
@@ -67,31 +67,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
     })
     console.log(`Sent response`)
 
-    const serverId = server.id!.split("-")[1]
-
-    const embed = new SteamServerEmbed({
-      serverId: serverId,
-      serverName: server.name!,
-      status: server.status?.status!,
-      address: server.connectivity?.address!,
-      port: server.connectivity?.port!,
-      steamPort: server.query?.port!,
-      location: {
-        city: server.location?.city!,
-        country: server.location?.country!,
-        region: server.location?.region!,
-        emoji: server.location?.emoji!,
-      },
-      application: server.application!,
-      players: server.status?.steam?.players!,
-      maxPlayers: server.status?.steam?.maxPlayers!,
-      owner: interaction.member?.user.username!,
-      capabilities: [],
-      provider: {
-        name: "K8S",
-        location: "DWS",
-      }
-    })
+    const embed = serverToEmbed(server)
     console.log(`Created embed`)
 
     const message = await context.http.createMessage(selectedValue, embed.toMessage(false, false))

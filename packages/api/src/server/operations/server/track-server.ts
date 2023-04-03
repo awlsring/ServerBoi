@@ -1,14 +1,12 @@
 import { Operation } from "@aws-smithy/server-common";
 import { TrackServerServerInput, TrackServerServerOutput, InternalServerError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
-import { ServerController } from "@serverboi/services"
 import { serverToSummary } from "./common";
 
 export const TrackServerOperation: Operation<TrackServerServerInput, TrackServerServerOutput, ServiceContext> = async (input, context) => {
   try {
     console.log(`Received TrackServer operation`);
     console.log(`Input: ${JSON.stringify(input)}`);
-    console.log(`Context: ${JSON.stringify(context)}`);
 
     const server = await context.controller.server.trackServer({
       scopeId: input.scope!,
@@ -37,6 +35,7 @@ export const TrackServerOperation: Operation<TrackServerServerInput, TrackServer
       summary: summary
     }
   } catch (e) {
+    console.error(e);
     throw new InternalServerError({ message: `Error tracking server: ${e}`} );
   }
 };

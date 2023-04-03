@@ -27,25 +27,24 @@ async function determineUserScope(auth?: string): Promise<string> {
   }
   
   const authFields = auth.split(" ");
-  console.log(`Auth fields: ${authFields}`)
-  if (authFields.length < 2) {
+  if (authFields.length < 3) {
     throw new Error("Invalid authorization header");
   }
-  const key = authFields[1];
+  const key = authFields[2];
   const userAuth = await userController.getUserAuth(key);
 
-  switch (authFields[0]) {
+  switch (authFields[1]) {
     case "Bot":
       if (userAuth.scope === "Bot") {
-        if (authFields.length < 4) {
+        if (authFields.length < 5) {
           throw new Error("Invalid Bot authorization header");
         }
-        return authFields[3];
+        return authFields[4];
       }
     case "User":
       return userAuth.scope;
     default:
-      throw new Error(`Invalid authorization header. No field ${authFields[0]}`);
+      throw new Error(`Invalid authorization header. No field ${authFields[1]}`);
   }
 }
 
@@ -57,7 +56,8 @@ export const server = createServer(async function (
   let user: string;
   try {
     user = await determineUserScope(req.headers.authorization);
-  } catch {
+  } catch (e) {
+    console.log(e)
     return writeResponse(new HttpResponse({
       statusCode: 401,
       headers: {

@@ -66,6 +66,7 @@ export class ServerController {
       name: input.name,
       application: input.application,
       address: input.address,
+      port: input.port,
       capabilities: input.capabilities,
       owner: input.owner,
       location: {
@@ -91,7 +92,13 @@ export class ServerController {
   }
 
   private async enhanceServer(server: ServerDto): Promise<ServerDto> {
-    const queryAddress = server.query.address ?? server.address;
+    let queryAddress = server.address;
+    if (server.query.address) {
+      if (server.query.address != "") {
+        queryAddress = server.query.address;
+      }
+    }
+    
     const status = await this.queryServer(server.query.type, queryAddress, server.query.port);
     return {
       ...server,

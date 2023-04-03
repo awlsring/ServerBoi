@@ -1,4 +1,4 @@
-import { Capabilities, ServerStatus } from "@serverboi/client";
+import { ServerConnectivitySummary, ServerLocationSummary, ServerStatus, ServerStatusSummary } from "@serverboi/client";
 import { EmbedType, APIStringSelectComponent, APISelectMenuOption, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
@@ -38,11 +38,8 @@ export interface ServerEmbedOptions {
   readonly serverName: string;
   readonly application: string;
   readonly status: string;
-  readonly address: string;
-  readonly port?: number;
-  readonly location: ServerLocation;
   readonly owner: string;
-  readonly capabilities: Capabilities[];
+  readonly capabilities: string[];
   readonly description: string;
   readonly fields: APIEmbedField[];
   readonly provider?: ServerProvider;
@@ -54,9 +51,10 @@ export abstract class ServerEmbed {
 
   constructor(options: ServerEmbedOptions) {
     this.ownerId = options.owner;
+    const id = options.serverId.split("-")[1] ?? "Unknown";
     this.embed = new Embed({
       type: EmbedType.Rich,
-      title: `${options.serverName} (${options.serverId})`,
+      title: `${options.serverName} (${id})`,
       description: options.description,
       color: this.determineColor(options.status),
       fields: options.fields,
@@ -90,14 +88,55 @@ export abstract class ServerEmbed {
     }
   }
 
-  protected static formStatusString(status: string): string {
-    switch (status) {
-      case ServerStatus.RUNNING:
-        return `🟢 Running`;
-      case ServerStatus.STOPPED:
-        return `🔴 Stopped`;
-      default:
-        return `Unknown`;
+  protected static formBlankField(): APIEmbedField {
+    return {
+      name: "\u200b",
+      value: "\u200b",
+      inline: true
+    }
+  }
+
+  protected static fromAddressString(connectivity?: ServerConnectivitySummary): string {
+    let address = "";
+    if (connectivity?.address) {
+      address = connectivity.address;
+    }
+    if (connectivity?.port) {
+      address += `:${connectivity.port}`;
+    }
+    return address;
+  }
+
+  protected static formAddressField(connectivity?: ServerConnectivitySummary): APIEmbedField {
+    let address = this.fromAddressString(connectivity);
+
+    return {
+      name: "Address",
+      value: `\`${address}\``,
+      inline: true
+    }
+  }
+
+  protected static formStatusField(summary?: ServerStatusSummary): APIEmbedField {
+    console.log(JSON.stringify(summary));
+    let status = "Unknown";
+    if (summary?.status) {
+      switch (summary.status) {
+        case ServerStatus.RUNNING:
+          status = `🟢 Running`;
+          break;
+        case ServerStatus.UNREACHABLE:
+        case ServerStatus.STOPPED:
+          status = `🔴 Stopped`;
+          break;
+        default:
+          status = `Unknown`;
+      }
+    }
+    return {
+      name: "Status",
+      value: status,
+      inline: true
     }
   }
 
@@ -108,11 +147,19 @@ export abstract class ServerEmbed {
     return `🌐 Hosted on ${provider.name} in ${provider.location} | 🕛 Updated: ${this.getUpdateTime()}`;
   }
 
-  protected static formLocationString(location: ServerLocation): string {
-    if (location.country.toLocaleLowerCase() === "us") {
-      return `${location.emoji} ${location.city}, ${location.region}`;
+  protected static formLocationField(summary?: ServerLocationSummary): APIEmbedField {
+    let location = "Unknown";
+    if (summary) {
+      if (summary.country?.toLocaleLowerCase() === "us") {
+        location = `${summary.emoji} ${summary.city}, ${summary.region}`;
+      }
+      location = `${summary.emoji} ${summary.city}, ${summary.country}`;
     }
-    return `${location.emoji} ${location.city}, ${location.country}`;
+    return {
+      name: "Location",
+      value: location,
+      inline: true
+    }
   }
 
   private makeMoreActionsSelect(options: ServerEmbedMoreActions[]): APIStringSelectComponent {

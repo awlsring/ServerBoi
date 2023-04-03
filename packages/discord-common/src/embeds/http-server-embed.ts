@@ -1,4 +1,4 @@
-import { Capabilities } from "@serverboi/client";
+import { Capabilities, ServerStatus, ServerSummary } from "@serverboi/client";
 import { APIEmbedField } from "discord-api-types/v10";
 import { ServerEmbed, ServerLocation, ServerProvider } from "./server-embed";
 
@@ -25,36 +25,24 @@ export class HTTPServerEmbed extends ServerEmbed {
     }
   }
 
-  constructor(options: HTTPServerEmbedOptions) {
+  constructor(summary: ServerSummary) {
     const fields: APIEmbedField[] = [
-      {
-        name: "Status",
-        value: HTTPServerEmbed.formStatusString(options.status),
-        inline: true
-      },
-      {
-        name: "Address",
-        value: `\`${options.address}\``,
-        inline: true
-      },
-      {
-        name: "Location",
-        value: HTTPServerEmbed.formLocationString(options.location),
-        inline: true
-      },
+      HTTPServerEmbed.formStatusField(summary.status),
+      HTTPServerEmbed.formAddressField(summary.connectivity),
+      HTTPServerEmbed.formLocationField(summary.location),
     ]
     super({
-      owner: options.owner,
-      serverId: options.serverId,
-      serverName: options.serverName,
-      application: options.application,
-      status: options.status,
-      address: options.address,
-      port: options.port,
-      location: options.location,
-      capabilities: options.capabilities,
-      provider: options.provider,
-      description: `Connect: ${options.address}`,
+      owner: summary.owner ?? "Unknown",
+      serverId: summary.id ?? "Unknown-Unknown",
+      serverName: summary.name ?? "Unknown",
+      status: summary.status?.status ?? ServerStatus.UNREACHABLE,
+      application: summary.application ?? "Unknown",
+      capabilities: summary.capabilities ?? [Capabilities.READ],
+      provider: summary.provider ? {
+        name: summary.provider.name ?? "Unknown",
+        location: summary.providerServerData?.location ?? "Unknown",
+      } : undefined,
+      description: `Connect: ${HTTPServerEmbed.fromAddressString(summary.connectivity)}`,
       fields: fields,
     });
   }

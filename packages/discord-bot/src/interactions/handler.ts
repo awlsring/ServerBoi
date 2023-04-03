@@ -1,4 +1,4 @@
-import { Component, Logger, DiscordHttpClient } from "@serverboi/discord-common";
+import { Component, Logger, DiscordHttpClient, InteractionContext } from "@serverboi/discord-common";
 import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
 
@@ -25,11 +25,17 @@ export class InteractionHandler {
     });
   }
 
-  private async formContext(response: FastifyReply) {
+  private async formContext(interaction: APIInteraction, response: FastifyReply): Promise<InteractionContext> {
+    let user = "";
+    if (interaction.member) {
+      user = interaction.member.user.id;
+    }
+
     return {
       http: this.httpClient,
       response: response,
       logger: this.log,
+      user: user,
     };
   }
 
@@ -86,7 +92,7 @@ export class InteractionHandler {
     console.log("Handling interaction")
     console.log(`Interaction ID: ${interaction.id}`)
     console.log(`Interaction: ${JSON.stringify(interaction)}`)
-    const context = await this.formContext(response);
+    const context = await this.formContext(interaction, response);
     console.log("Routing request")
 
     const interactionName = await this.determineInteractionName(interaction);

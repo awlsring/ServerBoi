@@ -3,7 +3,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import dotenv from 'dotenv';
 import { Config } from './config';
-import { ServerBoiService, ServerCardRepo, ServerCardDto, serverToEmbed, InteractionHttpClient } from '@serverboi/discord-common';
+import { ServerBoiService, ServerCardRepo, ServerCardDto, serverToEmbed, DiscordHttpClient } from '@serverboi/discord-common';
 dotenv.config();
 
 function loadConfig(): Config {
@@ -15,10 +15,10 @@ function loadConfig(): Config {
 class Refresher {
   readonly serverCardRepo: ServerCardRepo;
   readonly serverBoi: ServerBoiService;
-  readonly discord: InteractionHttpClient;
+  readonly discord: DiscordHttpClient;
 
   async refreshEmbeds(card: ServerCardDto) {
-    const server = await this.serverBoi.getServer(card.serverId);
+    const server = await this.serverBoi.getServer("refreshed", card.serverId);
     const embed = serverToEmbed(server);
     await this.discord.editMessage(card.channelId, card.messageId, embed.toMessage(false, false))
   }
@@ -32,7 +32,7 @@ class Refresher {
   constructor(config: Config) {
     this.serverBoi = new ServerBoiService(config.serverboi.endpoint, config.serverboi.apiKey);
     this.serverCardRepo = new ServerCardRepo(config.database);
-    this.discord = new InteractionHttpClient({
+    this.discord = new DiscordHttpClient({
       token: config.discord.token,
       version: "v10"
     });

@@ -1,4 +1,4 @@
-import { Capabilities } from "@serverboi/client";
+import { Capabilities, ServerStatus, ServerStatusSummary, ServerSummary, SteamStatusSummary } from "@serverboi/client";
 import { APIEmbedField } from "discord-api-types/v10";
 import { ServerEmbed, ServerLocation, ServerProvider } from "./server-embed";
 
@@ -36,51 +36,59 @@ export class SteamServerEmbed extends ServerEmbed {
     return `Connect: steam://connect/${address}:${port}`;
   }
 
-  constructor(options: SteamServerEmbedOptions) {
-    const fields: APIEmbedField[] = [
-      {
-        name: "Status",
-        value: SteamServerEmbed.formStatusString(options.status),
-        inline: true
-      },
-      {
-        name: "\u200b",
-        value: "\u200b",
-        inline: true
-      },
-      {
-        name: "Address",
-        value: `\`${options.address}\``,
-        inline: true
-      },
-      {
-        name: "Location",
-        value: SteamServerEmbed.formLocationString(options.location),
-        inline: true
-      },
-      {
-        name: "Game",
-        value: options.application,
-        inline: true
-      },
-      {
-        name: "Players",
-        value: `${options.players}/${options.maxPlayers}`,
-        inline: true
+  private static formGameField(application?: string): APIEmbedField {
+    let game = "Unknown";
+    if (application) {
+      game = application;
+    }
+    return {
+      name: "Game",
+      value: game,
+      inline: true
+    }
+  }
+
+  private static formPlayersField(summary?: SteamStatusSummary): APIEmbedField {
+    let players = 0;
+    let maxPlayers = 0;
+
+    if (summary) {
+      if (summary.players) {
+        players = summary.players;
       }
+      if (summary.maxPlayers) {
+        maxPlayers = summary.maxPlayers;
+      }
+    }
+
+    return {
+      name: "Players",
+      value: `${players}/${maxPlayers}`,
+      inline: true
+    }
+  }
+
+  constructor(summary: ServerSummary) {
+    const fields: APIEmbedField[] = [
+      SteamServerEmbed.formStatusField(summary.status),
+      SteamServerEmbed.formBlankField(),
+      SteamServerEmbed.formAddressField(summary.connectivity),
+      SteamServerEmbed.formLocationField(summary.location),
+      SteamServerEmbed.formGameField(summary.application),
+      SteamServerEmbed.formPlayersField(summary.status?.steam),
     ]
     super({
-      owner: options.owner,
-      serverId: options.serverId,
-      serverName: options.serverName,
-      application: options.application,
-      status: options.status,
-      address: options.address,
-      port: options.port,
-      location: options.location,
-      capabilities: options.capabilities,
-      provider: options.provider,
-      description: SteamServerEmbed.formSteamConnectString(options.address, options.port, options.steamPort),
+      owner: summary.owner ?? "Unknown",
+      serverId: summary.id ?? "Unknown-Unknown",
+      serverName: summary.name ?? "Unknown",
+      status: summary.status?.status ?? ServerStatus.UNREACHABLE,
+      application: summary.application ?? "Unknown",
+      capabilities: summary.capabilities ?? [Capabilities.READ],
+      provider: summary.provider ? {
+        name: summary.provider.name ?? "Unknown",
+        location: summary.providerServerData?.location ?? "Unknown",
+      } : undefined,
+      description: SteamServerEmbed.formSteamConnectString(summary.connectivity?.address ?? "unknown", summary.connectivity?.port ?? 0, summary.query?.port),
       fields: fields,
     });
   }
