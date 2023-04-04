@@ -2,12 +2,8 @@ import { GetServerCommand, ListServersCommand, ServerBoiClient, ServerSummary, T
 import { LRUCache } from "../cache/lru-cache";
 
 export class ServerBoiService {
-  private apiKeyBase: string;
-  private endpoint: string;
   private clientCache: LRUCache<ServerBoiClient>;
-  constructor(endpoint: string, apiKey: string) {
-    this.apiKeyBase = `Bot ${apiKey}`;
-    this.endpoint = endpoint;
+  constructor(private readonly endpoint: string, private readonly apiKey: string) {
     this.clientCache = new LRUCache<ServerBoiClient>(1000);
 
     setInterval(() => {
@@ -25,7 +21,20 @@ export class ServerBoiService {
     let client = this.clientCache.get(userId);
     if (!client) {
       console.log("ServerBoiService: creating new client for user", userId)
-      client = new ServerBoiClient({ endpoint: this.endpoint, apiKey: `${this.apiKeyBase} User ${userId}`});
+      client = new ServerBoiClient({ endpoint: this.endpoint, apiKey: this.apiKey});
+      client.middlewareStack.add(
+        (next, _) => async (args) => {
+          const request = args.request as any
+          request.headers!["x-serverboi-user"] = userId;
+          const result = await next(args);
+          return result;
+        },
+        {
+          step: "build",
+          name: "addUserHeader",
+          tags: ["BOT", "USER"],
+        }
+      );
       this.clientCache.set(userId, client);
     }
     return client;

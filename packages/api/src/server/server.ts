@@ -1,4 +1,4 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer, IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http";
 import {
   ServerBoiService as __ServerBoiService,
   getServerBoiServiceHandler,
@@ -21,30 +21,35 @@ const controllerContext: ControllerContext = {
 
 const userController = new UserAuthController(cfg.database);
 
-async function determineUserScope(auth?: string): Promise<string> {
+async function getUserFromHeaders(headers: IncomingHttpHeaders): Promise<string> {
+  if (!headers["x-serverboi-user"]) {
+    throw new Error("No user header");
+  }
+
+  return headers["x-serverboi-user"] as string;
+}
+
+async function buildContext(headers: IncomingHttpHeaders): Promise<ServiceContext> {
+  const auth = headers.authorization;
   if (!auth) {
     throw new Error("No authorization header");
   }
   
   const authFields = auth.split(" ");
-  if (authFields.length < 3) {
+  if (authFields.length != 2) {
     throw new Error("Invalid authorization header");
   }
-  const key = authFields[2];
+  const key = authFields[1];
   const userAuth = await userController.getUserAuth(key);
 
-  switch (authFields[1]) {
-    case "Bot":
-      if (userAuth.scope === "Bot") {
-        if (authFields.length < 5) {
-          throw new Error("Invalid Bot authorization header");
-        }
-        return authFields[4];
-      }
-    case "User":
-      return userAuth.scope;
-    default:
-      throw new Error(`Invalid authorization header. No field ${authFields[1]}`);
+  let user: string = userAuth.scope;
+  if (userAuth.scope === "Bot") {
+    user = await getUserFromHeaders(headers);
+  }
+  console.log("User: ", user)
+  return {
+    user: user,
+    controller: controllerContext,
   }
 }
 
@@ -53,9 +58,9 @@ export const server = createServer(async function (
   res: ServerResponse<IncomingMessage> & { req: IncomingMessage }
 ) {
 
-  let user: string;
+  let context: ServiceContext;
   try {
-    user = await determineUserScope(req.headers.authorization);
+    context = await buildContext(req.headers);
   } catch (e) {
     console.log(e)
     return writeResponse(new HttpResponse({
@@ -69,10 +74,6 @@ export const server = createServer(async function (
 
     }), res)
   }
-  const context: ServiceContext = {
-    user: user,
-    controller: controllerContext,
-  };
   const httpRequest = convertRequest(req);
   const httpResponse = await serviceHandler.handle(httpRequest, context);
 
