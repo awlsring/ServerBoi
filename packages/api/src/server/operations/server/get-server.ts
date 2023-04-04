@@ -1,7 +1,7 @@
 import { Operation } from "@aws-smithy/server-common";
 import { GetServerServerInput, GetServerServerOutput, InternalServerError, ResourceNotFoundError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
-import { ServerDto } from "@serverboi/services"
+import { ServerDto } from "@serverboi/backend-common"
 import { serverToSummary } from "./common";
 
 export const GetServerOperation: Operation<GetServerServerInput, GetServerServerOutput, ServiceContext> = async (input, context) => {

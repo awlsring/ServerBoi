@@ -1,5 +1,5 @@
 import { Operation } from "@aws-smithy/server-common";
-import { ProviderDto } from "@serverboi/services/dist/dto/provider-dto";
+import { ProviderDto } from "@serverboi/backend-common/dist/dto/provider-dto";
 import { GetProviderServerInput, GetProviderServerOutput, InternalServerError, ResourceNotFoundError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
 import { providerToSummary } from "./common";

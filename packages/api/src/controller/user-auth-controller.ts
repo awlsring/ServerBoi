@@ -1,7 +1,7 @@
 import { UserAuthDto } from "../dto/user-auth-dto";
 import { UserAuthRepo } from "../persistence/user-auth-repo";
 import * as crypto from "crypto";
-import { PrismaRepoOptions } from "@serverboi/services";
+import { PrismaRepoOptions } from "@serverboi/backend-common";
 
 export class UserAuthController {
   private repo: UserAuthRepo;

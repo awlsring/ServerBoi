@@ -1,4 +1,4 @@
-import { ProviderDto } from "@serverboi/services";
+import { ProviderDto } from "@serverboi/backend-common";
 import { ProviderSummary } from "@serverboi/ssdk";
 
 export function providerToSummary(provider: ProviderDto): ProviderSummary {

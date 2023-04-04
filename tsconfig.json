@@ -29,7 +29,7 @@
         "path": "./packages/client"
         },
         {
-        "path": "./packages/services"
+        "path": "./packages/backend-common"
         },
         {
         "path": "./packages/discord-common"

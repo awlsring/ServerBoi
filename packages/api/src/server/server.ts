@@ -7,7 +7,7 @@ import { ServiceHandler } from "./handler/service";
 import { convertRequest, writeResponse } from "@aws-smithy/server-node";
 import { ControllerContext, ServiceContext } from "./handler/context";
 import { loadConfig } from "../config";
-import { ProviderController, ServerController } from "@serverboi/services";
+import { ProviderController, ServerController } from "@serverboi/backend-common";
 import { UserAuthController } from "../controller/user-auth-controller";
 import { HttpResponse } from "@aws-sdk/protocol-http";
 

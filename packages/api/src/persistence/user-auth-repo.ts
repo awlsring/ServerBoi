@@ -1,6 +1,6 @@
 import { PrismaClient, UserAuth } from '@prisma/client';
 import { UserAuthDto } from '../dto/user-auth-dto';
-import { PrismaRepoOptions } from '@serverboi/services';
+import { PrismaRepoOptions } from '@serverboi/backend-common';
 
 export class UserAuthRepo {
   readonly prisma: PrismaClient;

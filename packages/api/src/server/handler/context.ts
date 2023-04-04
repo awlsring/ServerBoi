@@ -1,4 +1,4 @@
-import { ProviderController, ServerController } from "@serverboi/services";
+import { ProviderController, ServerController } from "@serverboi/backend-common";
 import { Config } from "../../config";
 
 export interface ControllerContext {
