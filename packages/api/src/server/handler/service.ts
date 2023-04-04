@@ -8,6 +8,7 @@ import {
   ListProvidersServerInput,
   CreateProviderServerInput,
   DeleteProviderServerInput,
+  UntrackServerServerInput,
 } from "@serverboi/ssdk";
 import { ServiceContext } from "./context";
 import { HealthOperation } from "../operations/health";
@@ -18,6 +19,7 @@ import { GetProviderOperation } from "../operations/provider/get-provider";
 import { ListProvidersOperation } from "../operations/provider/list-provider";
 import { CreateProviderOperation } from "../operations/provider/create-provider";
 import { DeleteProviderOperation } from "../operations/provider/delete-provider";
+import { UntrackServerOperation } from "../operations/server/untrack-server";
 
 export class ServiceHandler implements ServerBoiService<ServiceContext> {
   Health = (input: HealthServerInput, context: ServiceContext) => HealthOperation(input, context);
@@ -30,19 +32,13 @@ export class ServiceHandler implements ServerBoiService<ServiceContext> {
   GetServer = (input: GetServerServerInput, context: ServiceContext) => GetServerOperation(input, context);
   TrackServer = (input: TrackServerServerInput, context: ServiceContext) => TrackServerOperation(input, context);
   ListServers = (input: ListServersServerInput, context: ServiceContext) => ListServersOperation(input, context);
-  
-  async UntrackServer<UntrackServerServerInput, UntrackServerServerOutput>(
-    input: UntrackServerServerInput
-  ): Promise<UntrackServerServerOutput> {
-    return Promise.resolve({
-      success: true,
-    } as UntrackServerServerOutput);
-  }
+  UntrackServer = (input: UntrackServerServerInput, context: ServiceContext) => UntrackServerOperation(input, context);
+
   async UpdateServer<UpdateServerServerInput, UpdateServerServerOutput>(
     input: UpdateServerServerInput
   ): Promise<UpdateServerServerOutput> {
     return Promise.resolve({
-      success: true,
+      success: false,
     } as UpdateServerServerOutput);
   }
 }
