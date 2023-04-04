@@ -4,18 +4,13 @@ import dotenv from 'dotenv';
 import { Config } from './config';
 import { setInterval } from 'timers/promises';
 import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
-import { HttpQuerent, ServerDto, ServerRepo, ServerStatusDto, SteamQuerent } from '@serverboi/backend-common';
+import { determineConnectivity, HttpQuerent, ServerDto, ServerRepo, ServerStatusDto, SteamQuerent } from '@serverboi/backend-common';
 dotenv.config();
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
   const data = fs.readFileSync(configPath, 'utf-8');
   return new Config(yaml.load(data));
-}
-
-export interface Connectivity {
-  readonly address: string;
-  readonly port: number;
 }
 
 class StatusMonitor {
@@ -28,38 +23,17 @@ class StatusMonitor {
   }
 
   async getStatus(server: ServerDto): Promise<ServerStatusDto> {
-    const connectivity = await this.determineConnectivity(server);
+    const connectivity = await determineConnectivity(server);
     switch (server.query.type) {
       case ServerQueryType.STEAM:
-        return await new SteamQuerent(connectivity.address, connectivity.port).Query();
+        return await new SteamQuerent(connectivity).Query();
       case ServerQueryType.HTTP:
-        return await new HttpQuerent(connectivity.address, connectivity.port).Query();
+        return await new HttpQuerent(connectivity).Query();
       default:
         return {
           type: ServerQueryType.NONE,
           status: ServerStatus.UNREACHABLE,
         }
-    }
-  }
-
-  async determineConnectivity(server: ServerDto): Promise<Connectivity> {
-    let queryAddress = server.address;
-    if (server.query.address) {
-      if (server.query.address != "") {
-        queryAddress = server.query.address;
-      }
-    }
-
-    let queryPort = server.port;
-    if (server.query.port) {
-      if (server.query.port != 0) {
-        queryPort = server.query.port;
-      }
-    }
-
-    return {
-      address: queryAddress,
-      port: queryPort,
     }
   }
 

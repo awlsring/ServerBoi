@@ -53,6 +53,9 @@ export class ServerRepo {
             data: server.providerServerData!.data,
           }
         } : undefined,
+        status: {
+          create: server.status
+        }
       }
     });
     return this.toDto(createdServer);

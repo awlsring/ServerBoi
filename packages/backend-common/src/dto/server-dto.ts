@@ -52,6 +52,7 @@ export interface NewServerDto {
   readonly address: string;
   readonly port?: number;
   readonly capabilities: string[];
+  readonly status: ServerStatusDto;
   readonly provider?: ProviderDto;
   readonly providerServerData?: ProviderServerDataDto;
   readonly query: ServerQueryDto;

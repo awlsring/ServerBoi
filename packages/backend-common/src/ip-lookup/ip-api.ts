@@ -80,7 +80,13 @@ export class IPAPIClient {
     const ip = await this.resolveIp(address);
     const response = await fetch(`https://ipapi.co/${ip}/json`);
     if (!response.ok) {
-      throw new Error(`Failed to get IP info for ${address}`);
+      console.error(`Failed to get IP info for ${address}`);
+      return {
+        city: 'Unknown',
+        region: 'Unknown',
+        country: 'Unknown',
+        emoji: '😔',
+      };
     }
     const ipApiResponse = await response.json() as IPAPIResponse;
     console.log(ipApiResponse)

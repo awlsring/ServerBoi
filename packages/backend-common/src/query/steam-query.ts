@@ -1,28 +1,30 @@
 import { ServerQueryType, ServerStatus } from "@serverboi/ssdk";
 import { queryGameServerInfo } from "steam-server-query";
-import { ServerStatusDto } from "../dto/server-dto";
-import { Querent } from "./common";
+import { ServerDto, ServerStatusDto } from "../dto/server-dto";
+import { Connectivity, Querent, QuerentBase } from "./common";
 
 export interface SteamStatusData {
-  name: string;
-  map: string;
-  game: string;
-  gameId: number;
-  players: number;
-  maxPlayers: number;
-  visibility: number;
+  readonly name: string;
+  readonly map: string;
+  readonly game: string;
+  readonly gameId: number;
+  readonly players: number;
+  readonly maxPlayers: number;
+  readonly visibility: number;
 }
 
-export class SteamQuerent implements Querent {
-  private readonly type = ServerQueryType.STEAM;
+export class SteamQuerent extends QuerentBase {
+  protected readonly type = ServerQueryType.STEAM;
   private readonly address: string;
   private readonly port: number;
-  constructor(address: string, port: number) {
-    this.address = address;
-    if (address.includes(":")) {
-      this.address = address.split(":")[0];
+  constructor(connectivity: Connectivity) {
+    super(connectivity);
+
+    this.address = this.connectivity.address;
+    if (this.connectivity.address.includes(":")) {
+      this.address = this.connectivity.address.split(":")[0];
     }
-    this.port = port;
+    this.port = this.connectivity.port;
   }
 
   async Query(): Promise<ServerStatusDto> {

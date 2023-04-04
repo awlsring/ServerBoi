@@ -1,13 +1,14 @@
 import { ServerRepo } from "../persistence/server-repo";
 import { SteamQuerent } from "../query/steam-query";
 import { HttpQuerent } from "../query/http-query";
-import { Querent } from "../query/common";
+import { Connectivity, Querent } from "../query/common";
 import { ProviderServerDataDto, ServerDto, ServerQueryDto, ServerStatusDto } from "../dto/server-dto";
 import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
-import { ServerQueryType } from '@serverboi/ssdk';
+import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
+import { Server } from "@prisma/client";
 
 export class ServerController {
   private serverDao: ServerRepo;
@@ -19,22 +20,42 @@ export class ServerController {
     this.providerDao = new ProviderRepo(cfg);
   }
 
-  private async queryServer(type: string, address: string, port: number): Promise<ServerStatusDto> {
+  private async queryServer(type: string, connectivity: Connectivity): Promise<ServerStatusDto> {
     let querent: Querent;
     switch (type) {
       case ServerQueryType.STEAM:
-        querent = new SteamQuerent(address, port);
+        querent = new SteamQuerent(connectivity);
         break;
       case ServerQueryType.HTTP:
-        querent = new HttpQuerent(address, port);
+        querent = new HttpQuerent(connectivity);
         break;
       default:
         return {
           type: ServerQueryType.NONE,
-          status: "UNREACHABLE",
+          status: ServerStatus.UNREACHABLE,
         }
     }
     return querent.Query();
+  }
+
+  private determineConnectivity(address: string, port: number, queryAddress?: string, queryPort?: number): Connectivity {
+    let a = address;
+    if (queryAddress) {
+      if (queryAddress != "") {
+        a = queryAddress;
+      }
+    }
+
+    let p = port;
+    if (queryPort) {
+      if (queryPort != 0) {
+        p = queryPort;
+      }
+    }
+    return {
+      address: a,
+      port: p,
+    }
   }
 
   private async determineLocation(address: string): Promise<ServerLocation> {
@@ -58,6 +79,8 @@ export class ServerController {
       provider = await this.providerDao.find(input.providerName, input.owner);
     }
 
+    const status = await this.queryServer(input.query.type, this.determineConnectivity(input.address, input.port, input.query.address, input.query.port));
+
     const serverDto = await this.serverDao.create({
       scopeId: input.scopeId,
       serverId: this.generateServerId(),
@@ -73,6 +96,7 @@ export class ServerController {
         region: location.region,
         emoji: location.emoji,
       },
+      status: status,
       query: {
         type: input.query.type,
         address: input.query.address,
@@ -81,39 +105,12 @@ export class ServerController {
       provider: provider,
       providerServerData: input.providerServerData,
     });
-    return this.enhanceServer(serverDto);
+    return serverDto;
   }
 
   async untrackServer(id: string): Promise<void> {
     const { scopeId, serverId } = this.unpackId(id);
     await this.serverDao.delete(scopeId, serverId);
-  }
-
-  private async enhanceServer(server: ServerDto): Promise<ServerDto> {
-    let queryAddress = server.address;
-    if (server.query.address) {
-      if (server.query.address != "") {
-        queryAddress = server.query.address;
-      }
-    }
-
-    let queryPort = server.port;
-    if (server.query.port) {
-      if (server.query.port != 0) {
-        queryPort = server.query.port;
-      }
-    }
-    
-    const status = await this.queryServer(server.query.type, queryAddress, queryPort);
-    return {
-      ...server,
-      status,
-      query: {
-        type: server.query.type,
-        address: server.query.address,
-        port: server.query.port,
-      },
-    };
   }
 
   async getServer(id: string): Promise<ServerDto> {
@@ -122,15 +119,12 @@ export class ServerController {
     if (!serverDto) {
       throw new Error("Server not found");
     }
-    return this.enhanceServer(serverDto);
+    return serverDto;
   }
 
   async listServers(amount?: number, skip?: number): Promise<ServerDto[]> {
     const servers = await this.serverDao.findAll(amount, skip);
-    return Promise.all(servers.map(async (server) => {
-      return this.enhanceServer(server);
-    }
-    ));
+    return Promise.all(servers.map(async (server) => { return server; }));
   }
 }
 
