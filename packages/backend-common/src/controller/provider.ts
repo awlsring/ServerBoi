@@ -9,11 +9,11 @@ export class ProviderController {
     this.providerRepo = new ProviderRepo(cfg);
   }
 
-  async trackServer(input: NewProviderDto): Promise<ProviderDto> {
+  async createProvider(input: NewProviderDto): Promise<ProviderDto> {
     return await this.providerRepo.create(input);
   }
 
-  async untrackServer(name: string, ownerId: string): Promise<void> {
+  async deleteProvider(name: string, ownerId: string): Promise<void> {
     await this.providerRepo.delete(name, ownerId);
   }
 
@@ -21,7 +21,7 @@ export class ProviderController {
     return await this.providerRepo.find(name, ownerId);
   }
 
-  async listServers(ownerId: string, amount?: number, skip?: number): Promise<ProviderDto[]> {
+  async listProviders(ownerId: string, amount?: number, skip?: number): Promise<ProviderDto[]> {
     return await this.providerRepo.findAll(ownerId, amount, skip);
   }
 }

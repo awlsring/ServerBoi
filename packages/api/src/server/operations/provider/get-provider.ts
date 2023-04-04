@@ -9,13 +9,13 @@ export const GetProviderOperation: Operation<GetProviderServerInput, GetProvider
     console.log(`Received GetProvider operation`);
     console.log(`Input: ${JSON.stringify(input)}`);
     
-    let server: ProviderDto;
+    let provider: ProviderDto;
     try {
-      server = await context.controller.provider.getProvider(input.name!, context.user!);
+      provider = await context.controller.provider.getProvider(input.name!, context.user);
     } catch {
       throw new ResourceNotFoundError({ message: `Provider not found` });
     }
-    const summary = providerToSummary(server)
+    const summary = providerToSummary(provider)
 
     console.log(`Returning summary: ${JSON.stringify(summary)}`);
     return {
