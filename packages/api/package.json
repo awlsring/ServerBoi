@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
+    "build:container": "docker build -f packages/api/Dockerfile -t awlsring/serverboi-api:latest .",
     "start": "node dist/index.js",
     "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/index.js"
   },

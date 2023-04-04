@@ -5,6 +5,7 @@
   "main": "dist/refresher.js",
   "scripts": {
     "build": "tsc --build",
+    "build:container": "docker build -f packages/embed-refresher/Dockerfile -t awlsring/serverboi-embed-refresher:latest .",
     "start": "node dist/refresher.js",
     "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/refresher.js"
   },

@@ -5,12 +5,12 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc --build",
+    "build:container": "docker build -f packages/status-monitor/Dockerfile -t awlsring/serverboi-status-monitor:latest .",
     "start": "node dist/main.js",
     "start:dev": "npm run build && export CONFIG_PATH='./config.yaml' && npm run start"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",
-    "@serverboi/client": "^1.0.0",
     "@serverboi/backend-common": "^1.0.0",
     "http": "^0.0.1-security",
     "js-yaml": "^4.1.0",

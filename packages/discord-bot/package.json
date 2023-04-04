@@ -5,6 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc --build",
+    "build:container": "docker build -f packages/discord-bot/Dockerfile -t awlsring/serverboi-discord-bot:latest .",
     "start": "node dist/server.js",
     "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/server.js",
     "commands:deregister": "ts-node --project tsconfig.json scripts/deregister-commands.ts",
