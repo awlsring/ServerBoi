@@ -7,6 +7,7 @@ import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
+import { ServerQueryType } from '@serverboi/ssdk';
 
 export class ServerController {
   private serverDao: ServerRepo;
@@ -21,15 +22,15 @@ export class ServerController {
   private async queryServer(type: string, address: string, port: number): Promise<ServerStatusDto> {
     let querent: Querent;
     switch (type) {
-      case "STEAM":
+      case ServerQueryType.STEAM:
         querent = new SteamQuerent(address, port);
         break;
-      case "HTTP":
+      case ServerQueryType.HTTP:
         querent = new HttpQuerent(address, port);
         break;
       default:
         return {
-          type: "NONE",
+          type: ServerQueryType.NONE,
           status: "UNREACHABLE",
         }
     }

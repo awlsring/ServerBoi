@@ -1,3 +1,4 @@
+import { ServerQueryType, ServerStatus } from "@serverboi/ssdk";
 import { queryGameServerInfo } from "steam-server-query";
 import { ServerStatusDto } from "../dto/server-dto";
 import { Querent } from "./common";
@@ -13,7 +14,7 @@ export interface SteamStatusData {
 }
 
 export class SteamQuerent implements Querent {
-  private readonly type = "STEAM";
+  private readonly type = ServerQueryType.STEAM;
   private readonly address: string;
   private readonly port: number;
   constructor(address: string, port: number) {
@@ -40,7 +41,7 @@ export class SteamQuerent implements Querent {
 
       const status: ServerStatusDto = {
         type: this.type,
-        status: "RUNNING",
+        status: ServerStatus.RUNNING,
         data: JSON.stringify(steamData),
       };
 
@@ -51,7 +52,7 @@ export class SteamQuerent implements Querent {
       console.log(e);
       return {
         type: this.type,
-        status: "UNREACHABLE",
+        status: ServerStatus.UNREACHABLE,
       };
     }
   }

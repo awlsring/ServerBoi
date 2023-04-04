@@ -32,6 +32,9 @@
         "path": "./packages/backend-common"
         },
         {
+        "path": "./packages/status-monitor"
+        },
+        {
         "path": "./packages/discord-common"
         },
         {

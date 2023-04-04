@@ -823,6 +823,10 @@
     "@aws-smithy/server-common" "1.0.0-alpha.5"
     tslib "^2.3.1"
 
+"@serverboi/status-monitor@file:/Users/awlsring/Code/serverboi/packages/status-monitor":
+  version "1.0.0"
+  resolved "file:packages/status-monitor"
+
 "@sinclair/typebox@^0.25.16":
   version "0.25.24"
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.25.24.tgz"

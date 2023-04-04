@@ -1,5 +1,5 @@
 import { PrismaClient, Provider, ProviderServerData, Server, Status } from '@prisma/client';
-import { NewServerDto, ServerDto } from '../dto/server-dto';
+import { NewServerDto, ServerDto, ServerStatusDto } from '../dto/server-dto';
 import { PrismaRepoOptions } from './prisma-repo-options';
 
 type ServerFull = Server & {
@@ -84,6 +84,25 @@ export class ServerRepo {
       include: this.defaultInclude,
       where: { scopeId_serverId: { scopeId, serverId } },
       data: server,
+    });
+    if (!updatedServer) {
+      return null;
+    }
+    return this.toDto(updatedServer);
+  }
+
+  async updateStatus(scopeId: string, serverId: string, status: ServerStatusDto): Promise<ServerDto | null> {
+    const updatedServer = await this.prisma.server.update({
+      include: this.defaultInclude,
+      where: { scopeId_serverId: { scopeId, serverId } },
+      data: {
+        status: {
+          upsert: {
+            create: status,
+            update: status,
+          }
+        }
+      },
     });
     if (!updatedServer) {
       return null;
