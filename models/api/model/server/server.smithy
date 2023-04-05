@@ -10,6 +10,11 @@ resource Server {
     update: UpdateServer,
     create: TrackServer,
     delete: UntrackServer,
+    operations: [
+        StartServer,
+        StopServer,
+        RebootServer,
+    ],
 }
 
 string ServerIdentifier

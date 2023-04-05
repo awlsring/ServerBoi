@@ -8,7 +8,6 @@ import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
 import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
-import { Server } from "@prisma/client";
 
 export class ServerController {
   private serverDao: ServerRepo;
@@ -125,6 +124,18 @@ export class ServerController {
   async listServers(amount?: number, skip?: number): Promise<ServerDto[]> {
     const servers = await this.serverDao.findAll(amount, skip);
     return Promise.all(servers.map(async (server) => { return server; }));
+  }
+
+  async startServer(id: string): Promise<void> {
+    throw Error("Not implemented");
+  }
+
+  async stopServer(id: string): Promise<void> {
+    throw Error("Not implemented");
+  }
+
+  async rebootServer(id: string): Promise<void> {
+    throw Error("Not implemented");
   }
 }
 

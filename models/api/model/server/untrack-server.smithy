@@ -4,7 +4,7 @@ namespace awlsring.serverboi.api
 use smithy.framework#ValidationException
 
 @idempotent
-@http(method: "DELETE", uri: "/server/{id}", code: 200)
+@http(method: "DELETE", uri: "/track/{id}", code: 200)
 operation UntrackServer {
     input: UntrackServerInput,
     output: UntrackServerOutput,

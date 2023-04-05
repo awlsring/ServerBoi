@@ -3,7 +3,7 @@ $version: "2.0"
 namespace awlsring.serverboi.api
 use smithy.framework#ValidationException
 
-@http(method: "POST", uri: "/server/track", code: 200)
+@http(method: "POST", uri: "/track", code: 200)
 operation TrackServer {
     input: TrackServerInput,
     output: TrackServerOutput,
