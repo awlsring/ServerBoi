@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "dependencies": {
+    "@aws-sdk/client-ec2": "^3.306.0",
     "@kubernetes/client-node": "^0.18.1",
     "@prisma/client": "^4.11.0",
     "steam-server-query": "^1.1.3"
