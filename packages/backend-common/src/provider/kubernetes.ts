@@ -1,17 +1,18 @@
 import { AppsV1Api, CoreV1Api, KubeConfig } from "@kubernetes/client-node";
 import { ProviderAuthDto } from "../dto/provider-dto";
+import { Provider, ProviderServerData, State, Status } from "./provider";
 
 export interface KubernetesProviderOptions {
   readonly endpoint: string;
   readonly allowUnsecure: boolean;
+}
+
+export interface KubernetesProviderServerData extends ProviderServerData{
   readonly namespace: string;
+  readonly replicaCount: number;
 }
 
-export interface Status {
-  readonly state: string;
-}
-
-export class KubernetesProvider {
+export class KubernetesProvider implements Provider {
   private readonly core: CoreV1Api;
   private readonly apps: AppsV1Api;
 
@@ -49,27 +50,63 @@ export class KubernetesProvider {
     this.apps = config.makeApiClient(AppsV1Api);
   }
 
-  async getDeploymentStatus(namespace: string, name: string): Promise<Status> {
-    const res = await this.apps.readNamespacedDeployment(name, namespace);
+  async getServerStatus(serverData: KubernetesProviderServerData): Promise<Status> {
+    const res = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
 
     const status = res.body.status 
 
     if (!status) {
-      return { state: "UNKNOWN" }
+      return { state: State.UNKNOWN }
     }
 
     if (status.replicas != 0) {
-      if (status.availableReplicas == status.replicas && status.unavailableReplicas === 0) {
-        return { state: "RUNNING" }
+      if (status.availableReplicas == status.replicas && (status.unavailableReplicas === 0 || status.unavailableReplicas === undefined)) {
+        return { state: State.RUNNING }
       } else {
-        return { state: "STARTING" }
+        return { state: State.STARTING }
       }
     } else {
-      if (status.availableReplicas == status.replicas && status.unavailableReplicas === 0) {
-        return { state: "STOPPED" }
+      if (status.availableReplicas == status.replicas && (status.unavailableReplicas === 0 || status.unavailableReplicas === undefined)) {
+        return { state: State.STOPPED }
       } else {
-        return { state: "STOPPING" }
+        return { state: State.STOPPING }
       }
     }
   }
+
+  async startServer(serverData: KubernetesProviderServerData): Promise<void> {
+    const deployment = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
+
+    if (!deployment.body.spec) {
+      throw new Error("Deployment spec is missing");
+    }
+
+    if (deployment.body.spec.replicas === serverData.replicaCount) {
+      return;
+    }
+
+    deployment.body.spec.replicas = serverData.replicaCount;
+    await this.apps.replaceNamespacedDeployment(serverData.identifier, serverData.namespace, deployment.body);
+  }
+
+  async stopServer(serverData: KubernetesProviderServerData): Promise<void> {
+    const deployment = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
+
+    if (!deployment.body.spec) {
+      throw new Error("Deployment spec is missing");
+    }
+
+    if (deployment.body.spec.replicas !== serverData.replicaCount) {
+      throw new Error("Deployment isn't running");
+    }
+
+    deployment.body.spec.replicas = 0;
+    await this.apps.replaceNamespacedDeployment(serverData.identifier, serverData.namespace, deployment.body);
+  }
+
+  async rebootServer(serverData: KubernetesProviderServerData): Promise<void> {
+    await this.stopServer(serverData);
+    await this.startServer(serverData);
+  }
+
 }
