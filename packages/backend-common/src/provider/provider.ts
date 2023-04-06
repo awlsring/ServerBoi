@@ -1,3 +1,5 @@
+import { ProviderServerDataDto } from "../dto/server-dto";
+
 export enum State {
   UNKNOWN = "UNKNOWN",
   RUNNING = "RUNNING",
@@ -10,15 +12,9 @@ export interface Status {
   readonly state: State;
 }
 
-export interface ProviderServerData {
-  readonly serverId: string;
-  readonly identifier: string;
-  readonly location?: string;
-}
-
 export interface Provider {
-  getServerStatus(serverData: ProviderServerData): Promise<Status>;
-  startServer(serverData: ProviderServerData): Promise<void>;
-  stopServer(serverData: ProviderServerData): Promise<void>;
-  rebootServer(serverData: ProviderServerData): Promise<void>;
+  getServerStatus(serverData: ProviderServerDataDto): Promise<Status>;
+  startServer(serverData: ProviderServerDataDto): Promise<void>;
+  stopServer(serverData: ProviderServerDataDto): Promise<void>;
+  rebootServer(serverData: ProviderServerDataDto): Promise<void>;
 }

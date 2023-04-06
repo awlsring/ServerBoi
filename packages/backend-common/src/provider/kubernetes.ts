@@ -1,15 +1,17 @@
 import { AppsV1Api, CoreV1Api, KubeConfig } from "@kubernetes/client-node";
 import { ProviderAuthDto } from "../dto/provider-dto";
-import { Provider, ProviderServerData, State, Status } from "./provider";
+import { ProviderServerDataDto } from "../dto/server-dto";
+import { Provider, State, Status } from "./provider";
 
 export interface KubernetesProviderOptions {
   readonly endpoint: string;
   readonly allowUnsecure: boolean;
 }
 
-export interface KubernetesProviderServerData extends ProviderServerData{
+export interface KubernetesProviderServerData extends ProviderServerDataDto {
   readonly namespace: string;
   readonly replicaCount: number;
+  readonly allowUnsecure: boolean;
 }
 
 export class KubernetesProvider implements Provider {
@@ -50,8 +52,30 @@ export class KubernetesProvider implements Provider {
     this.apps = config.makeApiClient(AppsV1Api);
   }
 
-  async getServerStatus(serverData: KubernetesProviderServerData): Promise<Status> {
-    const res = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
+  private loadData(serverData: ProviderServerDataDto): KubernetesProviderServerData {
+    if (!serverData.data) {
+      throw new Error("Missing data on server data");
+    }
+
+    const k8sData = serverData.data as KubernetesProviderServerData;
+
+    if (!k8sData.namespace) {
+      throw new Error("Missing namespace on kubernetes server data");
+    }
+
+    if (!k8sData.replicaCount) {
+      throw new Error("Missing replica count on kubernetes server data");
+    }
+
+    return {
+      ...serverData,
+      ...k8sData,
+    };
+  }
+
+  async getServerStatus(serverData: ProviderServerDataDto): Promise<Status> {
+    const data = this.loadData(serverData);
+    const res = await this.apps.readNamespacedDeployment(data.identifier, data.namespace);
 
     const status = res.body.status 
 
@@ -74,37 +98,39 @@ export class KubernetesProvider implements Provider {
     }
   }
 
-  async startServer(serverData: KubernetesProviderServerData): Promise<void> {
-    const deployment = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
+  async startServer(serverData: ProviderServerDataDto): Promise<void> {
+    const data = this.loadData(serverData);
+    const deployment = await this.apps.readNamespacedDeployment(data.identifier, data.namespace);
 
     if (!deployment.body.spec) {
       throw new Error("Deployment spec is missing");
     }
 
-    if (deployment.body.spec.replicas === serverData.replicaCount) {
+    if (deployment.body.spec.replicas === data.replicaCount) {
       return;
     }
 
-    deployment.body.spec.replicas = serverData.replicaCount;
-    await this.apps.replaceNamespacedDeployment(serverData.identifier, serverData.namespace, deployment.body);
+    deployment.body.spec.replicas = data.replicaCount;
+    await this.apps.replaceNamespacedDeployment(serverData.identifier, data.namespace, deployment.body);
   }
 
-  async stopServer(serverData: KubernetesProviderServerData): Promise<void> {
-    const deployment = await this.apps.readNamespacedDeployment(serverData.identifier, serverData.namespace);
+  async stopServer(serverData: ProviderServerDataDto): Promise<void> {
+    const data = this.loadData(serverData);
+    const deployment = await this.apps.readNamespacedDeployment(data.identifier, data.namespace);
 
     if (!deployment.body.spec) {
       throw new Error("Deployment spec is missing");
     }
 
-    if (deployment.body.spec.replicas !== serverData.replicaCount) {
+    if (deployment.body.spec.replicas !== data.replicaCount) {
       throw new Error("Deployment isn't running");
     }
 
     deployment.body.spec.replicas = 0;
-    await this.apps.replaceNamespacedDeployment(serverData.identifier, serverData.namespace, deployment.body);
+    await this.apps.replaceNamespacedDeployment(data.identifier, data.namespace, deployment.body);
   }
 
-  async rebootServer(serverData: KubernetesProviderServerData): Promise<void> {
+  async rebootServer(serverData: ProviderServerDataDto): Promise<void> {
     await this.stopServer(serverData);
     await this.startServer(serverData);
   }

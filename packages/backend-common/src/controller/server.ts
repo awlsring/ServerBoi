@@ -8,15 +8,35 @@ import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
 import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
+import { LRUCache } from "../cache/lru-cache";
+import { Provider } from "../provider/provider";
+import { AwsEc2Provider } from "../provider/aws-ec2";
+import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
+import { KubernetesProvider, KubernetesProviderOptions, KubernetesProviderServerData } from "../provider/kubernetes";
 
 export class ServerController {
-  private serverDao: ServerRepo;
-  private providerDao: ProviderRepo;
+  private readonly serverDao: ServerRepo;
+  private readonly providerDao: ProviderRepo;
+  private readonly providerAuthDao: ProviderAuthRepo;
+
+  private readonly providerCache: LRUCache<Provider>;
+
   private ipLookup = new IPAPIClient();
 
   constructor(cfg: PrismaRepoOptions) {
     this.serverDao = new ServerRepo(cfg);
     this.providerDao = new ProviderRepo(cfg);
+    this.providerAuthDao = new ProviderAuthRepo(cfg);
+    this.providerCache = new LRUCache<Provider>(100);
+    setInterval(() => {
+      for (const node of this.providerCache.getCache().values()) {
+        if (Date.now() - node.created > this.providerCache.maxAge) {
+          console.log("ServerBoiService: clearing expired client from cache", node.key)
+          this.providerCache.getCache().delete(node.key);
+          this.providerCache.clear(node.key);
+        }
+      }
+    }, 60 * 1000 /* 1 minute */);
   }
 
   private async queryServer(type: string, connectivity: Connectivity): Promise<ServerStatusDto> {
@@ -127,15 +147,73 @@ export class ServerController {
   }
 
   async startServer(id: string): Promise<void> {
-    throw Error("Not implemented");
+    const server = await this.getServer(id);
+    if (!server.providerServerData) {
+      throw new Error("Server has no provider data");
+    }
+    const provider = await this.getProvider(server);
+
+    await provider.startServer(server.providerServerData);
   }
 
   async stopServer(id: string): Promise<void> {
-    throw Error("Not implemented");
+    const server = await this.getServer(id);
+    if (!server.providerServerData) {
+      throw new Error("Server has no provider data");
+    }
+    const provider = await this.getProvider(server);
+
+    await provider.stopServer(server.providerServerData);
   }
 
   async rebootServer(id: string): Promise<void> {
-    throw Error("Not implemented");
+    const server = await this.getServer(id);
+    if (!server.providerServerData) {
+      throw new Error("Server has no provider data");
+    }
+    const provider = await this.getProvider(server);
+
+    await provider.rebootServer(server.providerServerData);
+  }
+
+  private async loadProvider(server: ServerDto): Promise<Provider> {
+    if (!server.provider || !server.providerServerData) {
+      throw new Error("Server has no provider or provider data");
+    }
+
+    const provider = await this.providerDao.find(server.provider.name, server.owner);
+
+    const auth = await this.providerAuthDao.findById(server.provider.id);
+    if (!auth) {
+      throw new Error("Missing provider auth");
+    }
+    
+    switch (provider.type) {
+      case "AWS_EC2":
+        if (!server.providerServerData.location) {
+          throw new Error("Missing location data");
+        }
+        return new AwsEc2Provider({region: server.providerServerData.location}, auth);
+      case "K8S":
+        server.providerServerData.data as KubernetesProviderServerData
+        const k8sCfg: KubernetesProviderOptions = {
+          endpoint: server.providerServerData.data.endpoint,
+          allowUnsecure: server.providerServerData.data.allowUnsecure,
+        }
+        return new KubernetesProvider(k8sCfg, auth);
+      default:
+        throw new Error(`Unknown provider type ${provider.type}`);
+    }
+  }
+
+  private async getProvider(server: ServerDto): Promise<Provider> {
+    const serverIdentifier = `${server.scopeId}-${server.serverId}`;
+    let provider = this.providerCache.get(serverIdentifier);
+    if (!provider) {
+      provider = await this.loadProvider(server);
+      this.providerCache.set(serverIdentifier, provider);
+    }
+    return provider;
   }
 }
 

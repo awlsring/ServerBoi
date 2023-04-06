@@ -13,4 +13,5 @@
         "outDir": "./dist",
         "composite": true
     },
+    "exclude": ["scripts/**/*", "node_modules", "dist", "src/@types"]
 }

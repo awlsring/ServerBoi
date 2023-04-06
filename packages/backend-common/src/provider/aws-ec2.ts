@@ -1,13 +1,10 @@
 import { DescribeInstancesCommand, EC2Client, RebootInstancesCommand, StartInstancesCommand, StopInstancesCommand } from "@aws-sdk/client-ec2";
 import { ProviderAuthDto } from "../dto/provider-dto";
-import { Provider, ProviderServerData, State, Status } from "./provider";
+import { ProviderServerDataDto } from "../dto/server-dto";
+import { Provider, State, Status } from "./provider";
 
 export interface AwsEc2ProviderOptions {
   readonly region: string;
-}
-
-export interface AwsEc2ProviderServerData extends ProviderServerData {
-  readonly instanceId: string;
 }
 
 export class AwsEc2Provider implements Provider {
@@ -21,8 +18,8 @@ export class AwsEc2Provider implements Provider {
     this.client = new EC2Client({ region: cfg.region, credentials: { accessKeyId: auth.key, secretAccessKey: auth.secret } });
   }
 
-  async getServerStatus(serverData: AwsEc2ProviderServerData): Promise<Status> {
-    const instance = await this.client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.instanceId] }))
+  async getServerStatus(serverData: ProviderServerDataDto): Promise<Status> {
+    const instance = await this.client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }))
 
     if (!instance.Reservations || instance.Reservations.length === 0) {
       return { state: State.UNKNOWN };
@@ -53,15 +50,15 @@ export class AwsEc2Provider implements Provider {
     }
   }
 
-  async startServer(serverData: AwsEc2ProviderServerData): Promise<void> {
-    await this.client.send(new StartInstancesCommand({ InstanceIds: [serverData.instanceId] }))
+  async startServer(serverData: ProviderServerDataDto): Promise<void> {
+    await this.client.send(new StartInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 
-  async stopServer(serverData: AwsEc2ProviderServerData): Promise<void> {
-    await this.client.send(new StopInstancesCommand({ InstanceIds: [serverData.instanceId] }))
+  async stopServer(serverData: ProviderServerDataDto): Promise<void> {
+    await this.client.send(new StopInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 
-  async rebootServer(serverData: AwsEc2ProviderServerData): Promise<void> {
-    await this.client.send(new RebootInstancesCommand({ InstanceIds: [serverData.instanceId] }))
+  async rebootServer(serverData: ProviderServerDataDto): Promise<void> {
+    await this.client.send(new RebootInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 }
