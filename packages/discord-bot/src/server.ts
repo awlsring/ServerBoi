@@ -17,6 +17,14 @@ import { StartTrackServerButton } from './interactions/components/button/start-t
 import { ResubmitQueryButton } from './interactions/components/button/resubmit-steam-query';
 import { ResubmitBaseInfoButton } from './interactions/components/button/resubmit-base-info';
 import { HTTPQueryInformationModal } from './interactions/components/modals/http-query-info';
+import { CreateProviderRequestRepo } from './persistence/create-provider-request-repo';
+import { ProviderCreateMenu } from './interactions/components/menus/provider-create-menu';
+import { KubernetesProviderInformationModal } from './interactions/components/modals/k8s-info-modal';
+import { KubernetesProviderAuthInformationModal } from './interactions/components/modals/k8s-auth-modal';
+import { CreateProviderNameInputModal } from './interactions/components/modals/provider-name-input';
+import { CreateProviderCommand } from './interactions/components/commands/provider/create';
+import { KubernetesProviderAuthPromptButton } from './interactions/components/button/k8s-auth-prompt';
+import { CreateProviderNameInputPromptButton } from './interactions/components/button/name-prompt-modal';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -36,6 +44,7 @@ async function main() {
   const cfg = loadConfig();
   const serverboi = new ServerBoiService(cfg.serverboi.endpoint, cfg.serverboi.apiKey);
   const requestDao = new TrackServerRequestRepo(cfg.database);
+  const createProviderRequestRepo = new CreateProviderRequestRepo(cfg.database);
   const cardDao = new ServerCardRepo(cfg.database);
   
   const interactions = new InteractionHandler({
@@ -43,6 +52,7 @@ async function main() {
     version: cfg.discord.apiVersion ?? 'v10',
     components: [
       new TrackCommand(),
+      new CreateProviderCommand(),
       new QuerySelectMenu({ trackServerDao: requestDao }),
       new ChannelSelectMenu({
         serverBoiService: serverboi,
@@ -55,6 +65,12 @@ async function main() {
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
       new ResubmitBaseInfoButton(),
+      new CreateProviderNameInputPromptButton(),
+      new ProviderCreateMenu({ createProviderRequestRepo }),
+      new KubernetesProviderAuthPromptButton(),
+      new KubernetesProviderInformationModal({ requestRepo: createProviderRequestRepo }),
+      new KubernetesProviderAuthInformationModal({ requestRepo: createProviderRequestRepo }),
+      new CreateProviderNameInputModal({ requestRepo: createProviderRequestRepo }),
       new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, ServerCardRepo: cardDao }),

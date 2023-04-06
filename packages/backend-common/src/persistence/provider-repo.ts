@@ -88,6 +88,7 @@ export class ProviderRepo {
       name: provider.name,
       type: provider.type,
       owner: provider.ownerId,
+      data: provider.data ?? undefined,
     };
   }
 }

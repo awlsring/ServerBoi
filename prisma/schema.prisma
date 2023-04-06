@@ -71,7 +71,8 @@ model Provider {
   name           String
   type String
   auth ProviderAuth?
-  data ProviderServerData[]
+  data String?
+  serverData ProviderServerData[]
   servers Server[]
 }
 
@@ -85,6 +86,7 @@ model ProviderServerData {
   @@unique([serverScopeId, serverId])
   identifier String
   location String?
+  subType String?
   data String?
 } 
 
@@ -102,6 +104,17 @@ model TrackServer {
   queryAddress String?
   queryPort Int?
   channelId String?
+}
+
+model CreateProviderRequest {
+  id       String @unique
+  startedAt DateTime @default(now())
+  endedAt DateTime? @updatedAt
+  providerType String
+  providerData String?
+  providerAuthKey String?
+  providerAuthSecret String?
+  providerName String?
 }
 
 model ServerCard {

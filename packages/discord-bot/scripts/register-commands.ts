@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 
-import { ServerCommandGroup } from "../src/interactions/objects/commands/server/group";
+import { ServerCommandGroup } from "../src/interactions/components/commands/server/group";
+import { ProviderCommandGroup } from "../src/interactions/components/commands/provider/group";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const response = fetch(
       "Authorization": `Bot ${token}`,
     },
     method: "PUT",
-    body: JSON.stringify([ServerCommandGroup]),
+    body: JSON.stringify([ServerCommandGroup, ProviderCommandGroup]),
   }
 );
 

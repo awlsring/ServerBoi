@@ -189,13 +189,24 @@ export class ServerController {
     }
     
     switch (provider.type) {
-      case "AWS_EC2":
+      case "AWS":
+        if (!server.providerServerData.subType) {
+          throw new Error("Missing AWS subtype");
+        }
         if (!server.providerServerData.location) {
           throw new Error("Missing location data");
         }
-        return new AwsEc2Provider({region: server.providerServerData.location}, auth);
-      case "K8S":
-        server.providerServerData.data as KubernetesProviderServerData
+        switch (server.providerServerData.subType) {
+          case "EC2":
+            return new AwsEc2Provider({region: server.providerServerData.location}, auth);
+          default:
+            throw new Error(`Unknown AWS subtype ${server.providerServerData.subType}`);
+        }
+      case "KUBERNETES":
+        if (!provider.data) {
+          throw new Error("Provider has no needed kubernetes data");
+        }
+        provider.data as KubernetesProviderServerData
         const k8sCfg: KubernetesProviderOptions = {
           endpoint: server.providerServerData.data.endpoint,
           allowUnsecure: server.providerServerData.data.allowUnsecure,

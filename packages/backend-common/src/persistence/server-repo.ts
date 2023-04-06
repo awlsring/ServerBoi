@@ -51,6 +51,7 @@ export class ServerRepo {
             identifier: server.providerServerData!.identifier,
             location: server.providerServerData!.location,
             data: server.providerServerData!.data,
+            subType: server.providerServerData!.subType,
           }
         } : undefined,
         status: {
@@ -140,6 +141,12 @@ export class ServerRepo {
         name: server.provider.name,
         type: server.provider.type,
         owner: server.provider?.ownerId,
+      } : undefined,
+      providerServerData: server.providerData ? {
+        identifier: server.providerData.identifier ?? undefined,
+        location: server.providerData.location ?? undefined,
+        data: server.providerData.data ?? undefined,
+        subType: server.providerData.subType ?? undefined,
       } : undefined,
       query: {
         type: server.queryType,

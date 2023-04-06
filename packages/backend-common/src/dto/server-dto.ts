@@ -27,6 +27,7 @@ export interface ServerStatusDto {
 export interface ProviderServerDataDto {
   readonly identifier: string;
   readonly location?: string;
+  readonly subType?: string;
   readonly data?: any;
 }
 
@@ -42,7 +43,6 @@ export interface ServerLocationDto {
   readonly region: string;
   readonly emoji: string;
 }
-
 
 export interface NewServerDto {
   readonly scopeId: string;

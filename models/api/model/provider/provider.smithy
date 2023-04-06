@@ -22,7 +22,7 @@ structure ProviderSummary {
 }
 
 enum ProviderType {
-    AWS_EC2 = "AWS_EC2",
+    AWS = "AWS",
     KUBERNETES = "KUBERNETES",
     UNDEFINED = "UNDEFINED",
 }
