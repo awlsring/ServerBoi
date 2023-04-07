@@ -25,6 +25,7 @@ import { CreateProviderNameInputModal } from './interactions/commands/provider/c
 import { CreateProviderCommand } from './interactions/commands/provider/create/create-provider-command';
 import { KubernetesProviderAuthPromptButton } from './interactions/commands/provider/create/components/k8s-auth-prompt';
 import { CreateProviderNameInputPromptButton } from './interactions/commands/provider/create/components/name-prompt-modal';
+import { GetProviderCommand } from './interactions/commands/provider/get/get-provider-command';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -52,6 +53,7 @@ async function main() {
     version: cfg.discord.apiVersion ?? 'v10',
     components: [
       new TrackCommand(),
+      new GetProviderCommand({ serverBoiService: serverboi }),
       new CreateProviderCommand(),
       new QuerySelectMenu({ trackServerDao: requestDao }),
       new ChannelSelectMenu({
@@ -70,7 +72,7 @@ async function main() {
       new KubernetesProviderAuthPromptButton(),
       new KubernetesProviderInformationModal({ requestRepo: createProviderRequestRepo }),
       new KubernetesProviderAuthInformationModal({ requestRepo: createProviderRequestRepo }),
-      new CreateProviderNameInputModal({ requestRepo: createProviderRequestRepo }),
+      new CreateProviderNameInputModal({ serverBoiService: serverboi, requestRepo: createProviderRequestRepo }),
       new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, ServerCardRepo: cardDao }),

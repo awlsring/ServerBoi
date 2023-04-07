@@ -14,7 +14,6 @@ export class CreateProviderNameInputPromptButton extends ButtonComponent {
   };
 
   public async enact(context: InteractionContext, _: any) {
-    context.logger.info("Enacting start track server button");
     context.response.send({
       type: InteractionResponseType.MODAL,
       data: CreateProviderNameInputModal.toApiData(),

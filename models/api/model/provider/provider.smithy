@@ -19,6 +19,8 @@ structure ProviderSummary {
 
     @required
     type: ProviderType,
+
+    data: String
 }
 
 enum ProviderType {

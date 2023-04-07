@@ -53,7 +53,7 @@ export class KubernetesProviderAuthInformationModal extends ModalComponent {
     context.response.send({
       type: InteractionResponseType.UpdateMessage,
       data: {
-        content: "Now that all the information has been collected, we can create your provider! Give it a name.",
+        content: "All the information needed has been collected, new we can create your provider! Give it a name.",
         components: [
           {
             type: 1,

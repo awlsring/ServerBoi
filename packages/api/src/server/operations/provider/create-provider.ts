@@ -12,6 +12,7 @@ export const CreateProviderOperation: Operation<CreateProviderServerInput, Creat
       name: input.name!,
       type: input.type!,
       owner: context.user,
+      data: input.data,
       auth: {
         key: input.auth!.key!,
         secret: input.auth?.secret,

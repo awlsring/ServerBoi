@@ -51,14 +51,14 @@ export class InteractionHandler {
     }
     for (const option of interaction.data.options) {
       if (option.type === ApplicationCommandOptionType.Subcommand) {
-        return option.name;
+        return `${interaction.data.name}-${option.name}`;
       }
 
       if (option.type === ApplicationCommandOptionType.SubcommandGroup) {
         const subOptions = option.options ?? [];
         const subcommandOption = subOptions.find(o => o.type === ApplicationCommandOptionType.Subcommand);
         if (subcommandOption) {
-          return subcommandOption.name;
+          return `${interaction.data.name}-${option.name}-${subcommandOption.name}`;
         }
       }
     }

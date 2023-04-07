@@ -53,7 +53,62 @@ export class KubernetesProviderInformationModal extends ModalComponent {
     await context.response.send({
       type: InteractionResponseType.UpdateMessage,
       data: {
-        content: "You'll need to provide a token from a ServiceAccount that can describe deployments in the cluster.",
+        content: `To access your cluster, you'll need to provide an access token that is tied to a ServiceAccount that can describe deployments in the cluster.
+
+Below is a sample manifest you can deploy to your cluster that will create resources needed to access the cluster.
+
+\`\`\`yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: serverboi-role
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: serverboi-role-role
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "scale"]
+- apiGroups: ["apps"]
+  resources: ["deployments/status"]
+  verbs: ["get", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: serverboi-role-binding
+subjects:
+- kind: ServiceAccount
+  name: serverboi-role
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: serverboi-role-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: serverboi-role
+  annotations:
+    kubernetes.io/service-account.name: "serverboi-role"
+\`\`\`
+
+Once these resources are created in your cluster, you can access the token running the following command:
+
+\`\`\`shell
+kubectl get secret serverboi-role -o jsonpath='{.data.token}' | base64 -d
+\`\`\`
+
+One you have the token, you can enter it by hitting the button below.
+`,
+        // content: "You'll need to provide a token from a ServiceAccount that can describe deployments in the cluster.",
         components: [
           {
             type: 1,

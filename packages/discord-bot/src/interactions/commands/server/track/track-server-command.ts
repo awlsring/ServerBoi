@@ -4,7 +4,7 @@ import { StartTrackServerButton } from "./components/start-track";
 import { CommandComponent } from "../../command";
 
 export class TrackCommand extends CommandComponent {
-  public static readonly identifier = "track";
+  public static readonly identifier = "server-track";
   public static readonly data = {
     name: "track",
     description: "Track a server",

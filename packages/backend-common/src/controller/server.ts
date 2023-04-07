@@ -95,7 +95,7 @@ export class ServerController {
 
     let provider: ProviderDto | undefined = undefined;
     if (input.providerName) {
-      provider = await this.providerDao.find(input.providerName, input.owner);
+      provider = await this.providerDao.find(input.providerName, input.owner) ?? undefined;
     }
 
     const status = await this.queryServer(input.query.type, this.determineConnectivity(input.address, input.port, input.query.address, input.query.port));
@@ -182,6 +182,9 @@ export class ServerController {
     }
 
     const provider = await this.providerDao.find(server.provider.name, server.owner);
+    if (!provider) {
+      throw new Error("Provider not found");
+    }
 
     const auth = await this.providerAuthDao.findById(server.provider.id);
     if (!auth) {

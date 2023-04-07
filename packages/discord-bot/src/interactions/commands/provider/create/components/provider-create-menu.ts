@@ -16,7 +16,7 @@ export class ProviderCreateMenu extends SelectMenuComponent {
     {
       label: ProviderType.AWS,
       value: ProviderType.AWS,
-      description: "AWS Cloud",
+      description: "Amazon Web Services",
     },
     {
       label: "Kubernetes",
@@ -24,7 +24,7 @@ export class ProviderCreateMenu extends SelectMenuComponent {
       description: "A Kubernetes cluster",
     },
   ];
-  protected static readonly placeholder = "Select Provider type";
+  protected static readonly placeholder = "Select provider type";
   protected static readonly minSelectableValues = 1;
   protected static readonly maxSelectableValues = 1;
 

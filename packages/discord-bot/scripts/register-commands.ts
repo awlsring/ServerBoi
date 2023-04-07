@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
-import { ServerCommandGroup } from "../src/interactions/components/commands/server/group";
-import { ProviderCommandGroup } from "../src/interactions/components/commands/provider/group";
+import { ServerCommandGroup } from "../src/interactions/commands/server/group";
+import { ProviderCommandGroup } from "../src/interactions/commands/provider/group";
 
 dotenv.config();
 

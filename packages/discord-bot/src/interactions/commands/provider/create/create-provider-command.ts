@@ -4,14 +4,13 @@ import { CommandComponent } from "../../command";
 import { ProviderCreateMenu } from "./components/provider-create-menu";
 
 export class CreateProviderCommand extends CommandComponent {
-  public static readonly identifier = "create";
+  public static readonly identifier = "provider-create";
   public static readonly data = {
     name: "create",
     description: "Create a new provider",
     type: ApplicationCommandOptionType.Subcommand,
   };
   async enact(context: InteractionContext, interaction: APIApplicationCommandInteraction) {
-    console.log("Enacting create provider command");
     await context.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {

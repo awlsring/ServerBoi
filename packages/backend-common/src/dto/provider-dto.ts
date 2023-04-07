@@ -10,6 +10,7 @@ export interface NewProviderDto {
   readonly name: string;
   readonly type: string;
   readonly owner: string;
+  readonly data?: any;
   readonly auth: ProviderAuthDto;
 }
 
