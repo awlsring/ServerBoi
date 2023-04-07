@@ -1,6 +1,6 @@
 import { InteractionResponseType } from "discord-interactions";
 import { InteractionContext } from "@serverboi/discord-common";
-import { ServerTrackInitialModal } from "../modals/track-server-init";
+import { ServerTrackInitialModal } from "./track-server-init";
 import { ButtonComponent } from "@serverboi/discord-common";
 
 export class StartTrackServerButton extends ButtonComponent {

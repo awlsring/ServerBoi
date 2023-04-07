@@ -1,8 +1,8 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext } from "@serverboi/discord-common";
-import { ChannelSelectMenu } from "../menus/channel-select-menu";
+import { ChannelSelectMenu } from "../../../server/track/components/channel-select-menu";
 import { ModalComponent } from "@serverboi/discord-common";
-import { CreateProviderRequestRepo } from "../../../persistence/create-provider-request-repo";
+import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
 
 const NAME_INPUT = "provider-name-input";
 

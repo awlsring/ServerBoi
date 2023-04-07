@@ -1,24 +1,28 @@
 import { APIApplicationCommandInteraction, ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext } from "@serverboi/discord-common";
-import { CommandComponent } from "../command";
-import { ProviderCreateMenu } from "../../menus/provider-create-menu";
-import { StartTrackServerButton } from "../../button/start-track";
+import { StartTrackServerButton } from "./components/start-track";
+import { CommandComponent } from "../../command";
 
-export class CreateProviderCommand extends CommandComponent {
-  public static readonly identifier = "create";
+export class TrackCommand extends CommandComponent {
+  public static readonly identifier = "track";
   public static readonly data = {
-    name: "create",
-    description: "Create a new provider",
+    name: "track",
+    description: "Track a server",
     type: ApplicationCommandOptionType.Subcommand,
   };
   async enact(context: InteractionContext, interaction: APIApplicationCommandInteraction) {
-    console.log("Enacting create provider command");
+    console.log("Enacting track command");
     await context.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        content: "Select the type of provider you'd like to create.",
+        content: "To start tracking the server, we'll start with entering some information about it. Hit the button below to start.",
         components: [
-          ProviderCreateMenu.toApiData()
+          {
+            type: 1,
+            components: [
+              StartTrackServerButton.toApiData()
+            ],
+          }
         ],
         flags: MessageFlags.Ephemeral,
       }

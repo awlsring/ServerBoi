@@ -1,9 +1,9 @@
 import { ButtonComponent, InteractionContext } from "@serverboi/discord-common";
 import { InteractionResponseType } from "discord-api-types/v10";
-import { ServerTrackInitialModal } from "../modals/track-server-init";
+import { SteamQueryInformationModal } from "./steam-query-info";
 
-export class ResubmitBaseInfoButton extends ButtonComponent {
-  public static readonly identifier = "resubmit-base-info-button";
+export class ResubmitQueryButton extends ButtonComponent {
+  public static readonly identifier = "resubmit-query-button";
   protected static readonly style = 1;
   protected static readonly label = "Resubmit";
   protected static readonly emojii = {
@@ -15,7 +15,7 @@ export class ResubmitBaseInfoButton extends ButtonComponent {
   public async enact(context: InteractionContext, _: any) {
     context.response.send({
       type: InteractionResponseType.Modal,
-      data: ServerTrackInitialModal.toApiData(),
+      data: SteamQueryInformationModal.toApiData(),
     })
   }
 }

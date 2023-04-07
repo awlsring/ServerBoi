@@ -2,8 +2,8 @@ import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteracti
 import { InteractionContext } from "@serverboi/discord-common"
 import { SelectMenuComponent } from "@serverboi/discord-common"
 import { ProviderType } from "@serverboi/client"
-import { CreateProviderRequestRepo } from "../../../persistence/create-provider-request-repo"
-import { KubernetesProviderInformationModal } from "../modals/k8s-info-modal"
+import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo"
+import { KubernetesProviderInformationModal } from "./k8s-info-modal"
 
 export interface ProviderCreateMenuOptions {
   readonly createProviderRequestRepo: CreateProviderRequestRepo

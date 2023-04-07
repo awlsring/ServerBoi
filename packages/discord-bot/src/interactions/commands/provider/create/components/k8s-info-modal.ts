@@ -1,9 +1,9 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
-import { CreateProviderRequestRepo } from "../../../persistence/create-provider-request-repo";
+import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
 import { KubernetesProviderAuthInformationModal } from "./k8s-auth-modal";
-import { KubernetesProviderAuthPromptButton } from "../button/k8s-auth-prompt";
+import { KubernetesProviderAuthPromptButton } from "./k8s-auth-prompt";
 
 const PROVIDER_ENDPOINT = "kubernetes-provider-endpoint";
 

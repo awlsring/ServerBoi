@@ -1,5 +1,5 @@
 import { CommandGroup } from "../command";
-import { CreateProviderCommand } from "./create";
+import { CreateProviderCommand } from "./create/create-provider-command";
 
 export const ProviderCommandGroup: CommandGroup = {
   name: "provider",

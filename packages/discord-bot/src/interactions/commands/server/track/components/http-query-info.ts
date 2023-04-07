@@ -1,7 +1,7 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
-import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo";
+import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
 import { InteractionContext } from "@serverboi/discord-common";
-import { ChannelSelectMenu } from "../menus/channel-select-menu";
+import { ChannelSelectMenu } from "./channel-select-menu";
 import { ModalComponent } from "@serverboi/discord-common";
 
 export interface HTTPQueryInformationModalOptions {

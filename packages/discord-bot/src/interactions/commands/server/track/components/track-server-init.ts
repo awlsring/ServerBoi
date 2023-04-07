@@ -1,9 +1,9 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
-import { TrackServerRequestRepo } from "../../../persistence/track-server-request-repo";
+import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
 import { InteractionContext } from "@serverboi/discord-common";
-import { QuerySelectMenu } from "../menus/query-select";
+import { QuerySelectMenu } from "./query-select";
 import { ModalComponent } from "@serverboi/discord-common";
-import { ResubmitBaseInfoButton } from "../button/resubmit-base-info";
+import { ResubmitBaseInfoButton } from "./resubmit-base-info";
 
 export interface ServerTrackInitialModalOptions {
   readonly trackServerDao: TrackServerRequestRepo

@@ -1,5 +1,5 @@
 import { CommandGroup } from "../command";
-import { TrackCommand } from "./track";
+import { TrackCommand } from "./track/track-server-command";
 
 export const ServerCommandGroup: CommandGroup = {
   name: "server",
