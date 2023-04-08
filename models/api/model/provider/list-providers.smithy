@@ -6,6 +6,7 @@ use smithy.framework#ValidationException
 @readonly
 @http(method: "GET", uri: "/provider", code: 200)
 operation ListProviders {
+    input: ListProvidersInput,
     output: ListProvidersOutput,
     errors: [
         ValidationException,
@@ -13,6 +14,9 @@ operation ListProviders {
         InvalidInputError
     ]
 }
+
+@input 
+structure ListProvidersInput {}
 
 @output
 structure ListProvidersOutput {

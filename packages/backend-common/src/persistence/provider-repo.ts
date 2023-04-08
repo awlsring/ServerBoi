@@ -75,6 +75,12 @@ export class ProviderRepo {
   }
 
   async delete(id: string): Promise<void> {
+    await this.prisma.providerAuth.deleteMany({
+      where: {
+        providerId: id,
+      }
+    });
+
     await this.prisma.provider.delete({
       where: { id: id },
     });

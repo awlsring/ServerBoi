@@ -15,7 +15,6 @@ use aws.protocols#restJson1
     outputToken: "nextToken",
     pageSize: "pageSize"
 )
-
 service ServerBoi {
     version: "2023-03-19",
     operations: [ Health ],

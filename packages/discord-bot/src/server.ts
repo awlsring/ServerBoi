@@ -26,6 +26,9 @@ import { CreateProviderCommand } from './interactions/commands/provider/create/c
 import { KubernetesProviderAuthPromptButton } from './interactions/commands/provider/create/components/k8s-auth-prompt';
 import { CreateProviderNameInputPromptButton } from './interactions/commands/provider/create/components/name-prompt-modal';
 import { GetProviderCommand } from './interactions/commands/provider/get/get-provider-command';
+import { DescribeProviderCommand } from './interactions/commands/provider/describe/describe-provider-command';
+import { UserProviderListMenu } from './interactions/commands/provider/describe/components/provider-list';
+import { RemoveProviderCommand } from './interactions/commands/provider/remove/remove-provider-command';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -61,6 +64,9 @@ async function main() {
         trackServerDao: requestDao,
         ServerCardRepo: cardDao,
       }),
+      new RemoveProviderCommand({ serverBoiService: serverboi }),
+      new DescribeProviderCommand({ serverBoiService: serverboi }),
+      new UserProviderListMenu({ serverBoiService: serverboi }),
       new ServerTrackInitialModal({ trackServerDao: requestDao }),
       new SteamQueryInformationModal({ trackServerDao: requestDao }),
       new HTTPQueryInformationModal({ trackServerDao: requestDao }),

@@ -9,7 +9,8 @@ export const DeleteProviderOperation: Operation<DeleteProviderServerInput, Delet
     
     try {
       await context.controller.provider.deleteProvider(input.name!, context.user);
-    } catch {
+    } catch (e) {
+      console.log(e)
       throw new ResourceNotFoundError({ message: `Provider not found` });
     }
 
@@ -17,6 +18,7 @@ export const DeleteProviderOperation: Operation<DeleteProviderServerInput, Delet
       success: true
     }
   } catch (e) {
+    console.log(e)
     if (e instanceof ResourceNotFoundError) {
       throw e;
     }
