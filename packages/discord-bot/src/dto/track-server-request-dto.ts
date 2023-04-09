@@ -9,6 +9,11 @@ export interface TrackServerRequestDto {
   queryPort?: number;
   queryAddress?: string;
   channelId?: string;
+  provider?: string;
+  providerServerData?: string;
+  providerServerIdentifier?: string;
+  providerServerLocation?: string;
+  providerServerSubType?: string;
 }
 
 export interface NewTrackServerRequestDto {

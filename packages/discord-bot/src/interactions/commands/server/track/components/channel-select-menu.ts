@@ -1,7 +1,6 @@
 import { Capabilities } from "@serverboi/client"
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { serverToEmbed } from "@serverboi/discord-common"
-import { ServerCardRepo } from "@serverboi/discord-common"
+import { formServerEmbedMessage, ServerCardRepo } from "@serverboi/discord-common"
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo"
 import { ServerBoiService } from "@serverboi/discord-common"
 import { InteractionContext } from "@serverboi/discord-common"
@@ -48,6 +47,12 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         address: finalizedRequest.address,
         port: finalizedRequest.port,
       },
+      provider: finalizedRequest.provider,
+      providerServerData: {
+        identifier: finalizedRequest.providerServerIdentifier,
+        location: finalizedRequest.providerServerLocation,
+        data: finalizedRequest.providerServerData,
+      },
       capabilities: [ Capabilities.READ, Capabilities.QUERY ],
       query: {
         type: finalizedRequest.queryType,
@@ -67,10 +72,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
     })
     console.log(`Sent response`)
 
-    const embed = serverToEmbed(server)
-    console.log(`Created embed`)
-
-    const message = await context.http.createMessage(selectedValue, embed.toMessage())
+    const message = await context.http.createMessage(selectedValue, formServerEmbedMessage(server))
 
     await this.ServerCardRepo.create({
       messageId: message.id,

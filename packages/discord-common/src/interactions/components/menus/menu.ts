@@ -1,6 +1,7 @@
-import { ChannelType, APISelectMenuOption, ComponentType, APIMessageComponentSelectMenuInteraction } from "discord-api-types/v10"
+import { ChannelType, APISelectMenuOption, ComponentType, APIMessageComponentSelectMenuInteraction, APIInteractionResponse, MessageFlags, InteractionResponseType } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
 import { Component } from "../component";
+import { MessageComponentToResponseOptions } from "../message-component-options";
 
 export interface SelectMenuComponentOptions {
   readonly selectType: ComponentType;
@@ -21,6 +22,19 @@ export abstract class SelectMenuComponent extends Component {
   protected static channelTypes?: ChannelType[] = undefined
   
   abstract enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void>;
+
+  static toResponse(options?: MessageComponentToResponseOptions): APIInteractionResponse {
+    const data: any = {
+      content: options?.content ?? undefined,
+      components: this.toApiData(),
+      flags: options?.ephemeral ? MessageFlags.Ephemeral : undefined
+    }
+    
+    return {
+      type: options?.type ?? InteractionResponseType.UpdateMessage,
+      data: data,
+    }
+  }
 
   static toApiData() {
     return {

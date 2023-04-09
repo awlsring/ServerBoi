@@ -1,12 +1,14 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
-import { InteractionContext } from "@serverboi/discord-common";
+import { InteractionContext, ServerBoiService } from "@serverboi/discord-common";
 import { ResubmitQueryButton } from "./resubmit-steam-query";
-import { ChannelSelectMenu } from "./channel-select-menu";
 import { ModalComponent } from "@serverboi/discord-common";
+import { TrackServerSelectProvider } from "./select-provider-menu";
+import { ChannelSelectMenu } from "./channel-select-menu";
 
 export interface SteamQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
+  readonly serverboiService: ServerBoiService
 }
 
 export class SteamQueryInformationModal extends ModalComponent {
@@ -34,10 +36,12 @@ export class SteamQueryInformationModal extends ModalComponent {
   ]
 
   private readonly requestDao: TrackServerRequestRepo;
+  private readonly serverboiService: ServerBoiService;
 
   constructor(options: SteamQueryInformationModalOptions) {
     super()
     this.requestDao = options.trackServerDao
+    this.serverboiService = options.serverboiService
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
@@ -89,12 +93,28 @@ export class SteamQueryInformationModal extends ModalComponent {
       queryAddress: steamQueryAddress,
     })
 
+    const providers = await this.serverboiService.listProviders(context.user)
+
+    if (providers.length === 0) {
+      context.response.send({
+        type: InteractionResponseType.UpdateMessage,
+        data: {
+          content: "You have no configured provider so one will not be assigned to this server.\n\nSelect the channel to send the server information to.",
+          components: [
+            ChannelSelectMenu.toApiData()
+          ],
+          flags: MessageFlags.Ephemeral,
+        }
+      });
+      return
+    }
+
     context.response.send({
       type: InteractionResponseType.UpdateMessage,
       data: {
-        content: "Select the channel to send the server information to.",
+        content: "Select the provider you want to use to track this server.",
         components: [
-          ChannelSelectMenu.toApiData()
+          TrackServerSelectProvider.toApiDataWithProviders(providers)
         ],
         flags: MessageFlags.Ephemeral,
       }

@@ -14,6 +14,7 @@ export function serverToSummary(server: ServerDto): ServerSummary {
       type: server.provider?.type,
       name: server.provider?.name,
     } : undefined,
+    providerServerData: server.providerServerData,
     query: {
       type: server.query.type,
       address: server.query.address,

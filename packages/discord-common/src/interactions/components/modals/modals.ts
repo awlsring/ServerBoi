@@ -1,4 +1,4 @@
-import { APIModalInteractionResponseCallbackData, APIModalSubmitInteraction } from "discord-api-types/v10"
+import { APIInteractionResponse, APIModalInteractionResponseCallbackData, APIModalSubmitInteraction, InteractionResponseType } from "discord-api-types/v10"
 import { InteractionContext } from "../../context"
 import { Component } from "../component";
 
@@ -17,6 +17,13 @@ export abstract class ModalComponent extends Component {
   protected static readonly title: string;
   protected static readonly textInputs: TextModal[]
   abstract enact(context: InteractionContext, interaction: APIModalSubmitInteraction): Promise<void>;
+
+  static toResponse(): APIInteractionResponse {
+    return {
+      type: InteractionResponseType.Modal,
+      data: this.toApiData(),
+    }
+  }
 
   static toApiData(): APIModalInteractionResponseCallbackData {
     return {

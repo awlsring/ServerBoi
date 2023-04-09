@@ -20,9 +20,25 @@ export class InteractionHandler {
     });
     this.log = options.logger;
     this.components = new Map();
-    options.components?.forEach((component) => {
-      this.components.set(component.getIdentifier(), component);
+    this.components = this.registerComponents(options.components ?? [])
+  }
+
+  private registerComponents(components: Component[]) {
+    const registeredComponents = new Map<string, Component>();
+    components.forEach((component) => {
+      if (registeredComponents.has(component.getIdentifier())) {
+        throw new Error(`Component with identifier ${component.getIdentifier()} already registered.`);
+      }
+      registeredComponents.set(component.getIdentifier(), component);
     });
+
+    // log a list of all known components
+    this.log.info("Registered components:");
+    for (const [identifier, component] of registeredComponents) {
+      console.log(`- ${identifier}`);
+    }
+
+    return registeredComponents;
   }
 
   private async formContext(interaction: APIInteraction, response: FastifyReply): Promise<InteractionContext> {

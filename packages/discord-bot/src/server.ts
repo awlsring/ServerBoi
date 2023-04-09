@@ -29,6 +29,9 @@ import { GetProviderCommand } from './interactions/commands/provider/get/get-pro
 import { DescribeProviderCommand } from './interactions/commands/provider/describe/describe-provider-command';
 import { UserProviderListMenu } from './interactions/commands/provider/describe/components/provider-list';
 import { RemoveProviderCommand } from './interactions/commands/provider/remove/remove-provider-command';
+import { TrackServerSelectProvider } from './interactions/commands/server/track/components/select-provider-menu';
+import { ResubmitKubernetesProviderInfoButton } from './interactions/commands/server/track/components/resubmit-kubernetes-info-button';
+import { KubernetesServerProviderInformationModal } from './interactions/commands/server/track/components/kubernetes-provider-modal';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -50,6 +53,7 @@ async function main() {
   const requestDao = new TrackServerRequestRepo(cfg.database);
   const createProviderRequestRepo = new CreateProviderRequestRepo(cfg.database);
   const cardDao = new ServerCardRepo(cfg.database);
+
   
   const interactions = new InteractionHandler({
     token: cfg.discord.token,
@@ -64,11 +68,14 @@ async function main() {
         trackServerDao: requestDao,
         ServerCardRepo: cardDao,
       }),
+      new KubernetesServerProviderInformationModal({ requestRepo: requestDao }),
+      new ResubmitKubernetesProviderInfoButton(),
+      new TrackServerSelectProvider({ trackServerDao: requestDao, serverboiService: serverboi }),
       new RemoveProviderCommand({ serverBoiService: serverboi }),
       new DescribeProviderCommand({ serverBoiService: serverboi }),
       new UserProviderListMenu({ serverBoiService: serverboi }),
       new ServerTrackInitialModal({ trackServerDao: requestDao }),
-      new SteamQueryInformationModal({ trackServerDao: requestDao }),
+      new SteamQueryInformationModal({ trackServerDao: requestDao, serverboiService: serverboi }),
       new HTTPQueryInformationModal({ trackServerDao: requestDao }),
       new StartTrackServerButton(),
       new ResubmitQueryButton(),

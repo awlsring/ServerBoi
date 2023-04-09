@@ -76,6 +76,11 @@ export class TrackServerRequestRepo {
       queryType: trackServer.queryType ?? undefined,
       queryPort: trackServer.queryPort ?? undefined,
       queryAddress: trackServer.queryAddress ?? undefined,
+      provider: trackServer.provider ?? undefined,
+      providerServerIdentifier: trackServer.providerServerIdentifier ?? undefined,
+      providerServerLocation: trackServer.providerServerLocation ?? undefined,
+      providerServerData: trackServer.providerServerData ?? undefined,
+      channelId: trackServer.channelId ?? undefined,
     }
   }
 }
