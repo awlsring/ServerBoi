@@ -4,7 +4,7 @@ import { InteractionContext, ServerBoiService } from "@serverboi/discord-common"
 import { ResubmitQueryButton } from "./resubmit-steam-query";
 import { ModalComponent } from "@serverboi/discord-common";
 import { TrackServerSelectProvider } from "./select-provider-menu";
-import { ChannelSelectMenu } from "./channel-select-menu";
+import { CapabilitySelectMenu } from "./set-capabilities";
 
 export interface SteamQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -101,7 +101,7 @@ export class SteamQueryInformationModal extends ModalComponent {
         data: {
           content: "You have no configured provider so one will not be assigned to this server.\n\nSelect the channel to send the server information to.",
           components: [
-            ChannelSelectMenu.toApiData()
+            CapabilitySelectMenu.toApiData()
           ],
           flags: MessageFlags.Ephemeral,
         }

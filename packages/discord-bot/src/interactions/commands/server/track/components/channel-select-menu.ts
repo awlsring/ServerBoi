@@ -1,6 +1,5 @@
-import { Capabilities } from "@serverboi/client"
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ChannelType, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
-import { formServerEmbedMessage, ServerCardRepo } from "@serverboi/discord-common"
+import { ServerCardService } from "@serverboi/discord-common"
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo"
 import { ServerBoiService } from "@serverboi/discord-common"
 import { InteractionContext } from "@serverboi/discord-common"
@@ -9,7 +8,7 @@ import { SelectMenuComponent } from "@serverboi/discord-common"
 export interface ChannelSelectMenuOptions {
   readonly serverBoiService: ServerBoiService
   readonly trackServerDao: TrackServerRequestRepo
-  readonly ServerCardRepo: ServerCardRepo
+  readonly serverCardService: ServerCardService
 }
 
 export class ChannelSelectMenu extends SelectMenuComponent {
@@ -22,13 +21,13 @@ export class ChannelSelectMenu extends SelectMenuComponent {
 
   private readonly serverboi: ServerBoiService
   private readonly trackServerDao: TrackServerRequestRepo
-  private readonly ServerCardRepo: ServerCardRepo
+  private readonly serverCardService: ServerCardService
 
   constructor(options: ChannelSelectMenuOptions) {
     super()
     this.serverboi = options.serverBoiService
     this.trackServerDao = options.trackServerDao
-    this.ServerCardRepo = options.ServerCardRepo
+    this.serverCardService = options.serverCardService
   }
 
   public async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
@@ -53,7 +52,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         location: finalizedRequest.providerServerLocation,
         data: finalizedRequest.providerServerData,
       },
-      capabilities: [ Capabilities.READ, Capabilities.QUERY ],
+      capabilities: finalizedRequest.capabilities,
       query: {
         type: finalizedRequest.queryType,
         address: finalizedRequest.queryAddress,
@@ -72,13 +71,6 @@ export class ChannelSelectMenu extends SelectMenuComponent {
     })
     console.log(`Sent response`)
 
-    const message = await context.http.createMessage(selectedValue, formServerEmbedMessage(server))
-
-    await this.ServerCardRepo.create({
-      messageId: message.id,
-      serverId: server.id!,
-      channelId: selectedValue,
-      ownerId: finalizedRequest.ownerId,
-    })
+    await this.serverCardService.createCard(selectedValue, server)
   }
 }

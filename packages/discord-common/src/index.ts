@@ -13,5 +13,6 @@ export * from "./persistence/server-card-repo";
 export * from "./persistence/prisma-options";
 export * from "./dto/server-card-dto";
 export * from "./service/serverboi";
+export * from "./service/server-card";
 export * from "./http/client";
 export * from "./cache/lru-cache";

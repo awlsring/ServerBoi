@@ -14,6 +14,7 @@ export interface TrackServerRequestDto {
   providerServerIdentifier?: string;
   providerServerLocation?: string;
   providerServerSubType?: string;
+  capabilities?: string[];
 }
 
 export interface NewTrackServerRequestDto {

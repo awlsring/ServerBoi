@@ -1,8 +1,8 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
 import { InteractionContext } from "@serverboi/discord-common";
-import { ChannelSelectMenu } from "./channel-select-menu";
 import { ModalComponent } from "@serverboi/discord-common";
+import { CapabilitySelectMenu } from "./set-capabilities";
 
 export interface HTTPQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -52,7 +52,7 @@ export class HTTPQueryInformationModal extends ModalComponent {
       data: {
         content: "Select the channel to send the server information to.",
         components: [
-          ChannelSelectMenu.toApiData()
+          CapabilitySelectMenu.toApiData()
         ],
         flags: MessageFlags.Ephemeral,
       }

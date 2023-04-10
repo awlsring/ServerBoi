@@ -2,9 +2,8 @@ import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteracti
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
 import { InteractionContext, SelectMenuComponent, ServerBoiService } from "@serverboi/discord-common";
 import { ProviderSummary, ProviderType } from "@serverboi/client";
-import { ChannelSelectMenu } from "./channel-select-menu";
-import { KubernetesProviderInformationModal } from "../../../provider/create/components/k8s-info-modal";
 import { KubernetesServerProviderInformationModal } from "./kubernetes-provider-modal";
+import { CapabilitySelectMenu } from "./set-capabilities";
 
 export interface TrackServerSelectProviderOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -75,7 +74,7 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
         data: {
           content: "Select the channel to send the server information to.",
           components: [
-            ChannelSelectMenu.toApiData()
+            CapabilitySelectMenu.toApiData()
           ],
           flags: MessageFlags.Ephemeral,
         }

@@ -3,7 +3,8 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import dotenv from 'dotenv';
 import { Config } from './config';
-import { ServerBoiService, ServerCardRepo, ServerCardDto, DiscordHttpClient, formServerEmbedMessage } from '@serverboi/discord-common';
+import { ServerBoiService, ServerCardRepo, ServerCardDto, DiscordHttpClient, formServerEmbedMessage, ServerCardService } from '@serverboi/discord-common';
+import { ResourceNotFoundError } from '@serverboi/client';
 dotenv.config();
 
 function loadConfig(): Config {
@@ -13,28 +14,37 @@ function loadConfig(): Config {
 }
 
 class Refresher {
-  readonly serverCardRepo: ServerCardRepo;
   readonly serverBoi: ServerBoiService;
-  readonly discord: DiscordHttpClient;
+  readonly serverCard: ServerCardService;
 
-  async refreshEmbeds(card: ServerCardDto) {
-    const server = await this.serverBoi.getServer("refreshed", card.serverId);
-    await this.discord.editMessage(card.channelId, card.messageId, formServerEmbedMessage(server))
+  async refreshEmbed(card: ServerCardDto) {
+    try {
+      const server = await this.serverBoi.getServer("refreshed", card.serverId);
+      await this.serverCard.refreshCard(card, server)
+    } catch (e) {
+      console.log(e)
+      if (e instanceof ResourceNotFoundError) {
+        console.log(`Deleting card for server ${card.serverId} as it no longer exists`)
+        await this.serverCard.deleteCard({ serverId: card.serverId });
+        return
+      }
+    }
   }
 
   async refreshCards() {
-    const cards = await this.serverCardRepo.findAll();
+    const cards = await this.serverCard.listCards();
     console.log(`Refreshing ${cards.length} cards`)
-    await Promise.all(cards.map(card => this.refreshEmbeds(card)));
+    await Promise.all(cards.map(card => this.refreshEmbed(card)));
   }
 
   constructor(config: Config) {
     this.serverBoi = new ServerBoiService(config.serverboi.endpoint, config.serverboi.apiKey);
-    this.serverCardRepo = new ServerCardRepo(config.database);
-    this.discord = new DiscordHttpClient({
+    const cardRepo = new ServerCardRepo(config.database);
+    const discord = new DiscordHttpClient({
       token: config.discord.token,
       version: "v10"
     });
+    this.serverCard = new ServerCardService(cardRepo, discord);
   }
 }
 

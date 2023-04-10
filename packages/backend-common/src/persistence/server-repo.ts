@@ -115,6 +115,24 @@ export class ServerRepo {
   }
 
   async delete(scopeId: string, serverId: string): Promise<ServerDto | null> {
+    await this.prisma.providerServerData.deleteMany({
+      where: {
+        server: {
+          scopeId,
+          serverId,
+        },
+      }
+    });
+
+    await this.prisma.status.deleteMany({
+      where: {
+        server: {
+          scopeId,
+          serverId,
+        },
+      }
+    });
+
     const deletedServer = await this.prisma.server.delete({
       include: this.defaultInclude,
       where: { scopeId_serverId: { scopeId, serverId } },

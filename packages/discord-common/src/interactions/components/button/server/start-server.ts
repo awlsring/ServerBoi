@@ -19,7 +19,7 @@ export class StartServerButton extends ServerButton {
   }
 
   public async enact(context: InteractionContext, interaction: APIMessageComponentButtonInteraction) {
-    const card = await this.serverCardRepo.findById(interaction.message.id)
+    const card = await this.serverCardRepo.findByMessageId(interaction.message.id)
 
     if (!this.isUserAuthorized(context.user, card!.ownerId, card!.admins ?? [])) {
       return await this.unauthorizedResponse(context)

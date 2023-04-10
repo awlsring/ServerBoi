@@ -187,6 +187,12 @@ export class DiscordHttpClient {
     return await response.json();
   }
 
+  async deleteMessage(channelId: string, messageId: string) {
+    await this.request(`/channels/${channelId}/messages/${messageId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async getUser(userId: string): Promise<APIUser> {
     const response = await this.request(`/users/${userId}`);
     return await response.json();

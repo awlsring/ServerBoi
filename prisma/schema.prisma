@@ -99,11 +99,17 @@ model TrackServer {
   application String 
   address   String
   port Int
+  provider String?
+  providerServerIdentifier String?
+  providerServerLocation String?
+  providerServerSubType String?
+  providerServerData String?
   ownerId String
   queryType String?
   queryAddress String?
   queryPort Int?
   channelId String?
+  capabilities String[]
 }
 
 model CreateProviderRequest {
@@ -118,9 +124,10 @@ model CreateProviderRequest {
 }
 
 model ServerCard {
+  id       String @id @default(uuid())
   messageId       String      @unique
   addedAt DateTime @default(now())
-  serverId String
+  serverId String @unique
   channelId String
   ownerId String
   admins String[]

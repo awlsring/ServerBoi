@@ -81,6 +81,7 @@ export class TrackServerRequestRepo {
       providerServerLocation: trackServer.providerServerLocation ?? undefined,
       providerServerData: trackServer.providerServerData ?? undefined,
       channelId: trackServer.channelId ?? undefined,
+      capabilities: trackServer.capabilities ?? undefined,
     }
   }
 }

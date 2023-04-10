@@ -3,7 +3,7 @@ import { TrackServerRequestRepo } from "../../../../../persistence/track-server-
 import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { ResubmitKubernetesProviderInfoButton } from "./resubmit-kubernetes-info-button";
-import { ChannelSelectMenu } from "./channel-select-menu";
+import { CapabilitySelectMenu } from "./set-capabilities";
 
 export interface KubernetesServerProviderInformationModalOptions {
   readonly requestRepo: TrackServerRequestRepo
@@ -112,7 +112,7 @@ export class KubernetesServerProviderInformationModal extends ModalComponent {
       data: {
         content: "Select the channel to send the server information to.",
         components: [
-          ChannelSelectMenu.toApiData()
+          CapabilitySelectMenu.toApiData()
         ],
         flags: MessageFlags.Ephemeral,
       }

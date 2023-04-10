@@ -23,9 +23,29 @@ export class ServerCardRepo {
     return this.toDto(createdServer);
   }
 
-  async findById(messageId: string): Promise<ServerCardDto | null> {
+  async findById(id: string): Promise<ServerCardDto | null> {
+    const serverCard = await this.prisma.serverCard.findUnique({
+      where: { id },
+    });
+    if (!serverCard) {
+      return null;
+    }
+    return this.toDto(serverCard);
+  }
+
+  async findByMessageId(messageId: string): Promise<ServerCardDto | null> {
     const serverCard = await this.prisma.serverCard.findUnique({
       where: { messageId },
+    });
+    if (!serverCard) {
+      return null;
+    }
+    return this.toDto(serverCard);
+  }
+
+  async findByServerId(id: string): Promise<ServerCardDto | null> {
+    const serverCard = await this.prisma.serverCard.findUnique({
+      where: { serverId: id },
     });
     if (!serverCard) {
       return null;
@@ -41,9 +61,9 @@ export class ServerCardRepo {
     return users.map((serverCard) => this.toDto(serverCard));
   }
 
-  async update(messageId: string, serverCard: any): Promise<ServerCardDto | null> {
+  async update(id: string, serverCard: any): Promise<ServerCardDto | null> {
     const updatedServer = await this.prisma.serverCard.update({
-      where: { messageId: messageId },
+      where: { id: id },
       data: serverCard,
     });
     if (!updatedServer) {
@@ -52,18 +72,15 @@ export class ServerCardRepo {
     return this.toDto(updatedServer);
   }
 
-  async delete(messageId: string): Promise<ServerCardDto | null> {
-    const deletedServer = await this.prisma.serverCard.delete({
-      where: { messageId },
+  async delete(id: string): Promise<void> {
+    await this.prisma.serverCard.delete({
+      where: { id: id },
     });
-    if (!deletedServer) {
-      return null;
-    }
-    return this.toDto(deletedServer);
   }
 
   private toDto(card: ServerCard): ServerCardDto {
     return {
+      id: card.id,
       messageId: card.messageId,
       addedAt: new Date(card.addedAt),
       serverId: card.serverId,

@@ -6,7 +6,7 @@ import { InteractionHandler } from './interactions/handler';
 import { Config } from './config';
 import fs from 'fs';
 import yaml from 'js-yaml';
-import { ServerBoiService, ServerCardRepo, ServerMoreActionsMenu, StartServerButton, StopServerButton } from '@serverboi/discord-common';
+import { DiscordHttpClient, ServerBoiService, ServerCardRepo, ServerCardService, ServerMoreActionsMenu, StartServerButton, StopServerButton } from '@serverboi/discord-common';
 import { TrackServerRequestRepo } from './persistence/track-server-request-repo';
 import { TrackCommand } from './interactions/commands/server/track/track-server-command';
 import { QuerySelectMenu } from './interactions/commands/server/track/components/query-select';
@@ -32,6 +32,8 @@ import { RemoveProviderCommand } from './interactions/commands/provider/remove/r
 import { TrackServerSelectProvider } from './interactions/commands/server/track/components/select-provider-menu';
 import { ResubmitKubernetesProviderInfoButton } from './interactions/commands/server/track/components/resubmit-kubernetes-info-button';
 import { KubernetesServerProviderInformationModal } from './interactions/commands/server/track/components/kubernetes-provider-modal';
+import { CapabilitySelectMenu } from './interactions/commands/server/track/components/set-capabilities';
+import { RemoveCommand } from './interactions/commands/server/remove/remove-server-command';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -52,22 +54,28 @@ async function main() {
   const serverboi = new ServerBoiService(cfg.serverboi.endpoint, cfg.serverboi.apiKey);
   const requestDao = new TrackServerRequestRepo(cfg.database);
   const createProviderRequestRepo = new CreateProviderRequestRepo(cfg.database);
-  const cardDao = new ServerCardRepo(cfg.database);
+  const cardRepo = new ServerCardRepo(cfg.database);
+  const discord = new DiscordHttpClient({
+    token: cfg.discord.token,
+    version: "v10"
+  });
+  const serverCardService = new ServerCardService(cardRepo, discord);
 
-  
   const interactions = new InteractionHandler({
     token: cfg.discord.token,
     version: cfg.discord.apiVersion ?? 'v10',
     components: [
       new TrackCommand(),
+      new RemoveCommand({ serverboiService: serverboi, serverCardService }),
       new GetProviderCommand({ serverBoiService: serverboi }),
       new CreateProviderCommand(),
       new QuerySelectMenu({ trackServerDao: requestDao }),
       new ChannelSelectMenu({
         serverBoiService: serverboi,
         trackServerDao: requestDao,
-        ServerCardRepo: cardDao,
+        serverCardService: serverCardService,
       }),
+      new CapabilitySelectMenu({ trackServerDao: requestDao }),
       new KubernetesServerProviderInformationModal({ requestRepo: requestDao }),
       new ResubmitKubernetesProviderInfoButton(),
       new TrackServerSelectProvider({ trackServerDao: requestDao, serverboiService: serverboi }),
@@ -86,9 +94,9 @@ async function main() {
       new KubernetesProviderInformationModal({ requestRepo: createProviderRequestRepo }),
       new KubernetesProviderAuthInformationModal({ requestRepo: createProviderRequestRepo }),
       new CreateProviderNameInputModal({ serverBoiService: serverboi, requestRepo: createProviderRequestRepo }),
-      new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
-      new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
-      new ServerMoreActionsMenu({ serverBoiService: serverboi, ServerCardRepo: cardDao }),
+      new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
+      new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
+      new ServerMoreActionsMenu({ serverBoiService: serverboi, serverCardService: serverCardService }),
     ],
     logger: server.log,
   });

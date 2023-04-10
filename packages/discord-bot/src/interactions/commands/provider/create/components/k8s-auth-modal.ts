@@ -1,9 +1,7 @@
 import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext } from "@serverboi/discord-common";
-import { ChannelSelectMenu } from "../../../server/track/components/channel-select-menu";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
-import { CreateProviderNameInputModal } from "./provider-name-input";
 import { CreateProviderNameInputPromptButton } from "./name-prompt-modal";
 
 const PROVIDER_AUTH = "kubernetes-provider-auth";
