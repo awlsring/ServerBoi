@@ -13,8 +13,14 @@ export function serverToSummary(server: ServerDto): ServerSummary {
     provider: server.provider ? {
       type: server.provider?.type,
       name: server.provider?.name,
+      data: server.provider?.data ? JSON.parse(server.provider?.data) : undefined,
     } : undefined,
-    providerServerData: server.providerServerData,
+    providerServerData: {
+      identifier: server.providerServerData?.identifier,
+      location: server.providerServerData?.location,
+      subType: server.providerServerData?.subType,
+      data: server.providerServerData?.data ? JSON.parse(server.providerServerData?.data) : undefined,
+    },
     query: {
       type: server.query.type,
       address: server.query.address,
@@ -38,23 +44,13 @@ function serverStatusToSummary(status?: ServerStatusDto): ServerStatusSummary {
   if (!status) {
     return {
       type: ServerQueryType.NONE,
-      status: ServerStatus.UNREACHABLE,
+      status: ServerStatus.UNKNOWN,
     };
   }
 
-  const base = {
+  return {
     type: status.type!,
     status: status.status!,
+    data: status.data ? JSON.parse(status.data) : undefined,
   };
-
-  switch (status.type) {
-    case ServerQueryType.STEAM:
-      const steam: SteamStatusData = JSON.parse(status.data!)
-      return {
-        ...base,
-        steam: steam
-      };
-    default:
-      return base;
-  }     
 }

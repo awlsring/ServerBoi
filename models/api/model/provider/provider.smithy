@@ -20,7 +20,7 @@ structure ProviderSummary {
     @required
     type: ProviderType,
 
-    data: String
+    data: Document
 }
 
 enum ProviderType {

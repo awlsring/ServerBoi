@@ -87,7 +87,7 @@ structure ServerProviderDataSummary {
 
     location: String
 
-    data: String
+    data: Document
 }
 
 structure ServerStatusSummary {
@@ -97,7 +97,11 @@ structure ServerStatusSummary {
     @required
     status: ServerStatus,
 
-    steam: SteamStatusSummary,
+    query: QueryServerStatus,
+
+    provider: ProviderServerStatus,
+
+    data: Document,
 }
 
 structure SteamStatusSummary {
@@ -158,6 +162,21 @@ enum ServerStatus {
     STOPPING = "STOPPING",
     REBOOTING = "REBOOTING",
     STOPPED = "STOPPED",
+    UNREACHABLE = "UNREACHABLE",
+    UNREACHABLE_RUNNING = "UNREACHABLE_RUNNING",
+    UNKNOWN = "UNKNOWN",
+}
+
+enum ProviderServerStatus {
+    RUNNING = "RUNNING",
+    STARTING = "STARTING",
+    STOPPING = "STOPPING",
+    REBOOTING = "REBOOTING",
+    STOPPED = "STOPPED",
+}
+
+enum QueryServerStatus {
+    REACHABLE = "REACHABLE",
     UNREACHABLE = "UNREACHABLE",
 }
 

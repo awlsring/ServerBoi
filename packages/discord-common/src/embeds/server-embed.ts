@@ -1,8 +1,18 @@
-import { Capabilities, ServerConnectivitySummary, ServerLocationSummary, ServerQueryType, ServerStatus, ServerStatusSummary, ServerSummary, SteamStatusSummary } from "@serverboi/client";
-import { EmbedType, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIButtonComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
+import { Capabilities, ServerConnectivitySummary, ServerLocationSummary, ServerQueryType, ServerStatus, ServerStatusSummary, ServerSummary } from "@serverboi/client";
+import { EmbedType, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, APIMessageActionRowComponent, APIEmbedField, APIEmbed} from "discord-api-types/v10";
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
 import { ServerMoreActionsMenu } from "../interactions/components/menus/server-more-actions";
+
+export interface SteamStatusData {
+  readonly name: string;
+  readonly map: string;
+  readonly game: string;
+  readonly gameId: number;
+  readonly players: number;
+  readonly maxPlayers: number;
+  readonly visibility: number;
+}
 
 export enum ServerEmbedColor {
   Green = 0x00ff00,
@@ -95,7 +105,7 @@ function formSteamFields(summary: ServerSummary): APIEmbedField[] {
     formAddressField(summary.connectivity),
     formLocationField(summary.location),
     formGameField(summary.application),
-    formPlayersField(summary.status?.steam),
+    formPlayersField(summary.status?.data),
   ]
 }
 
@@ -213,17 +223,21 @@ function formGameField(application?: string): APIEmbedField {
   }
 }
 
-function formPlayersField(summary?: SteamStatusSummary): APIEmbedField {
+function formPlayersField(summary: any): APIEmbedField {
   let players = 0;
   let maxPlayers = 0;
 
   if (summary) {
-    if (summary.players) {
-      players = summary.players;
+    if (summary instanceof Object && "players" in summary && "maxPlayers" in summary) {
+      const sum = summary as unknown as SteamStatusData
+      if (summary.players) {
+        players = sum.players;
+      }
+      if (summary.maxPlayers) {
+        maxPlayers = sum.maxPlayers;
+      }
     }
-    if (summary.maxPlayers) {
-      maxPlayers = summary.maxPlayers;
-    }
+
   }
 
   return {
