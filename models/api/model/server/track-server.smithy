@@ -44,7 +44,7 @@ structure TrackServerProviderDataInput {
 
     location: String
 
-    data: String
+    data: Document
 }
 
 structure TrackServerQueryInput {

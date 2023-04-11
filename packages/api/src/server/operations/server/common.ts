@@ -13,13 +13,13 @@ export function serverToSummary(server: ServerDto): ServerSummary {
     provider: server.provider ? {
       type: server.provider?.type,
       name: server.provider?.name,
-      data: server.provider?.data ? JSON.parse(server.provider?.data) : undefined,
+      data: server.provider?.data ? server.provider?.data : undefined,
     } : undefined,
     providerServerData: {
       identifier: server.providerServerData?.identifier,
       location: server.providerServerData?.location,
       subType: server.providerServerData?.subType,
-      data: server.providerServerData?.data ? JSON.parse(server.providerServerData?.data) : undefined,
+      data: server.providerServerData?.data ? server.providerServerData?.data : undefined,
     },
     query: {
       type: server.query.type,
@@ -43,14 +43,12 @@ export function serverToSummary(server: ServerDto): ServerSummary {
 function serverStatusToSummary(status?: ServerStatusDto): ServerStatusSummary {
   if (!status) {
     return {
-      type: ServerQueryType.NONE,
       status: ServerStatus.UNKNOWN,
     };
   }
 
   return {
-    type: status.type!,
-    status: status.status!,
-    data: status.data ? JSON.parse(status.data) : undefined,
+    status: status.status,
+    data: status.data ? status.data as any : undefined,
   };
 }

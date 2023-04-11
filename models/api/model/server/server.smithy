@@ -92,9 +92,6 @@ structure ServerProviderDataSummary {
 
 structure ServerStatusSummary {
     @required
-    type: ServerQueryType,
-
-    @required
     status: ServerStatus,
 
     query: QueryServerStatus,

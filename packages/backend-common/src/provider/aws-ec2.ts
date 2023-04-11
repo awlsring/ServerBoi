@@ -1,7 +1,8 @@
 import { DescribeInstancesCommand, EC2Client, RebootInstancesCommand, StartInstancesCommand, StopInstancesCommand } from "@aws-sdk/client-ec2";
+import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
-import { Provider, State, Status } from "./provider";
+import { Provider } from "./provider";
 
 export interface AwsEc2ProviderOptions {
   readonly region: string;
@@ -18,35 +19,35 @@ export class AwsEc2Provider implements Provider {
     this.client = new EC2Client({ region: cfg.region, credentials: { accessKeyId: auth.key, secretAccessKey: auth.secret } });
   }
 
-  async getServerStatus(serverData: ProviderServerDataDto): Promise<Status> {
+  async getServerStatus(serverData: ProviderServerDataDto): Promise<ProviderServerStatus> {
     const instance = await this.client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }))
 
     if (!instance.Reservations || instance.Reservations.length === 0) {
-      return { state: State.UNKNOWN };
+      return ProviderServerStatus.STOPPED; // unknown;
     }
 
     if (!instance.Reservations[0].Instances || instance.Reservations[0].Instances.length === 0) {
-      return { state: State.UNKNOWN };
+      return ProviderServerStatus.STOPPED; // unknown;
     }
 
     if (!instance.Reservations[0].Instances[0].State) {
-      return { state: State.UNKNOWN };
+      return ProviderServerStatus.STOPPED; // unknown;
     }
 
     const state = instance.Reservations[0].Instances[0].State.Name;
 
     switch (state) {
       case "running":
-        return { state: State.RUNNING };
+        return ProviderServerStatus.RUNNING;
       case "pending":
-        return { state: State.STARTING };
+        return ProviderServerStatus.STARTING;
       case "stopped":
-        return { state: State.STOPPED };
+        return ProviderServerStatus.STOPPED;
       case "stopping":
       case "shutting-down":
-        return { state: State.STOPPING };
+        return ProviderServerStatus.STOPPING;
       default:
-        return { state: State.UNKNOWN };
+        return ProviderServerStatus.STOPPED // unknown;
     }
   }
 

@@ -57,7 +57,8 @@ model Server {
 model Status {
   id             String       @id @default(uuid())
   status String
-  type String
+  query String?
+  provider String?
   server Server @relation(fields: [serverScopeId, serverId], references: [scopeId, serverId])
   serverScopeId String
   serverId String

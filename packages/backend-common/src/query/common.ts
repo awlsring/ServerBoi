@@ -30,7 +30,7 @@ export async function determineConnectivity(server: ServerDto): Promise<Connecti
 export interface QueryData {}
 
 export interface Querent {
-  Query(): Promise<ServerStatusDto>;
+  Query(): Promise<Partial<ServerStatusDto>>;
 }
 
 export abstract class QuerentBase implements Querent {
@@ -38,5 +38,5 @@ export abstract class QuerentBase implements Querent {
 
   constructor(protected readonly connectivity: Connectivity) {}
 
-  abstract Query(): Promise<ServerStatusDto>;
+  abstract Query(): Promise<Partial<ServerStatusDto>>;
 }

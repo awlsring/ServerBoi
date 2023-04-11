@@ -1,4 +1,4 @@
-import { ServerQueryType, ServerStatus } from "@serverboi/ssdk";
+import { QueryServerStatus, ServerQueryType, ServerStatus } from "@serverboi/ssdk";
 import { queryGameServerInfo } from "steam-server-query";
 import { ServerDto, ServerStatusDto } from "../dto/server-dto";
 import { Connectivity, Querent, QuerentBase } from "./common";
@@ -27,7 +27,7 @@ export class SteamQuerent extends QuerentBase {
     this.port = this.connectivity.port;
   }
 
-  async Query(): Promise<ServerStatusDto> {
+  async Query(): Promise<Partial<ServerStatusDto>> {
     const queryAddress = `${this.address}:${this.port}`;
     try {
       const query = await queryGameServerInfo(queryAddress);
@@ -41,20 +41,15 @@ export class SteamQuerent extends QuerentBase {
         visibility: query.visibility,
       }
 
-      const status: ServerStatusDto = {
-        type: this.type,
-        status: ServerStatus.RUNNING,
-        data: JSON.stringify(steamData),
+      return {
+        query: QueryServerStatus.REACHABLE,
+        data: steamData
       };
-
-      return status;
-
     } catch (e) {
       console.log(`Error querying ${this.address}:${this.port}`);
       console.log(e);
       return {
-        type: this.type,
-        status: ServerStatus.UNREACHABLE,
+        query: QueryServerStatus.UNREACHABLE,
       };
     }
   }

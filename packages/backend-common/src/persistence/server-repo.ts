@@ -50,12 +50,17 @@ export class ServerRepo {
             providerId: server.provider?.id,
             identifier: server.providerServerData!.identifier,
             location: server.providerServerData!.location,
-            data: server.providerServerData!.data,
+            data: server.providerServerData!.data ? JSON.stringify(server.providerServerData!.data) : undefined,
             subType: server.providerServerData!.subType,
           }
         } : undefined,
         status: {
-          create: server.status
+          create: {
+            status: server.status.status,
+            provider: server.status.provider,
+            query: server.status.query,
+            data: server.status.data ? JSON.stringify(server.status.data) : undefined,
+          }
         }
       }
     });
@@ -70,7 +75,6 @@ export class ServerRepo {
     if (!server) {
       return null;
     }
-    console.log(JSON.stringify(server, null, 2));
     return this.toDto(server);
   }
 
@@ -102,8 +106,18 @@ export class ServerRepo {
       data: {
         status: {
           upsert: {
-            create: status,
-            update: status,
+            create: {
+              status: status.status,
+              provider: status.provider,
+              query: status.query,
+              data: status.data ? JSON.stringify(status.data) : undefined,
+            },
+            update: {
+              status: status.status,
+              provider: status.provider,
+              query: status.query,
+              data: status.data ? JSON.stringify(status.data) : undefined,
+            },
           }
         }
       },
@@ -163,7 +177,7 @@ export class ServerRepo {
       providerServerData: server.providerData ? {
         identifier: server.providerData.identifier ?? undefined,
         location: server.providerData.location ?? undefined,
-        data: server.providerData.data ?? undefined,
+        data: server.providerData.data ? JSON.parse(server.providerData.data) : undefined,
         subType: server.providerData.subType ?? undefined,
       } : undefined,
       query: {
@@ -172,9 +186,10 @@ export class ServerRepo {
         port: server.queryPort ?? undefined,
       },
       status: server.status ? {
-        type: server.status.type,
         status: server.status.status,
-        data: server.status.data ?? undefined,
+        provider: server.status.provider ?? undefined,
+        query: server.status.query ?? undefined,
+        data: server.status.data ? JSON.parse(server.status.data) : undefined,
       } : undefined,
       location: {
         city: server.city,

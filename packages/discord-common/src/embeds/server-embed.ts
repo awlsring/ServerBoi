@@ -96,8 +96,6 @@ function formFields(summary: ServerSummary) {
   }
 }
 
-
-
 function formSteamFields(summary: ServerSummary): APIEmbedField[] {
   return [
     formStatusField(summary.status),
@@ -190,23 +188,34 @@ function fromAddressString(connectivity?: ServerConnectivitySummary): string {
 }
 
 function formStatusField(summary?: ServerStatusSummary): APIEmbedField {
+  let emoji = "❔";
   let status = "Unknown";
   if (summary?.status) {
-    switch (summary.status) {
+    status = summary.status;
+    switch (status) {
       case ServerStatus.RUNNING:
-        status = `🟢 Running`;
+        emoji = `🟢`;
         break;
+      case ServerStatus.STARTING:
+      case ServerStatus.REBOOTING:
+        emoji = `🟡`;
+      case ServerStatus.STOPPING:
       case ServerStatus.UNREACHABLE:
       case ServerStatus.STOPPED:
-        status = `🔴 Stopped`;
+        emoji = "🔴";
         break;
       default:
-        status = `Unknown`;
+        emoji = "❔";
     }
   }
+
+  const lowercased = status.toLowerCase();
+  const capitalized = lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
+  const statusString = `${emoji} ${capitalized}`;
+
   return {
     name: "Status",
-    value: status,
+    value: statusString,
     inline: true
   }
 }

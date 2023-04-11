@@ -3,8 +3,7 @@ import yaml from 'js-yaml';
 import dotenv from 'dotenv';
 import { Config } from './config';
 import { setInterval } from 'timers/promises';
-import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
-import { determineConnectivity, HttpQuerent, ServerDto, ServerRepo, ServerStatusDto, SteamQuerent } from '@serverboi/backend-common';
+import { ServerController, ServerDto, ServerRepo } from '@serverboi/backend-common';
 dotenv.config();
 
 function loadConfig(): Config {
@@ -14,27 +13,13 @@ function loadConfig(): Config {
 }
 
 class StatusMonitor {
+  readonly controller: ServerController;
   readonly serverRepo: ServerRepo;
 
-  async monitorServer(server: ServerDto) {
+  private async monitorServer(server: ServerDto) {
     console.log(`Updating status of server ${server.serverId}`)
-    const status = await this.getStatus(server);
+    const status = await this.controller.getServerStatus(server);
     await this.serverRepo.updateStatus(server.scopeId, server.serverId, status);
-  }
-
-  async getStatus(server: ServerDto): Promise<ServerStatusDto> {
-    const connectivity = await determineConnectivity(server);
-    switch (server.query.type) {
-      case ServerQueryType.STEAM:
-        return await new SteamQuerent(connectivity).Query();
-      case ServerQueryType.HTTP:
-        return await new HttpQuerent(connectivity).Query();
-      default:
-        return {
-          type: ServerQueryType.NONE,
-          status: ServerStatus.UNREACHABLE,
-        }
-    }
   }
 
   async checkServers() {
@@ -44,6 +29,7 @@ class StatusMonitor {
   }
 
   constructor(config: Config) {
+    this.controller = new ServerController(config.database)
     this.serverRepo = new ServerRepo(config.database);
   }
 }

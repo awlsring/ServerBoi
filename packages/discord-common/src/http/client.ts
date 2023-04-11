@@ -188,9 +188,19 @@ export class DiscordHttpClient {
   }
 
   async deleteMessage(channelId: string, messageId: string) {
-    await this.request(`/channels/${channelId}/messages/${messageId}`, {
-      method: 'DELETE',
-    });
+    try {
+      const response = await this.request(`/channels/${channelId}/messages/${messageId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.status === 204) {
+        console.log('Message deleted successfully');
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
   }
 
   async getUser(userId: string): Promise<APIUser> {

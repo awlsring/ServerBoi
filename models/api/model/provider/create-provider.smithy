@@ -25,7 +25,7 @@ structure CreateProviderInput {
     @required
     auth: CreateProviderAuthInput
 
-    data: String
+    data: Document
 }
 
 structure CreateProviderAuthInput {

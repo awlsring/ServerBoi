@@ -19,8 +19,9 @@ export interface ServerDto {
 }
 
 export interface ServerStatusDto {
-  readonly type: string;
   readonly status: string;
+  readonly query?: string;
+  readonly provider?: string;
   readonly data?: any;
 }
 

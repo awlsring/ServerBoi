@@ -7,12 +7,12 @@ import { IPAPIClient, ServerLocation } from "../ip-lookup/ip-api";
 import { PrismaRepoOptions } from "../persistence/prisma-repo-options";
 import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
-import { ServerQueryType, ServerStatus } from '@serverboi/ssdk';
+import { ProviderServerStatus, QueryServerStatus, ServerQueryType, ServerStatus } from '@serverboi/ssdk';
 import { LRUCache } from "../cache/lru-cache";
 import { Provider } from "../provider/provider";
 import { AwsEc2Provider } from "../provider/aws-ec2";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
-import { KubernetesProvider, KubernetesProviderOptions, KubernetesProviderServerData } from "../provider/kubernetes";
+import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
 
 export class ServerController {
   private readonly serverDao: ServerRepo;
@@ -39,6 +39,87 @@ export class ServerController {
     }, 60 * 1000 /* 1 minute */);
   }
 
+  async getServerStatus(server: ServerDto): Promise<ServerStatusDto> {
+    const provider = await this.getProviderStatus(server);
+    const query = await this.getQueryStatus(server);
+
+    let primaryStatus: ServerStatus = ServerStatus.UNKNOWN;
+
+    if (provider && query.query) {
+      if (query.query === QueryServerStatus.UNREACHABLE) {
+        if (provider === ProviderServerStatus.RUNNING) {
+          primaryStatus = ServerStatus.UNREACHABLE_RUNNING;
+        }
+      } else if (query.query === QueryServerStatus.REACHABLE) {
+        if (provider === ProviderServerStatus.RUNNING) {
+          primaryStatus = ServerStatus.RUNNING;
+        }
+      } else if (provider === ProviderServerStatus.STOPPED) {
+        primaryStatus = ServerStatus.STOPPED;
+      } else if (provider === ProviderServerStatus.STOPPING) {
+        primaryStatus = ServerStatus.STOPPED;
+      } else if (provider === ProviderServerStatus.REBOOTING) {
+        primaryStatus = ServerStatus.REBOOTING;
+      }
+    } else if (provider) {
+      if (provider === ProviderServerStatus.RUNNING) {
+        primaryStatus = ServerStatus.RUNNING;
+      } else if (provider === ProviderServerStatus.STOPPED) {
+        primaryStatus = ServerStatus.STOPPED;
+      } else if (provider === ProviderServerStatus.STOPPING) {
+        primaryStatus = ServerStatus.STOPPED;
+      } else if (provider === ProviderServerStatus.REBOOTING) {
+        primaryStatus = ServerStatus.REBOOTING;
+      } else if (provider === ProviderServerStatus.STARTING) {
+        primaryStatus = ServerStatus.STARTING;
+      }
+    } else if (query.query) {
+      if (query.query === QueryServerStatus.REACHABLE) {
+        primaryStatus = ServerStatus.RUNNING;
+      } else if (query.query === QueryServerStatus.UNREACHABLE) {
+        primaryStatus = ServerStatus.UNREACHABLE;
+      }
+    }
+
+    const status = {
+      status: primaryStatus,
+      provider: provider,
+      ...query
+    }
+    return status;
+  }
+
+  private async getProviderStatus(server: ServerDto): Promise<ProviderServerStatus | undefined> {
+    const provider = await this.getProvider(server);
+    if (!server.providerServerData) {
+      return undefined;
+    }
+    return await provider.getServerStatus(server.providerServerData);
+  }
+
+  private async getQueryStatus(server: ServerDto): Promise<Partial<ServerStatusDto>> {
+    const connectivity = this.determineConnectivity(
+      server.address,
+      server.port,
+      server.query.address,
+      server.query.port,
+    );
+    let querent: Querent;
+    switch (server.query.type) {
+      case ServerQueryType.STEAM:
+        querent = new SteamQuerent(connectivity);
+        break;
+      case ServerQueryType.HTTP:
+        querent = new HttpQuerent(connectivity);
+        break;
+      default:
+        return {
+          query: undefined,
+        }
+    }
+    return await querent.Query();
+  }
+
   private async queryServer(type: string, connectivity: Connectivity): Promise<ServerStatusDto> {
     let querent: Querent;
     switch (type) {
@@ -50,11 +131,15 @@ export class ServerController {
         break;
       default:
         return {
-          type: ServerQueryType.NONE,
           status: ServerStatus.UNREACHABLE,
         }
     }
-    return querent.Query();
+    const queryResult = await querent.Query();
+
+    return {
+      status: ServerStatus.UNKNOWN, // TODO: determine status
+      ...queryResult,
+    }
   }
 
   private determineConnectivity(address: string, port: number, queryAddress?: string, queryPort?: number): Connectivity {
@@ -209,10 +294,10 @@ export class ServerController {
         if (!provider.data) {
           throw new Error("Provider has no needed kubernetes data");
         }
-        provider.data as KubernetesProviderServerData
+        const data = provider.data as unknown as KubernetesProviderOptions
         const k8sCfg: KubernetesProviderOptions = {
-          endpoint: server.providerServerData.data.endpoint,
-          allowUnsecure: server.providerServerData.data.allowUnsecure,
+          endpoint: data.endpoint,
+          allowUnsecure: true,
         }
         return new KubernetesProvider(k8sCfg, auth);
       default:

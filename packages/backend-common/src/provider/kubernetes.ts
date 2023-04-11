@@ -1,11 +1,12 @@
 import { AppsV1Api, CoreV1Api, KubeConfig } from "@kubernetes/client-node";
+import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
-import { Provider, State, Status } from "./provider";
+import { Provider } from "./provider";
 
 export interface KubernetesProviderOptions {
   readonly endpoint: string;
-  readonly allowUnsecure: boolean;
+  readonly allowUnsecure?: boolean;
 }
 
 export interface KubernetesProviderServerData extends ProviderServerDataDto {
@@ -56,9 +57,8 @@ export class KubernetesProvider implements Provider {
     if (!serverData.data) {
       throw new Error("Missing data on server data");
     }
-
-    const k8sData = serverData.data as KubernetesProviderServerData;
-
+    
+    const k8sData = serverData.data as KubernetesProviderServerData
     if (!k8sData.namespace) {
       throw new Error("Missing namespace on kubernetes server data");
     }
@@ -73,27 +73,27 @@ export class KubernetesProvider implements Provider {
     };
   }
 
-  async getServerStatus(serverData: ProviderServerDataDto): Promise<Status> {
+  async getServerStatus(serverData: ProviderServerDataDto): Promise<ProviderServerStatus> {
     const data = this.loadData(serverData);
     const res = await this.apps.readNamespacedDeployment(data.identifier, data.namespace);
 
     const status = res.body.status 
 
     if (!status) {
-      return { state: State.UNKNOWN }
+      return ProviderServerStatus.STOPPED;
     }
 
     if (status.replicas != 0) {
       if (status.availableReplicas == status.replicas && (status.unavailableReplicas === 0 || status.unavailableReplicas === undefined)) {
-        return { state: State.RUNNING }
+        return ProviderServerStatus.RUNNING
       } else {
-        return { state: State.STARTING }
+        return ProviderServerStatus.STARTING
       }
     } else {
       if (status.availableReplicas == status.replicas && (status.unavailableReplicas === 0 || status.unavailableReplicas === undefined)) {
-        return { state: State.STOPPED }
+        return ProviderServerStatus.STOPPED
       } else {
-        return { state: State.STOPPING }
+        return ProviderServerStatus.STOPPING
       }
     }
   }

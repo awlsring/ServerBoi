@@ -23,7 +23,7 @@ export class ProviderRepo {
         name: request.name,
         type: request.type,
         ownerId: request.owner,
-        data: request.data,
+        data: request.data ? JSON.stringify(request.data) : undefined,
         auth: {
           create: {
             key: request.auth.key,
@@ -92,7 +92,7 @@ export class ProviderRepo {
       name: provider.name,
       type: provider.type,
       owner: provider.ownerId,
-      data: provider.data ?? undefined,
+      data: provider.data ? JSON.parse(provider.data) : undefined,
     };
   }
 }

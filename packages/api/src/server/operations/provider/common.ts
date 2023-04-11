@@ -5,6 +5,6 @@ export function providerToSummary(provider: ProviderDto): ProviderSummary {
   return {
     name: provider.name,
     type: provider.type,
-    data: provider.data,
+    data: provider.data as any,
   };
 }
