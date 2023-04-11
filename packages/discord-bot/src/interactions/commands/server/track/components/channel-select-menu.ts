@@ -47,11 +47,11 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         port: finalizedRequest.port,
       },
       provider: finalizedRequest.provider,
-      providerServerData: {
+      providerServerData: finalizedRequest.provider ? {
         identifier: finalizedRequest.providerServerIdentifier,
         location: finalizedRequest.providerServerLocation,
         data: finalizedRequest.providerServerData,
-      },
+      } : undefined,
       capabilities: finalizedRequest.capabilities,
       query: {
         type: finalizedRequest.queryType,

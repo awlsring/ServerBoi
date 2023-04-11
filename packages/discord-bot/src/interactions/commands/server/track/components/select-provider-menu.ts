@@ -3,7 +3,7 @@ import { TrackServerRequestRepo } from "../../../../../persistence/track-server-
 import { InteractionContext, SelectMenuComponent, ServerBoiService } from "@serverboi/discord-common";
 import { ProviderSummary, ProviderType } from "@serverboi/client";
 import { KubernetesServerProviderInformationModal } from "./kubernetes-provider-modal";
-import { CapabilitySelectMenu } from "./set-capabilities";
+import { ChannelSelectMenu } from "./channel-select-menu";
 
 export interface TrackServerSelectProviderOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -63,24 +63,24 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
     context.logger.info(`Selected values: ${selectedValue}`)
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
-    await this.trackServerDao.update(interaction.message!.interaction!.id, {
-      provider: selectedValue
-    })
-
     if (selectedValue === "None") {
       await context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {
           content: "Select the channel to send the server information to.",
           components: [
-            CapabilitySelectMenu.toApiData()
+            ChannelSelectMenu.toApiData()
           ],
           flags: MessageFlags.Ephemeral,
         }
       })
       return
     }
+
+    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    await this.trackServerDao.update(interaction.message!.interaction!.id, {
+      provider: selectedValue
+    })
 
     try {
       const provider = await this.serverboi.getProvider(context.user, selectedValue)

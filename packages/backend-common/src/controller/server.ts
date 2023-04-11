@@ -90,10 +90,10 @@ export class ServerController {
   }
 
   private async getProviderStatus(server: ServerDto): Promise<ProviderServerStatus | undefined> {
-    const provider = await this.getProvider(server);
-    if (!server.providerServerData) {
+    if (!server.provider || !server.providerServerData) {
       return undefined;
     }
+    const provider = await this.getProvider(server);
     return await provider.getServerStatus(server.providerServerData);
   }
 
@@ -183,8 +183,6 @@ export class ServerController {
       provider = await this.providerDao.find(input.providerName, input.owner) ?? undefined;
     }
 
-    const status = await this.queryServer(input.query.type, this.determineConnectivity(input.address, input.port, input.query.address, input.query.port));
-
     const serverDto = await this.serverDao.create({
       scopeId: input.scopeId,
       serverId: this.generateServerId(),
@@ -200,7 +198,9 @@ export class ServerController {
         region: location.region,
         emoji: location.emoji,
       },
-      status: status,
+      status: {
+        status: ServerStatus.UNKNOWN,
+      },
       query: {
         type: input.query.type,
         address: input.query.address,
@@ -209,7 +209,9 @@ export class ServerController {
       provider: provider,
       providerServerData: input.providerServerData,
     });
-    return serverDto;
+
+    const status = await this.getServerStatus(serverDto);
+    return await this.serverDao.updateStatus(serverDto.scopeId, serverDto.serverId, status) ?? serverDto;
   }
 
   async untrackServer(id: string): Promise<void> {

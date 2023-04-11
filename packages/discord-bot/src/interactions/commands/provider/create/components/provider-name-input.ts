@@ -35,14 +35,13 @@ export class CreateProviderNameInputModal extends ModalComponent {
     this.serverBoiService = options.serverBoiService
   }
 
-  private createProviderDataString(data?: string) {
+  private createProviderDataString(data?: any) {
     if (!data) {
       return ""
     }
 
-    const obj = JSON.parse(data)
     return `**Data**: 
-${this.toMarkdownBulletList(obj)}
+${this.toMarkdownBulletList(data)}
 `
   }
 
@@ -107,7 +106,7 @@ ${this.toMarkdownBulletList(obj)}
 
 **Name**: ${provider.name}
 **Type**: ${provider.type}
-${this.createProviderDataString(provider.data)}
+${this.createProviderDataString( provider.data)}
 
 `,
         components: [],
