@@ -4,7 +4,7 @@ import { InteractionContext } from "@serverboi/discord-common"
 import { SteamQueryInformationModal } from "./steam-query-info"
 import { SelectMenuComponent } from "@serverboi/discord-common"
 import { HTTPQueryInformationModal } from "./http-query-info"
-import { CapabilitySelectMenu } from "./set-capabilities"
+import { ChannelSelectMenu } from "./channel-select-menu"
 
 export interface QuerySelectMenuOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -70,7 +70,7 @@ export class QuerySelectMenu extends SelectMenuComponent {
           data: {
             content: "Select the channel to send the server information to.",
             components: [
-              CapabilitySelectMenu.toApiData()
+              ChannelSelectMenu.toApiData()
             ],
             flags: MessageFlags.Ephemeral,
           }

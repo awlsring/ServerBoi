@@ -84,7 +84,7 @@ async function main() {
       new UserProviderListMenu({ serverBoiService: serverboi }),
       new ServerTrackInitialModal({ trackServerDao: requestDao }),
       new SteamQueryInformationModal({ trackServerDao: requestDao, serverboiService: serverboi }),
-      new HTTPQueryInformationModal({ trackServerDao: requestDao }),
+      new HTTPQueryInformationModal({ trackServerDao: requestDao, serverboiService: serverboi}),
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
       new ResubmitBaseInfoButton(),
