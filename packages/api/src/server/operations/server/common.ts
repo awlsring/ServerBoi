@@ -15,12 +15,12 @@ export function serverToSummary(server: ServerDto): ServerSummary {
       name: server.provider?.name,
       data: server.provider?.data ? server.provider?.data : undefined,
     } : undefined,
-    providerServerData: {
+    providerServerData: server.providerServerData ? {
       identifier: server.providerServerData?.identifier,
       location: server.providerServerData?.location,
       subType: server.providerServerData?.subType,
       data: server.providerServerData?.data ? server.providerServerData?.data : undefined,
-    },
+    } : undefined,
     query: {
       type: server.query.type,
       address: server.query.address,
@@ -49,6 +49,8 @@ function serverStatusToSummary(status?: ServerStatusDto): ServerStatusSummary {
 
   return {
     status: status.status,
+    query: status.query,
+    provider: status.provider,
     data: status.data ? status.data as any : undefined,
   };
 }
