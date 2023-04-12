@@ -28,6 +28,11 @@ export interface IPAPIResponse {
   asn: string;
   org: string;
   hostname: string;
+
+  // errors
+  error: boolean,
+  reason: string,
+  reserved: boolean,
 }
 
 export interface ServerLocation {
@@ -76,8 +81,60 @@ export class IPAPIClient {
     return await this.resolveHostname(input);
   }
 
+  private isPrivateIPAddress(ipAddress: string): boolean {
+    const octets = ipAddress.split('.').map(octet => Number(octet));
+    if (octets.length !== 4) {
+      return false;
+    }
+    if (octets[0] === 10) {
+      return true;
+    }
+    if (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) {
+      return true;
+    }
+    if (octets[0] === 192 && octets[1] === 168) {
+      return true;
+    }
+    return false;
+  }
+
+  private isTailscaleAddress(ipAddress: string): boolean {
+    const pattern = /^100\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+    return pattern.test(ipAddress);
+  }
+
   public async getIPInfo(address: string): Promise<ServerLocation> {
     const ip = await this.resolveIp(address);
+
+    if (!ip) {
+      console.error(`Failed to get IP info for ${address}`);
+      return {
+        city: 'Unknown',
+        region: 'Unknown',
+        country: 'Unknown',
+        emoji: '😔',
+      };
+    }
+
+    // check if tailscale
+    if (this.isTailscaleAddress(ip)) {
+      return {
+        city: 'Tailscale',
+        region: 'Tailscale',
+        country: 'Tailscale',
+        emoji: '🧜‍♀️',
+      };
+    }
+
+    if (this.isPrivateIPAddress(ip)) {
+      return {
+        city: 'Private',
+        region: 'Private',
+        country: 'Private',
+        emoji: '🤫',
+      };
+    }
+
     const response = await fetch(`https://ipapi.co/${ip}/json`);
     if (!response.ok) {
       console.error(`Failed to get IP info for ${address}`);
@@ -89,7 +146,15 @@ export class IPAPIClient {
       };
     }
     const ipApiResponse = await response.json() as IPAPIResponse;
-    console.log(ipApiResponse)
+    if (ipApiResponse.reserved) {
+      console.error(`Failed to get IP info for ${address}`);
+      return {
+        city: 'Private',
+        region: 'Private',
+        country: 'Private',
+        emoji: '🤫',
+      };
+    }
     return {
       city: ipApiResponse.city,
       region: ipApiResponse.region_code,

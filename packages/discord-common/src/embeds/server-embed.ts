@@ -152,7 +152,10 @@ function formLocationField(summary?: ServerLocationSummary): APIEmbedField {
   if (summary) {
     if (summary.country === "US") {
       location = `${summary.emoji} ${summary.city}, ${summary.region}`;
-    } else {
+    } else if (summary.city === "Private" || summary.city === "Unknown" || summary.city === "Tailscale") {
+      location = `${summary.emoji} ${summary.city}`;
+    } 
+    else {
       location = `${summary.emoji} ${summary.city}, ${summary.country}`;
     }
   }
