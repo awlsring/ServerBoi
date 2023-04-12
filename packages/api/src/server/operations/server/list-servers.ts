@@ -8,7 +8,10 @@ export const ListServersOperation: Operation<ListServersServerInput, ListServers
     console.log(`Received ListServers operation`);
     console.log(`Input: ${JSON.stringify(input)}`);
 
-    const server = await context.controller.server.listServers();
+    const server = await context.controller.server.listServers({
+      user: context.user,
+      scopeId: input.scope,
+    });
     const summaries = server.map((server) => {
       return serverToSummary(server);
     });

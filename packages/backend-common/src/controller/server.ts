@@ -14,6 +14,13 @@ import { AwsEc2Provider } from "../provider/aws-ec2";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
 import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
 
+export interface ListServerInput {
+  readonly user: string;
+  readonly scopeId?: string;
+  readonly amount?: number;
+  readonly skip?: number;
+}
+
 export class ServerController {
   private readonly serverDao: ServerRepo;
   private readonly providerDao: ProviderRepo;
@@ -120,28 +127,6 @@ export class ServerController {
     return await querent.Query();
   }
 
-  private async queryServer(type: string, connectivity: Connectivity): Promise<ServerStatusDto> {
-    let querent: Querent;
-    switch (type) {
-      case ServerQueryType.STEAM:
-        querent = new SteamQuerent(connectivity);
-        break;
-      case ServerQueryType.HTTP:
-        querent = new HttpQuerent(connectivity);
-        break;
-      default:
-        return {
-          status: ServerStatus.UNREACHABLE,
-        }
-    }
-    const queryResult = await querent.Query();
-
-    return {
-      status: ServerStatus.UNKNOWN, // TODO: determine status
-      ...queryResult,
-    }
-  }
-
   private determineConnectivity(address: string, port: number, queryAddress?: string, queryPort?: number): Connectivity {
     let a = address;
     if (queryAddress) {
@@ -228,8 +213,13 @@ export class ServerController {
     return serverDto;
   }
 
-  async listServers(amount?: number, skip?: number): Promise<ServerDto[]> {
-    const servers = await this.serverDao.findAll(amount, skip);
+  async listServers(input: ListServerInput): Promise<ServerDto[]> {
+    let servers: ServerDto[];
+    if (input.scopeId) {
+      servers = await this.serverDao.findAllInScope(input.scopeId, input.amount, input.skip);
+    } else {
+      servers = await this.serverDao.findAllInForUser(input.user, input.amount, input.skip);
+    }
     return Promise.all(servers.map(async (server) => { return server; }));
   }
 

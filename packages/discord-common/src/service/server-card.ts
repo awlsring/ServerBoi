@@ -29,6 +29,14 @@ export class ServerCardService {
     })
   }
 
+  async getCardFromServer(serverId: string) {
+    const card = await this.cardRepo.findByServerId(serverId)
+    if (!card) {
+      throw new Error(`Card with server ID ${serverId} not found`)
+    }
+    return card
+  }
+
   async getCardFromMessage(messageId: string) {
     const card = await this.cardRepo.findByMessageId(messageId)
     if (!card) {

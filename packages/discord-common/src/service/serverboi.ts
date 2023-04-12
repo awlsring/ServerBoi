@@ -79,9 +79,11 @@ export class ServerBoiService {
     throw Error("ServerBoiService.getServer: server not found");
   }
 
-  async listServers(user: string): Promise<ServerSummary[]> {
+  async listServers(user: string, scope?: string): Promise<ServerSummary[]> {
     const client = await this.getClientForUser(user);
-    const servers = await client.send(new ListServersCommand({}));
+    const servers = await client.send(new ListServersCommand({
+      scope: scope,
+    }));
     return servers.summaries ?? [];
   } 
 

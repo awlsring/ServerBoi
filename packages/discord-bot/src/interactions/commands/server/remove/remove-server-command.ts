@@ -1,4 +1,4 @@
-import { APIApplicationCommandInteraction, ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext, ServerBoiService, ServerCardService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
 

@@ -34,6 +34,7 @@ import { ResubmitKubernetesProviderInfoButton } from './interactions/commands/se
 import { KubernetesServerProviderInformationModal } from './interactions/commands/server/track/components/kubernetes-provider-modal';
 import { CapabilitySelectMenu } from './interactions/commands/server/track/components/set-capabilities';
 import { RemoveCommand } from './interactions/commands/server/remove/remove-server-command';
+import { ListServerCommand } from './interactions/commands/server/list/list-server-command';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -67,6 +68,7 @@ async function main() {
     components: [
       new TrackCommand(),
       new RemoveCommand({ serverboiService: serverboi, serverCardService }),
+      new ListServerCommand({ serverboiService: serverboi, serverCardService }),
       new GetProviderCommand({ serverBoiService: serverboi }),
       new CreateProviderCommand(),
       new QuerySelectMenu({ trackServerDao: requestDao }),

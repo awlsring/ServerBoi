@@ -87,6 +87,26 @@ export class ServerRepo {
     return users.map((server) => this.toDto(server));
   }
 
+  async findAllInScope(scope: string, amount?: number, skip?: number): Promise<ServerDto[]> {
+    const users = await this.prisma.server.findMany({
+      include: this.defaultInclude,
+      where: { scopeId: scope },
+      skip,
+      take: amount,
+    });
+    return users.map((server) => this.toDto(server));
+  }
+
+  async findAllInForUser(user: string, amount?: number, skip?: number): Promise<ServerDto[]> {
+    const users = await this.prisma.server.findMany({
+      include: this.defaultInclude,
+      where: { ownerId: user },
+      skip,
+      take: amount,
+    });
+    return users.map((server) => this.toDto(server));
+  }
+
   async update(scopeId: string, serverId: string, server: Server): Promise<ServerDto | null> {
     const updatedServer = await this.prisma.server.update({
       include: this.defaultInclude,

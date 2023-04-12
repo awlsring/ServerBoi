@@ -16,7 +16,10 @@ operation ListServers {
 }
 
 @input
-structure ListServersInput {}
+structure ListServersInput {
+    @httpQuery("scope")
+    scope: String,
+}
 
 @output
 structure ListServersOutput {
