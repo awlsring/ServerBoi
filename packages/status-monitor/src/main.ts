@@ -3,7 +3,7 @@ import yaml from 'js-yaml';
 import dotenv from 'dotenv';
 import { Config } from './config';
 import { setInterval } from 'timers/promises';
-import { ServerController, ServerDto, ServerRepo } from '@serverboi/backend-common';
+import { logger, ServerController, ServerDto, ServerRepo } from '@serverboi/backend-common';
 dotenv.config();
 
 function loadConfig(): Config {
@@ -13,18 +13,20 @@ function loadConfig(): Config {
 }
 
 class StatusMonitor {
+  private logger = logger.child({ name: "StatusMonitor" });
+
   readonly controller: ServerController;
   readonly serverRepo: ServerRepo;
 
   private async monitorServer(server: ServerDto) {
-    console.log(`Updating status of server ${server.serverId}`)
+    this.logger.debug(`Updating status of server ${server.serverId}`)
     const status = await this.controller.getServerStatus(server);
     await this.serverRepo.updateStatus(server.scopeId, server.serverId, status);
   }
 
   async checkServers() {
     const servers = await this.serverRepo.findAll();
-    console.log(`Checking status of ${servers.length} servers`)
+    this.logger.info(`Checking status of ${servers.length} servers`)
     await Promise.all(servers.map(server => this.monitorServer(server)));
   }
 
@@ -35,16 +37,17 @@ class StatusMonitor {
 }
 
 async function start() {
-  console.log('Initializing status monitor');
+  const log = logger.child({ name: "main" });
+  log.info('Initializing status monitor');
   const config = loadConfig();
   const monitor = new StatusMonitor(config);
 
-  console.log('Starting status monitor');
+  log.info('Starting status monitor');
   await monitor.checkServers();
 
-  console.log(`Starting interval, waiting ${config.monitor.interval}ms between checks`);
+  log.info(`Starting interval, waiting ${config.monitor.interval}ms between checks`);
   for await (const _ of setInterval(config.monitor.interval)) {
-    console.log("Starting next run")
+    log.info("Starting next run")
     await monitor.checkServers();
   }
 }

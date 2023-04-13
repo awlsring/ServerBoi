@@ -2,6 +2,7 @@ import { AppsV1Api, CoreV1Api, KubeConfig } from "@kubernetes/client-node";
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
+import { logger } from "../logger/logger";
 import { Provider } from "./provider";
 
 export interface KubernetesProviderOptions {
@@ -16,6 +17,7 @@ export interface KubernetesProviderServerData extends ProviderServerDataDto {
 }
 
 export class KubernetesProvider implements Provider {
+  private logger = logger.child({ name: "KubernetesProvider" });
   private readonly core: CoreV1Api;
   private readonly apps: AppsV1Api;
 
