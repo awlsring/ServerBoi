@@ -1,9 +1,10 @@
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
 import { InteractionContext } from "@serverboi/discord-common"
 import { SelectMenuComponent } from "@serverboi/discord-common"
-import { ProviderType } from "@serverboi/client"
+import { ProviderSubtype, ProviderType } from "@serverboi/client"
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo"
 import { KubernetesProviderInformationModal } from "./k8s-info-modal"
+import { AWSProviderAuthPromptButton } from "./aws-ec2-auth-prompt"
 
 export interface ProviderCreateMenuOptions {
   readonly createProviderRequestRepo: CreateProviderRequestRepo
@@ -14,8 +15,8 @@ export class ProviderCreateMenu extends SelectMenuComponent {
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly options = [
     {
-      label: ProviderType.AWS,
-      value: ProviderType.AWS,
+      label: `${ProviderType.AWS}-${ProviderSubtype.EC2}`,
+      value: `${ProviderType.AWS}-${ProviderSubtype.EC2}`,
       description: "Amazon Web Services",
     },
     {
@@ -40,13 +41,47 @@ export class ProviderCreateMenu extends SelectMenuComponent {
     context.logger.info(`Selected values: ${selectedValue}`)
 
     switch (selectedValue) {
-      case ProviderType.AWS:
+      case `${ProviderType.AWS}-${ProviderSubtype.EC2}`:
         await context.response.send({
           type: InteractionResponseType.UpdateMessage,
           data: {
-            content: "AWS is not implemented, please select a new option.",
+            content: `To access your instance, I'll need an IAM User with permission to perform various operations on your instances.
+    
+    Below is a sample CloudFormation template you can deploy that will create a user that provides the access that is needed.
+    
+    \`\`\`yaml
+    Resources:
+      EC2User:
+        Type: "AWS::IAM::User"
+        Properties:
+          Path: "/"
+          UserName: "ServerBoiEC2User"
+          ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+    \`\`\`
+    
+    Alternatively, you can use the AWS CLI to create the user.
+    
+    \`\`\`shell
+    aws iam create-user --user-name ServerBoiEC2User
+    aws iam attach-user-policy --user-name ServerBoiEC2User --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+    \`\`\`
+    
+    Once this user is created, you'll need to create an access key for the user.
+    
+    \`\`\`shell
+    aws iam create-access-key --user-name ServerBoiEC2User
+    \`\`\`
+    
+    One you have the access key and secret key, you can enter it by hitting the button below.
+    `,
             components: [
-              ProviderCreateMenu.toApiData()
+              {
+                type: 1,
+                components: [
+                  AWSProviderAuthPromptButton.toApiData()
+                ],
+              }
             ],
             flags: MessageFlags.Ephemeral,
           }

@@ -4,23 +4,33 @@ import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
 import { Provider } from "./provider";
 
-export interface AwsEc2ProviderOptions {
-  readonly region: string;
-}
-
 export class AwsEc2Provider implements Provider {
-  readonly client: EC2Client;
+  private clients = new Map<string, EC2Client>();
+  private readonly auth: ProviderAuthDto;
 
-  constructor(cfg: AwsEc2ProviderOptions, auth: ProviderAuthDto) {
+  constructor(auth: ProviderAuthDto) {
     if (!auth.secret) {
       throw new Error("Missing secret on provider auth");
     }
+    this.auth = auth;
+  }
 
-    this.client = new EC2Client({ region: cfg.region, credentials: { accessKeyId: auth.key, secretAccessKey: auth.secret } });
+  async getClient(region?: string): Promise<EC2Client> {
+    if (!region) {
+      throw new Error("Missing region");
+    }
+
+    if (this.clients.has(region)) {
+      return this.clients.get(region)!;
+    }
+    const client = new EC2Client({ region: region, credentials: { accessKeyId: this.auth.key, secretAccessKey: this.auth.secret! } })
+    this.clients.set(region, client);
+    return client;
   }
 
   async getServerStatus(serverData: ProviderServerDataDto): Promise<ProviderServerStatus> {
-    const instance = await this.client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }))
+    const client = await this.getClient(serverData.location);
+    const instance = await client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }))
 
     if (!instance.Reservations || instance.Reservations.length === 0) {
       return ProviderServerStatus.STOPPED; // unknown;
@@ -52,14 +62,17 @@ export class AwsEc2Provider implements Provider {
   }
 
   async startServer(serverData: ProviderServerDataDto): Promise<void> {
-    await this.client.send(new StartInstancesCommand({ InstanceIds: [serverData.identifier] }))
+    const client = await this.getClient(serverData.location);
+    await client.send(new StartInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 
   async stopServer(serverData: ProviderServerDataDto): Promise<void> {
-    await this.client.send(new StopInstancesCommand({ InstanceIds: [serverData.identifier] }))
+    const client = await this.getClient(serverData.location);
+    await client.send(new StopInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 
   async rebootServer(serverData: ProviderServerDataDto): Promise<void> {
-    await this.client.send(new RebootInstancesCommand({ InstanceIds: [serverData.identifier] }))
+    const client = await this.getClient(serverData.location);
+    await client.send(new RebootInstancesCommand({ InstanceIds: [serverData.identifier] }))
   }
 }

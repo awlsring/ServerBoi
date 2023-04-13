@@ -278,7 +278,7 @@ export class ServerController {
         }
         switch (server.provider.subType) {
           case "EC2":
-            return new AwsEc2Provider({region: server.providerServerData.location}, auth);
+            return new AwsEc2Provider(auth);
           default:
             throw new Error(`Unknown AWS subtype ${server.provider.subType}`);
         }

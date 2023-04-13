@@ -1,9 +1,10 @@
 import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteractionData, APIModalSubmitInteraction, ComponentType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { TrackServerRequestRepo } from "../../../../../persistence/track-server-request-repo";
 import { InteractionContext, SelectMenuComponent, ServerBoiService } from "@serverboi/discord-common";
-import { ProviderSummary, ProviderType } from "@serverboi/client";
+import { ProviderSubtype, ProviderSummary, ProviderType } from "@serverboi/client";
 import { KubernetesServerProviderInformationModal } from "./kubernetes-provider-modal";
 import { ChannelSelectMenu } from "./channel-select-menu";
+import { AWSEC2ServerProviderInformationModal } from "./aws-ec2-provider-modal";
 
 export interface TrackServerSelectProviderOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -89,8 +90,8 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
         case ProviderType.KUBERNETES:
           await context.response.send(KubernetesServerProviderInformationModal.toResponse())
           break;
-        case ProviderType.AWS:
-          // return aws sub provider menu
+        case `${ProviderType.AWS}-${ProviderSubtype.EC2}`:
+          await context.response.send(AWSEC2ServerProviderInformationModal.toResponse())
           break;
         default:
           throw new Error("Provider type not supported")
