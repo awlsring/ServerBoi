@@ -2,6 +2,7 @@ export interface CreateProviderRequestDto {
   readonly id: string;
   readonly startedAt: Date;
   readonly providerType: string;
+  readonly providerSubType?: string;
   readonly endedAt?: Date;
   readonly providerData?: any;
   readonly providerAuthKey?: string;
@@ -12,4 +13,5 @@ export interface CreateProviderRequestDto {
 export interface NewCreateProviderRequestDto {
   readonly id: string;
   readonly providerType: string;
+  readonly providerSubType?: string;
 }

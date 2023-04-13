@@ -19,6 +19,7 @@ export class CreateProviderRequestRepo {
       data: {
         id: request.id,
         providerType: request.providerType,
+        providerSubType: request.providerSubType,
       }
     });
     return this.toDto(req);
@@ -66,6 +67,7 @@ export class CreateProviderRequestRepo {
       startedAt: trackServer.startedAt,
       endedAt: trackServer.endedAt ?? undefined,
       providerType: trackServer.providerType,
+      providerSubType: trackServer.providerSubType ?? undefined,
       providerData: trackServer.providerData ?? undefined,
       providerAuthKey: trackServer.providerAuthKey ?? undefined,
       providerAuthSecret: trackServer.providerAuthSecret ?? undefined,

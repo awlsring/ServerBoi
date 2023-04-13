@@ -48,7 +48,8 @@ export class ServerCardService {
   async refreshCard(card: ServerCardDto, summary: ServerSummary) {
     try {
       await this.http.editMessage(card.channelId, card.messageId, formServerEmbedMessage(summary))
-    } catch {
+    } catch (e) {
+      console.log(e)
       await this.regenerateCard(card.id, summary)
     }
   }

@@ -71,6 +71,7 @@ model Provider {
   ownerId        String
   name           String
   type String
+  subType String?
   auth ProviderAuth?
   data String?
   serverData ProviderServerData[]
@@ -87,7 +88,6 @@ model ProviderServerData {
   @@unique([serverScopeId, serverId])
   identifier String
   location String?
-  subType String?
   data String?
 } 
 
@@ -103,7 +103,6 @@ model TrackServer {
   provider String?
   providerServerIdentifier String?
   providerServerLocation String?
-  providerServerSubType String?
   providerServerData String?
   ownerId String
   queryType String?
@@ -118,6 +117,7 @@ model CreateProviderRequest {
   startedAt DateTime @default(now())
   endedAt DateTime? @updatedAt
   providerType String
+  providerSubType String?
   providerData String?
   providerAuthKey String?
   providerAuthSecret String?

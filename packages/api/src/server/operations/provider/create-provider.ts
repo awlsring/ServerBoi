@@ -11,6 +11,7 @@ export const CreateProviderOperation: Operation<CreateProviderServerInput, Creat
     const provider = await context.controller.provider.createProvider({
       name: input.name!,
       type: input.type!,
+      subType: input.subType,
       owner: context.user,
       data: input.data,
       auth: {

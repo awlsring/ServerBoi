@@ -20,6 +20,8 @@ structure ProviderSummary {
     @required
     type: ProviderType,
 
+    subType: ProviderSubtype
+
     data: Document
 }
 
@@ -27,6 +29,10 @@ enum ProviderType {
     AWS = "AWS",
     KUBERNETES = "KUBERNETES",
     UNDEFINED = "UNDEFINED",
+}
+
+enum ProviderSubtype {
+    EC2 = "EC2"
 }
 
 list ProviderSummaries {

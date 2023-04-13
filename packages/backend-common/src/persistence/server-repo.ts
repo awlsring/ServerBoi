@@ -51,7 +51,6 @@ export class ServerRepo {
             identifier: server.providerServerData!.identifier,
             location: server.providerServerData!.location,
             data: server.providerServerData!.data ? JSON.stringify(server.providerServerData!.data) : undefined,
-            subType: server.providerServerData!.subType,
           }
         } : undefined,
         status: {
@@ -192,13 +191,13 @@ export class ServerRepo {
         id: server.providerId!,
         name: server.provider.name,
         type: server.provider.type,
+        subType: server.provider?.subType ?? undefined,
         owner: server.provider?.ownerId,
       } : undefined,
       providerServerData: server.providerData ? {
         identifier: server.providerData.identifier ?? undefined,
         location: server.providerData.location ?? undefined,
         data: server.providerData.data ? JSON.parse(server.providerData.data) : undefined,
-        subType: server.providerData.subType ?? undefined,
       } : undefined,
       query: {
         type: server.queryType,

@@ -83,8 +83,6 @@ structure ServerProviderDataSummary {
     @required
     identifier: String
 
-    subType: ServerProviderSubtype
-
     location: String
 
     data: Document
@@ -181,8 +179,4 @@ enum ServerQueryType {
     STEAM = "STEAM",
     HTTP = "HTTP",
     NONE = "NONE",
-}
-
-enum ServerProviderSubtype {
-    EC2 = "EC2"
 }

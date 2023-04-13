@@ -72,7 +72,8 @@ ${this.toMarkdownBulletList(data)}
     try {
       provider = await this.serverBoiService.createProvider(context.user, {
         name: name,
-        type: ProviderType.KUBERNETES,
+        type: request.providerType,
+        subType: request.providerSubType,
         data: request.providerData,
         auth: {
           key: request.providerAuthKey,

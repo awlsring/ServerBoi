@@ -28,7 +28,6 @@ export interface ServerStatusDto {
 export interface ProviderServerDataDto {
   readonly identifier: string;
   readonly location?: string;
-  readonly subType?: string;
   readonly data?: any;
 }
 

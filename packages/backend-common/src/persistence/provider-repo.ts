@@ -91,6 +91,7 @@ export class ProviderRepo {
       id: provider.id,
       name: provider.name,
       type: provider.type,
+      subType: provider.subType ?? undefined,
       owner: provider.ownerId,
       data: provider.data ? JSON.parse(provider.data) : undefined,
     };

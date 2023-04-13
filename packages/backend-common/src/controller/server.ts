@@ -270,17 +270,17 @@ export class ServerController {
     
     switch (provider.type) {
       case "AWS":
-        if (!server.providerServerData.subType) {
+        if (!server.provider.subType) {
           throw new Error("Missing AWS subtype");
         }
         if (!server.providerServerData.location) {
           throw new Error("Missing location data");
         }
-        switch (server.providerServerData.subType) {
+        switch (server.provider.subType) {
           case "EC2":
             return new AwsEc2Provider({region: server.providerServerData.location}, auth);
           default:
-            throw new Error(`Unknown AWS subtype ${server.providerServerData.subType}`);
+            throw new Error(`Unknown AWS subtype ${server.provider.subType}`);
         }
       case "KUBERNETES":
         if (!provider.data) {

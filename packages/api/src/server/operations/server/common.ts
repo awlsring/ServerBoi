@@ -12,13 +12,13 @@ export function serverToSummary(server: ServerDto): ServerSummary {
     status: serverStatusToSummary(server.status),
     provider: server.provider ? {
       type: server.provider?.type,
+      subType: server.provider?.subType,
       name: server.provider?.name,
       data: server.provider?.data ? server.provider?.data : undefined,
     } : undefined,
     providerServerData: server.providerServerData ? {
       identifier: server.providerServerData?.identifier,
       location: server.providerServerData?.location,
-      subType: server.providerServerData?.subType,
       data: server.providerServerData?.data ? server.providerServerData?.data : undefined,
     } : undefined,
     query: {
