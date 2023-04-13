@@ -39,6 +39,9 @@
         },
         {
         "path": "./packages/embed-refresher"
+        },
+        {
+        "path": "./packages/common"
         }
     ]
 }

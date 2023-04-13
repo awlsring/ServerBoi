@@ -1,7 +1,7 @@
 import { QueryServerStatus, ServerQueryType, ServerStatus } from "@serverboi/ssdk";
 import { queryGameServerInfo } from "steam-server-query";
 import { ServerDto, ServerStatusDto } from "../dto/server-dto";
-import { logger } from "../logger/logger";
+import { logger } from "@serverboi/common";
 import { Connectivity, Querent, QuerentBase } from "./common";
 
 export interface SteamStatusData {

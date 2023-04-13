@@ -1,0 +1,15 @@
+{
+  "name": "@serverboi/common",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "dependencies": {
+    "winston": "^3.8.2"
+  },
+  "scripts": {
+    "build": "yarn generate && tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

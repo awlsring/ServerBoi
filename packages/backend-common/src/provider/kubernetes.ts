@@ -2,7 +2,7 @@ import { AppsV1Api, CoreV1Api, KubeConfig } from "@kubernetes/client-node";
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
-import { logger } from "../logger/logger";
+import { logger } from "@serverboi/common";
 import { Provider } from "./provider";
 
 export interface KubernetesProviderOptions {

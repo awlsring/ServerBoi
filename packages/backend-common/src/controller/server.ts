@@ -13,7 +13,7 @@ import { Provider } from "../provider/provider";
 import { AwsEc2Provider } from "../provider/aws-ec2";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
 import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
-import { logger } from "../logger/logger";
+import { logger } from "@serverboi/common";
 
 export interface ListServerInput {
   readonly user: string;

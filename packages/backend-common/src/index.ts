@@ -9,4 +9,3 @@ export * from "./persistence/server-repo";
 export * from "./persistence/provider-repo";
 export * from "./persistence/prisma-repo-options";
 export * from "./ip-lookup/ip-api";
-export * from "./logger/logger";

@@ -2,7 +2,7 @@ import { DescribeInstancesCommand, EC2Client, RebootInstancesCommand, StartInsta
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
-import { logger } from "../logger/logger";
+import { logger } from "@serverboi/common";
 import { Provider } from "./provider";
 
 export class AwsEc2Provider implements Provider {

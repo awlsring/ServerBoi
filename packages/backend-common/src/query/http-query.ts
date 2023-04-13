@@ -2,7 +2,7 @@ import { ServerStatusDto } from "../dto/server-dto";
 import { Connectivity, QuerentBase } from "./common";
 import { URL } from "url";
 import { QueryServerStatus, ServerQueryType } from "@serverboi/ssdk";
-import { logger } from "../logger/logger";
+import { logger } from "@serverboi/common";
 
 export class HttpQuerent extends QuerentBase {
   private logger = logger.child({ name: "HttpQuerent" });

@@ -3,7 +3,8 @@ import yaml from 'js-yaml';
 import dotenv from 'dotenv';
 import { Config } from './config';
 import { setInterval } from 'timers/promises';
-import { logger, ServerController, ServerDto, ServerRepo } from '@serverboi/backend-common';
+import { ServerController, ServerDto, ServerRepo } from '@serverboi/backend-common';
+import { logger } from '@serverboi/common';
 dotenv.config();
 
 function loadConfig(): Config {

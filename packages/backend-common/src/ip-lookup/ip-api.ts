@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import dns from 'dns';
-import { logger } from '../logger/logger';
+import { logger } from '@serverboi/common';
 
 export interface IPAPIResponse {
   ip: string;
