@@ -27,7 +27,6 @@ export class ProviderAuthRepo {
     if (!provider!.auth) {
       return null;
     }
-    console.log(JSON.stringify(provider, null, 2));
     return this.toDto(provider.auth);
   }
 

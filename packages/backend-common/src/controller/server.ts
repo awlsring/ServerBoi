@@ -13,6 +13,7 @@ import { Provider } from "../provider/provider";
 import { AwsEc2Provider } from "../provider/aws-ec2";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
 import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
+import { logger } from "../logger/logger";
 
 export interface ListServerInput {
   readonly user: string;
@@ -22,6 +23,7 @@ export interface ListServerInput {
 }
 
 export class ServerController {
+  private logger = logger.child({ name: "ServerController" });
   private readonly serverDao: ServerRepo;
   private readonly providerDao: ProviderRepo;
   private readonly providerAuthDao: ProviderAuthRepo;
@@ -38,7 +40,7 @@ export class ServerController {
     setInterval(() => {
       for (const node of this.providerCache.getCache().values()) {
         if (Date.now() - node.created > this.providerCache.maxAge) {
-          console.log("ServerBoiService: clearing expired client from cache", node.key)
+          this.logger.info("ServerBoiService: clearing expired client from cache", node.key)
           this.providerCache.getCache().delete(node.key);
           this.providerCache.clear(node.key);
         }
@@ -47,6 +49,7 @@ export class ServerController {
   }
 
   async getServerStatus(server: ServerDto): Promise<ServerStatusDto> {
+    this.logger.debug(`getting status for server ${server.scopeId}-${server.serverId}`)
     const provider = await this.getProviderStatus(server);
     const query = await this.getQueryStatus(server);
 

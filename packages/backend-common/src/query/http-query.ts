@@ -2,8 +2,11 @@ import { ServerStatusDto } from "../dto/server-dto";
 import { Connectivity, QuerentBase } from "./common";
 import { URL } from "url";
 import { QueryServerStatus, ServerQueryType } from "@serverboi/ssdk";
+import { logger } from "../logger/logger";
 
 export class HttpQuerent extends QuerentBase {
+  private logger = logger.child({ name: "HttpQuerent" });
+
   protected readonly type = ServerQueryType.HTTP;
   private url: URL;
   constructor(connectivity: Connectivity) {
@@ -31,7 +34,7 @@ export class HttpQuerent extends QuerentBase {
         query: response.ok ? QueryServerStatus.REACHABLE : QueryServerStatus.UNREACHABLE,
       };
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       return {
         query: QueryServerStatus.UNREACHABLE,
       };

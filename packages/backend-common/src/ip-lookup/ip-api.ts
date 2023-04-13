@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import dns from 'dns';
+import { logger } from '../logger/logger';
 
 export interface IPAPIResponse {
   ip: string;
@@ -43,6 +44,8 @@ export interface ServerLocation {
 }
 
 export class IPAPIClient {
+  private logger = logger.child({ name: "IPAPIClient" });
+
   private getFlagEmoji(countryCode: string): string {
     const codePoints = countryCode.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0));
     const emoji = String.fromCodePoint(...codePoints);
@@ -107,7 +110,7 @@ export class IPAPIClient {
     const ip = await this.resolveIp(address);
 
     if (!ip) {
-      console.error(`Failed to get IP info for ${address}`);
+      this.logger.error(`Failed to get IP info for ${address}`);
       return {
         city: 'Unknown',
         region: 'Unknown',
@@ -118,6 +121,7 @@ export class IPAPIClient {
 
     // check if tailscale
     if (this.isTailscaleAddress(ip)) {
+      this.logger.debug(`Found Tailscale address ${ip}`);
       return {
         city: 'Tailscale',
         region: 'Tailscale',
@@ -127,6 +131,7 @@ export class IPAPIClient {
     }
 
     if (this.isPrivateIPAddress(ip)) {
+      this.logger.debug(`Found private address ${ip}`);
       return {
         city: 'Private',
         region: 'Private',
@@ -137,7 +142,7 @@ export class IPAPIClient {
 
     const response = await fetch(`https://ipapi.co/${ip}/json`);
     if (!response.ok) {
-      console.error(`Failed to get IP info for ${address}`);
+      this.logger.error(`Failed to get IP info for ${address}`);
       return {
         city: 'Unknown',
         region: 'Unknown',
@@ -147,7 +152,7 @@ export class IPAPIClient {
     }
     const ipApiResponse = await response.json() as IPAPIResponse;
     if (ipApiResponse.reserved) {
-      console.error(`Failed to get IP info for ${address}`);
+      this.logger.error(`Failed to get IP info for ${address}`);
       return {
         city: 'Private',
         region: 'Private',

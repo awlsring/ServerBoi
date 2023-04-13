@@ -2,9 +2,12 @@ import { DescribeInstancesCommand, EC2Client, RebootInstancesCommand, StartInsta
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
+import { logger } from "../logger/logger";
 import { Provider } from "./provider";
 
 export class AwsEc2Provider implements Provider {
+  private logger = logger.child({ name: "AwsEc2Provider" });
+
   private clients = new Map<string, EC2Client>();
   private readonly auth: ProviderAuthDto;
 
@@ -19,10 +22,10 @@ export class AwsEc2Provider implements Provider {
     if (!region) {
       throw new Error("Missing region");
     }
-
     if (this.clients.has(region)) {
       return this.clients.get(region)!;
     }
+    this.logger.debug(`Creating new client for region ${region}`);
     const client = new EC2Client({ region: region, credentials: { accessKeyId: this.auth.key, secretAccessKey: this.auth.secret! } })
     this.clients.set(region, client);
     return client;

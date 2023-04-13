@@ -1,6 +1,7 @@
 import { QueryServerStatus, ServerQueryType, ServerStatus } from "@serverboi/ssdk";
 import { queryGameServerInfo } from "steam-server-query";
 import { ServerDto, ServerStatusDto } from "../dto/server-dto";
+import { logger } from "../logger/logger";
 import { Connectivity, Querent, QuerentBase } from "./common";
 
 export interface SteamStatusData {
@@ -14,6 +15,8 @@ export interface SteamStatusData {
 }
 
 export class SteamQuerent extends QuerentBase {
+  private logger = logger.child({ name: "SteamQuerent" });
+
   protected readonly type = ServerQueryType.STEAM;
   private readonly address: string;
   private readonly port: number;
@@ -46,8 +49,8 @@ export class SteamQuerent extends QuerentBase {
         data: steamData
       };
     } catch (e) {
-      console.log(`Error querying ${this.address}:${this.port}`);
-      console.log(e);
+      this.logger.error(`Error querying ${this.address}:${this.port}`);
+      this.logger.error(e);
       return {
         query: QueryServerStatus.UNREACHABLE,
       };
