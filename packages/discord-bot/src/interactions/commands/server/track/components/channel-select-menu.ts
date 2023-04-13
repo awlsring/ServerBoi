@@ -50,7 +50,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       providerServerData: finalizedRequest.provider ? {
         identifier: finalizedRequest.providerServerIdentifier,
         location: finalizedRequest.providerServerLocation,
-        data: finalizedRequest.providerServerData,
+        data: finalizedRequest.providerServerData ? JSON.parse(finalizedRequest.providerServerData) : undefined,
       } : undefined,
       capabilities: finalizedRequest.capabilities,
       query: {
