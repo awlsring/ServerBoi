@@ -3,6 +3,7 @@ import {
   ServerBoiService as __ServerBoiService,
   getServerBoiServiceHandler,
 } from "@serverboi/ssdk";
+import { ApiServicePrometheusMetrics } from "../metrics/prometheus-metrics-controller";
 import { ServiceHandler } from "./handler/service";
 import { convertRequest, writeResponse } from "@aws-smithy/server-node";
 import { ControllerContext, ServiceContext } from "./handler/context";
@@ -20,6 +21,11 @@ const controllerContext: ControllerContext = {
 }
 
 const userController = new UserAuthController(cfg.database);
+
+const metrics = new ApiServicePrometheusMetrics({
+  app: "serverboi-api",
+  prefix: "api",
+})
 
 async function getUserFromHeaders(headers: IncomingHttpHeaders): Promise<string> {
   if (!headers["x-serverboi-user"]) {
@@ -49,6 +55,7 @@ async function buildContext(headers: IncomingHttpHeaders): Promise<ServiceContex
   console.log("User: ", user)
   return {
     user: user,
+    metrics: metrics,
     controller: controllerContext,
   }
 }
@@ -57,13 +64,23 @@ export const server = createServer(async function (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & { req: IncomingMessage }
 ) {
+  
+  if (req.url === "/metrics") {
+    const metricsDump = await metrics.dump();
+    res.writeHead(200, {
+      "Content-Type": metrics.contentType,
+    }).end(metricsDump);
+    return;
+  }
 
-  let context: ServiceContext;
+  const recievedAt = Date.now();
+  let context: ServiceContext | undefined = undefined;
+  let httpResponse: HttpResponse | undefined = undefined
   try {
     context = await buildContext(req.headers);
   } catch (e) {
     console.log(e)
-    return writeResponse(new HttpResponse({
+    httpResponse = new HttpResponse({
       statusCode: 401,
       headers: {
         "Content-Type": "application/json",
@@ -71,11 +88,18 @@ export const server = createServer(async function (
       body: JSON.stringify({
         message: "Unauthorized",
       }),
-
-    }), res)
+      
+    })
   }
-  const httpRequest = convertRequest(req);
-  const httpResponse = await serviceHandler.handle(httpRequest, context);
 
-  return writeResponse(httpResponse, res);
+  const httpRequest = convertRequest(req);
+
+  if (!httpResponse && context) {
+    httpResponse = await serviceHandler.handle(httpRequest, context);
+  }
+
+  const responseTime = Date.now() - recievedAt;
+  metrics.observeRequest(httpRequest.method, httpRequest.path, httpResponse!.statusCode, responseTime)
+  
+  return writeResponse(httpResponse!, res);
 });

@@ -1,5 +1,6 @@
 import { ProviderController, ServerController } from "@serverboi/backend-common";
 import { Config } from "../../config";
+import { MetricsController } from "../../metrics/metrics-controller";
 
 export interface ControllerContext {
   readonly server: ServerController;
@@ -8,5 +9,6 @@ export interface ControllerContext {
 
 export interface ServiceContext {
   user: string;
+  metrics: MetricsController
   controller: ControllerContext;
 }

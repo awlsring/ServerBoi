@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "dependencies": {
+    "prom-client": "^14.2.0",
     "winston": "^3.8.2"
   },
   "scripts": {
