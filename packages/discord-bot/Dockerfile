@@ -18,7 +18,11 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/refresher
 
+EXPOSE 7032
+
 COPY --from=build /opt/build/node_modules ./node_modules
+COPY --from=build /opt/build/packages/common/dist ./packages/common/dist
+COPY --from=build /opt/build/packages/common/package.json ./packages/common/package.json
 COPY --from=build /opt/build/packages/discord-common/dist ./packages/discord-common/dist
 COPY --from=build /opt/build/packages/discord-common/package.json ./packages/discord-common/package.json
 COPY --from=build /opt/build/packages/client/dist ./packages/client/dist

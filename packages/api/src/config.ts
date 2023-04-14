@@ -2,7 +2,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 
 export function loadConfig(): Config {
-  const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
+  const configPath = process.env.CONFIG_PATH ?? '/config/config.yaml';
   const data = fs.readFileSync(configPath, 'utf-8');
   return new Config(yaml.load(data));
 }

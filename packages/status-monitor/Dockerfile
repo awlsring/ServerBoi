@@ -18,7 +18,11 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/refresher
 
+EXPOSE 7032
+
 COPY --from=build /opt/build/node_modules ./node_modules
+COPY --from=build /opt/build/packages/common/dist ./packages/common/dist
+COPY --from=build /opt/build/packages/common/package.json ./packages/common/package.json
 COPY --from=build /opt/build/packages/backend-common/dist ./packages/backend-common/dist
 COPY --from=build /opt/build/packages/backend-common/package.json ./packages/backend-common/package.json
 COPY --from=build /opt/build/packages/ssdk/dist ./packages/ssdk/dist

@@ -9,7 +9,17 @@
   ],
   "scripts": {
     "build": "tsc --build --verbose",
-    "build:model": "cd models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-ssdk-codegen && yarn install && yarn build"
+    "build:model": "cd models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-ssdk-codegen && yarn install && yarn build",
+    "package:embed-refresher:dev": "docker build -f packages/embed-refresher/Dockerfile -t awlsring/serverboi-embed-refresher:latest .",
+    "package:api:dev": "docker build -f packages/api/Dockerfile -t awlsring/serverboi-api:latest .",
+    "package:discord-bot:dev": "docker build -f packages/discord-bot/Dockerfile -t awlsring/serverboi-discord-bot:latest .",
+    "package:status-monitor:dev": "docker build -f packages/status-monitor/Dockerfile -t awlsring/serverboi-status-monitor:latest .",
+    "package:all:dev": "yarn package:embed-refresher:dev && yarn package:api:dev && yarn package:discord-bot:dev && yarn package:status-monitor:dev",
+    "package:embed-refresher": "docker buildx build --platform linux/amd64,linuxarm64 -f packages/embed-refresher/Dockerfile -t awlsring/serverboi-embed-refresher:latest --push .",
+    "package:api": "docker buildx build --platform linux/amd64,linux/arm64 -f packages/api/Dockerfile -t awlsring/serverboi-api:latest --push .",
+    "package:discord-bot": "docker buildx build --platform linux/amd64,linux/arm64 -f packages/discord-bot/Dockerfile -t awlsring/serverboi-discord-bot:latest --push .",
+    "package:status-monitor": "docker buildx build --platform linux/amd64,linux/arm64 -f packages/status-monitor/Dockerfile -t awlsring/serverboi-status-monitor:latest -push .",
+    "package:all": "yarn package:embed-refresher && yarn package:api && yarn package:discord-bot && yarn package:status-monitor"
   },
   "devDependencies": {
     "@types/node": "^18.15.3",
