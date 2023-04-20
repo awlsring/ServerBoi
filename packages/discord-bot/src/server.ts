@@ -35,6 +35,8 @@ import { KubernetesServerProviderInformationModal } from './interactions/command
 import { CapabilitySelectMenu } from './interactions/commands/server/track/components/set-capabilities';
 import { RemoveCommand } from './interactions/commands/server/remove/remove-server-command';
 import { ListServerCommand } from './interactions/commands/server/list/list-server-command';
+import { APIKeyAuthInformationModal } from './interactions/commands/provider/create/components/api-key-info-modal';
+import { APIKeyAuthPromptButton } from './interactions/commands/provider/create/components/api-key-auth-prompt';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -77,6 +79,8 @@ async function main() {
         trackServerDao: requestDao,
         serverCardService: serverCardService,
       }),
+      new APIKeyAuthInformationModal({ requestRepo: createProviderRequestRepo }),
+      new APIKeyAuthPromptButton(),
       new CapabilitySelectMenu({ trackServerDao: requestDao }),
       new KubernetesServerProviderInformationModal({ requestRepo: requestDao }),
       new ResubmitKubernetesProviderInfoButton(),

@@ -5,6 +5,7 @@ import { ProviderSubtype, ProviderType } from "@serverboi/client"
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo"
 import { KubernetesProviderInformationModal } from "./k8s-info-modal"
 import { AWSProviderAuthPromptButton } from "./aws-ec2-auth-prompt"
+import { APIKeyAuthPromptButton } from "./api-key-auth-prompt"
 
 export interface ProviderCreateMenuOptions {
   readonly createProviderRequestRepo: CreateProviderRequestRepo
@@ -23,6 +24,11 @@ export class ProviderCreateMenu extends SelectMenuComponent {
       label: "Kubernetes",
       value: ProviderType.KUBERNETES,
       description: "A Kubernetes cluster",
+    },
+    {
+      label: "Hetzner",
+      value: ProviderType.HETZNER,
+      description: "Hetzner Cloud",
     },
   ];
   protected static readonly placeholder = "Select provider type";
@@ -91,6 +97,28 @@ export class ProviderCreateMenu extends SelectMenuComponent {
         await context.response.send({
           type: InteractionResponseType.Modal,
           data: KubernetesProviderInformationModal.toApiData()
+        })
+        break;
+      case ProviderType.HETZNER:
+        await context.response.send({
+          type: InteractionResponseType.UpdateMessage,
+          data: {
+            content: `To access your instance, I'll need an API Key with read and write permissions.
+    
+    You can follow this Hetzner documentation to create an API token https://docs.hetzner.com/cloud/api/getting-started/generating-api-token/
+    
+    One you have the API key, you can enter it by hitting the button below.
+    `,
+            components: [
+              {
+                type: 1,
+                components: [
+                  APIKeyAuthPromptButton.toApiData()
+                ],
+              }
+            ],
+            flags: MessageFlags.Ephemeral,
+          }
         })
         break;
       default:
