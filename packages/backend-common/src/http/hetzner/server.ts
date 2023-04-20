@@ -2,6 +2,18 @@ export interface GetServerResponse {
   server: Server;
 }
 
+export enum ServerStatus {
+  INITIALIZING = "initializing",
+  RUNNING = "running",
+  STARTING = "starting",
+  STOPPING = "stopping",
+  OFF = "off",
+  DELETING = "deleting",
+  REBUILDING = "rebuilding",
+  MIGRATING = "migrating",
+  UNKNOWN = "unknown",
+}
+
 export interface Server {
   backup_window: string;
   created: string;

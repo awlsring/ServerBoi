@@ -28,6 +28,7 @@ structure ProviderSummary {
 enum ProviderType {
     AWS = "AWS",
     KUBERNETES = "KUBERNETES",
+    HETZNER = "HETZNER",
     UNDEFINED = "UNDEFINED",
 }
 

@@ -14,6 +14,7 @@ import { AwsEc2Provider } from "../provider/aws-ec2";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
 import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
 import { logger } from "@serverboi/common";
+import { HetznerProvider } from "../provider/hetzner";
 
 export interface ListServerInput {
   readonly user: string;
@@ -295,6 +296,8 @@ export class ServerController {
           allowUnsecure: true,
         }
         return new KubernetesProvider(k8sCfg, auth);
+      case "HETZNER":
+        return new HetznerProvider(auth);
       default:
         throw new Error(`Unknown provider type ${provider.type}`);
     }
