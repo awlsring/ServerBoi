@@ -41,6 +41,8 @@ async function start() {
   const log = logger.child({ name: "main" });
   log.info('Initializing status monitor');
   const config = loadConfig();
+  log.level = config.logLevel ?? 'info';
+  log.debug(`Log level set to ${config.logLevel}`);
   const monitor = new StatusMonitor(config);
 
   log.info('Starting status monitor');
