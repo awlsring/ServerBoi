@@ -8,6 +8,7 @@ export function loadConfig(): Config {
 }
 
 export class Config {
+  readonly logLevel?: string;
   readonly server: {
     readonly port?: number;
   };
@@ -19,6 +20,7 @@ export class Config {
     readonly database: string;
   };
   constructor(data: any) {
+    this.logLevel = data.logLevel;
     this.server = data.server;
     this.database = data.database;
   }

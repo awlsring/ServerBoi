@@ -1,11 +1,14 @@
 import { Operation } from "@aws-smithy/server-common";
 import { ResourceNotFoundError, InternalServerError, UntrackServerServerInput, UntrackServerServerOutput } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
+import { logger } from "@serverboi/common";
+
+const log = logger.child({ name: "UntrackServerOperation" });
 
 export const UntrackServerOperation: Operation<UntrackServerServerInput, UntrackServerServerOutput, ServiceContext> = async (input, context) => {
   try {
-    console.log(`Received UntrackServer operation`);
-    console.log(`Input: ${JSON.stringify(input)}`);
+    log.debug(`Received UntrackServer operation`);
+    log.debug(`Input: ${JSON.stringify(input)}`);
 
     const server = await context.controller.server.getServer(input.id!);
     if (server.owner !== context.user) {
@@ -18,7 +21,7 @@ export const UntrackServerOperation: Operation<UntrackServerServerInput, Untrack
       success: true
     }
   } catch (e) {
-    console.error(e);
+    log.error(e);
     throw new InternalServerError({ message: `Error untracking server: ${e}`} );
   }
 };

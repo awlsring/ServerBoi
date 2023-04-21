@@ -11,6 +11,7 @@ import { loadConfig } from "../config";
 import { ProviderController, ServerController } from "@serverboi/backend-common";
 import { UserAuthController } from "../controller/user-auth-controller";
 import { HttpResponse } from "@aws-sdk/protocol-http";
+import { logger } from "@serverboi/common";
 
 const serviceHandler = getServerBoiServiceHandler(new ServiceHandler());
 const cfg = loadConfig();
@@ -26,6 +27,8 @@ const metrics = new ApiServicePrometheusMetrics({
   app: "serverboi-api",
   prefix: "api",
 })
+
+const log = logger.child({ name: "Server" });
 
 async function getUserFromHeaders(headers: IncomingHttpHeaders): Promise<string> {
   if (!headers["x-serverboi-user"]) {
@@ -50,9 +53,10 @@ async function buildContext(headers: IncomingHttpHeaders): Promise<ServiceContex
 
   let user: string = userAuth.scope;
   if (userAuth.scope === "Bot") {
+    log.debug("Caller is bot user, getting user from headers")
     user = await getUserFromHeaders(headers);
   }
-  console.log("User: ", user)
+  log.debug(`Validated user: ${user}`)
   return {
     user: user,
     metrics: metrics,
@@ -66,6 +70,7 @@ export const server = createServer(async function (
 ) {
   
   if (req.url === "/metrics") {
+    log.debug("Received metrics request, dumping metrics");
     const metricsDump = await metrics.dump();
     res.writeHead(200, {
       "Content-Type": metrics.contentType,
@@ -76,10 +81,12 @@ export const server = createServer(async function (
   const recievedAt = Date.now();
   let context: ServiceContext | undefined = undefined;
   let httpResponse: HttpResponse | undefined = undefined
+
+  log.debug("Building context")
   try {
     context = await buildContext(req.headers);
-  } catch (e) {
-    console.log(e)
+  } catch {
+    log.debug("Failed to build context, returning 401")
     httpResponse = new HttpResponse({
       statusCode: 401,
       headers: {
@@ -92,8 +99,10 @@ export const server = createServer(async function (
     })
   }
 
+  log.debug("Converting request")
   const httpRequest = convertRequest(req);
 
+  log.debug("Handling request")
   if (!httpResponse && context) {
     httpResponse = await serviceHandler.handle(httpRequest, context);
   }
@@ -101,5 +110,6 @@ export const server = createServer(async function (
   const responseTime = Date.now() - recievedAt;
   metrics.observeRequest(httpRequest.method, httpRequest.path, httpResponse!.statusCode, responseTime)
   
+  log.debug("Writing response")
   return writeResponse(httpResponse!, res);
 });

@@ -1,11 +1,14 @@
 import { Operation } from "@aws-smithy/server-common";
 import { RebootServerServerInput, RebootServerServerOutput, InternalServerError, ResourceNotFoundError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
+import { logger } from "@serverboi/common";
+
+const log = logger.child({ name: "RebootServerOperation" });
 
 export const RebootServerOperation: Operation<RebootServerServerInput, RebootServerServerOutput, ServiceContext> = async (input, context) => {
   try {
-    console.log(`Received RebootServer operation`);
-    console.log(`Input: ${JSON.stringify(input)}`);
+    log.debug(`Received RebootServer operation`);
+    log.debug(`Input: ${JSON.stringify(input)}`);
     
     try {
       await context.controller.server.rebootServer(input.id!);
@@ -18,7 +21,7 @@ export const RebootServerOperation: Operation<RebootServerServerInput, RebootSer
       success: true
     }
   } catch (e) {
-    console.error(e);
+    log.error(e);
     if (e instanceof ResourceNotFoundError) {
       throw e;
     }

@@ -3,11 +3,14 @@ import { GetServerServerInput, GetServerServerOutput, InternalServerError, Resou
 import { ServiceContext } from "../../handler/context";
 import { ServerDto } from "@serverboi/backend-common"
 import { serverToSummary } from "./common";
+import { logger } from "@serverboi/common";
+
+const log = logger.child({ name: "GetServerOperation" });
 
 export const GetServerOperation: Operation<GetServerServerInput, GetServerServerOutput, ServiceContext> = async (input, context) => {
   try {
-    console.log(`Received GetServer operation`);
-    console.log(`Input: ${JSON.stringify(input)}`);
+    log.debug(`Received GetServer operation`);
+    log.debug(`Input: ${JSON.stringify(input)}`);
     
     let server: ServerDto;
     try {
@@ -18,12 +21,12 @@ export const GetServerOperation: Operation<GetServerServerInput, GetServerServer
     }
     const summary = serverToSummary(server)
 
-    console.log(`Returning summary: ${JSON.stringify(summary)}`);
+    log.debug(`Returning summary: ${JSON.stringify(summary)}`);
     return {
       summary: summary
     }
   } catch (e) {
-    console.error(e);
+    log.error(e);
     if (e instanceof ResourceNotFoundError) {
       throw e;
     }

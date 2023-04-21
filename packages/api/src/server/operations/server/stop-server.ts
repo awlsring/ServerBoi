@@ -1,11 +1,14 @@
 import { Operation } from "@aws-smithy/server-common";
 import { StopServerServerInput, StopServerServerOutput, InternalServerError, ResourceNotFoundError } from "@serverboi/ssdk";
 import { ServiceContext } from "../../handler/context";
+import { logger } from "@serverboi/common";
+
+const log = logger.child({ name: "StopServerOperation" });
 
 export const StopServerOperation: Operation<StopServerServerInput, StopServerServerOutput, ServiceContext> = async (input, context) => {
   try {
-    console.log(`Received StopServer operation`);
-    console.log(`Input: ${JSON.stringify(input)}`);
+    log.debug(`Received StopServer operation`);
+    log.debug(`Input: ${JSON.stringify(input)}`);
     
     try {
       await context.controller.server.stopServer(input.id!);
@@ -18,7 +21,7 @@ export const StopServerOperation: Operation<StopServerServerInput, StopServerSer
       success: true
     }
   } catch (e) {
-    console.error(e);
+    log.error(e);
     if (e instanceof ResourceNotFoundError) {
       throw e;
     }
