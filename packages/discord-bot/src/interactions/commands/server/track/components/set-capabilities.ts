@@ -4,12 +4,14 @@ import { InteractionContext } from "@serverboi/discord-common"
 import { SelectMenuComponent } from "@serverboi/discord-common"
 import { Capabilities } from "@serverboi/client"
 import { ChannelSelectMenu } from "./channel-select-menu"
+import { logger } from "@serverboi/common"
 
 export interface QuerySelectMenuOptions {
   readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class CapabilitySelectMenu extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "CapabilitySelectMenu" });
   public static readonly identifier = "capabilites-select";
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly options = [
@@ -41,8 +43,10 @@ export class CapabilitySelectMenu extends SelectMenuComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug("Enacting query select menu")
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction.data)}`)
     const selectedValues = (interaction.data as APIMessageSelectMenuInteractionData).values
-    context.logger.info(`Selected values: ${selectedValues}`)
+    this.logger.info(`Selected values: ${selectedValues}`)
 
     const capabilities: Capabilities[] = []
 
@@ -50,7 +54,7 @@ export class CapabilitySelectMenu extends SelectMenuComponent {
       capabilities.push(selectedValue as Capabilities)
     }
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.trackServerDao.update(interaction.message!.interaction!.id, {
       capabilities: capabilities
     })

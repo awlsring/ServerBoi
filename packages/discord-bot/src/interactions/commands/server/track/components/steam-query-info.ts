@@ -5,6 +5,7 @@ import { ResubmitQueryButton } from "./resubmit-steam-query";
 import { ModalComponent } from "@serverboi/discord-common";
 import { TrackServerSelectProvider } from "./select-provider-menu";
 import { ChannelSelectMenu } from "./channel-select-menu";
+import { logger } from "@serverboi/common";
 
 export interface SteamQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -12,6 +13,7 @@ export interface SteamQueryInformationModalOptions {
 }
 
 export class SteamQueryInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "SteamQueryInformationModal" });
   public static readonly identifier = "steam-query-info";
   protected static readonly title = "Steam Query Information";
   protected static readonly textInputs = [
@@ -45,6 +47,8 @@ export class SteamQueryInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting Steam query information modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
     let steamQueryAddress: string | undefined = undefined
     let steamQueryPort: string | undefined = undefined
     let errorMessage = undefined
@@ -70,6 +74,7 @@ export class SteamQueryInformationModal extends ModalComponent {
     })
     
     if (errorMessage) {
+      this.logger.debug(`Error validating the data: ${errorMessage}`)
       context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {

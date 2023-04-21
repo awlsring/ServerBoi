@@ -4,12 +4,14 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CapabilitySelectMenu } from "./set-capabilities";
 import { ResubmitAWSEC2ProviderInfoButton } from "./resubmit-aws-ec2-info-button";
+import { logger } from "@serverboi/common";
 
 export interface AWSEC2ServerProviderInformationModalOptions {
   readonly requestRepo: TrackServerRequestRepo
 }
 
 export class AWSEC2ServerProviderInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "AWSEC2ServerProviderInformationModal"});
   public static readonly identifier = "track-server-aws-ec2-provider-info";
   protected static readonly title = "AWS EC2 Provider Information";
   protected static readonly textInputs = [
@@ -51,6 +53,8 @@ export class AWSEC2ServerProviderInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting AWS EC2 provider information modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
     let id: string | undefined = undefined
     let region: string | undefined = undefined
     let errorMessage = undefined
@@ -93,11 +97,11 @@ export class AWSEC2ServerProviderInformationModal extends ModalComponent {
     }
 
     if (!id || !region || !interaction.member) {
-      context.logger.error("All required fields not provided.")
+      this.logger.error("All required fields not provided.")
       return
     }
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.debug(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.requestRepo.update(interaction.message!.interaction!.id, {
       providerServerIdentifier: id,
       providerServerLocation: region,

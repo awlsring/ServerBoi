@@ -2,6 +2,7 @@ import { APIMessageComponentSelectMenuInteraction, APIMessageSelectMenuInteracti
 import { InteractionContext, ServerBoiService } from "@serverboi/discord-common"
 import { SelectMenuComponent } from "@serverboi/discord-common"
 import { ProviderSummary } from "@serverboi/client"
+import { logger } from "@serverboi/common"
 
 export interface UserProviderListMenuOptions {
   readonly serverBoiService: ServerBoiService;
@@ -9,6 +10,7 @@ export interface UserProviderListMenuOptions {
 }
 
 export class UserProviderListMenu extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "UserProviderListMenu" });
   public static readonly identifier = "user-provider-list-select";
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly placeholder = "Select provider type";
@@ -63,8 +65,10 @@ ${this.toMarkdownBulletList(data)}
   }
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug("Enacting UserProviderListMenu");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
-    context.logger.info(`Selected values: ${selectedValue}`)
+    this.logger.info(`Selected values: ${selectedValue}`)
 
     try {
       const provider = await this.serverBoiService.getProvider(context.user, selectedValue);
@@ -82,6 +86,7 @@ ${this.createProviderDataString(provider.data)}
         }
       });
     } catch (e) {
+      this.logger.error(e);
       await context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {

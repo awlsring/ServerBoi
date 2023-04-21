@@ -3,14 +3,15 @@ import { TrackServerRequestRepo } from "../../../../../persistence/track-server-
 import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CapabilitySelectMenu } from "./set-capabilities";
-import { ResubmitAWSEC2ProviderInfoButton } from "./resubmit-aws-ec2-info-button";
 import { ResubmitHetznerProviderInfoButton } from "./resubmit-hetzner-info-button";
+import { logger } from "@serverboi/common";
 
 export interface HetznerServerProviderInformationModalOptions {
   readonly requestRepo: TrackServerRequestRepo
 }
 
 export class HetznerServerProviderInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "HetznerServerProviderInformationModal"});
   public static readonly identifier = "track-server-hetzner-provider-info";
   protected static readonly title = "Hetzner Provider Information";
   protected static readonly textInputs = [
@@ -55,6 +56,9 @@ export class HetznerServerProviderInformationModal extends ModalComponent {
 
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting Hetzner provider information modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
+
     let id: string | undefined = undefined
     let region: string | undefined = undefined
     let errorMessage = undefined
@@ -96,11 +100,11 @@ export class HetznerServerProviderInformationModal extends ModalComponent {
     }
 
     if (!id || !region || !interaction.member) {
-      context.logger.error("All required fields not provided.")
+      this.logger.error("All required fields not provided.")
       return
     }
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.debug(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.requestRepo.update(interaction.message!.interaction!.id, {
       providerServerIdentifier: id,
       providerServerLocation: region,

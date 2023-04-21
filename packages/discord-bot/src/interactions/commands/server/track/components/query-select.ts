@@ -5,12 +5,14 @@ import { SteamQueryInformationModal } from "./steam-query-info"
 import { SelectMenuComponent } from "@serverboi/discord-common"
 import { HTTPQueryInformationModal } from "./http-query-info"
 import { ChannelSelectMenu } from "./channel-select-menu"
+import { logger } from "@serverboi/common"
 
 export interface QuerySelectMenuOptions {
   readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class QuerySelectMenu extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "QuerySelectMenu" });
   public static readonly identifier = "query-select";
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly options = [
@@ -42,16 +44,19 @@ export class QuerySelectMenu extends SelectMenuComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug("Enacting query select menu")
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction.data)}`)
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
-    context.logger.info(`Selected values: ${selectedValue}`)
+    this.logger.info(`Selected values: ${selectedValue}`)
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.trackServerDao.update(interaction.message!.interaction!.id, {
       queryType: selectedValue
     })
 
     switch (selectedValue) {
       case "STEAM":
+        this.logger.info("Sending steam query information modal")
         let response = {
           type: InteractionResponseType.Modal,
           data: SteamQueryInformationModal.toApiData()
@@ -59,12 +64,14 @@ export class QuerySelectMenu extends SelectMenuComponent {
         await context.response.send(response)
         break;
       case "HTTP":
+        this.logger.info("Sending HTTP query information modal")
         await context.response.send({
           type: InteractionResponseType.Modal,
           data: HTTPQueryInformationModal.toApiData()
         })
         break;
       default:
+        this.logger.info("Sending channel select menu")
         await context.response.send({
           type: InteractionResponseType.UpdateMessage,
           data: {

@@ -2,8 +2,10 @@ import { APIApplicationCommandInteraction, ApplicationCommandOptionType, Interac
 import { InteractionContext } from "@serverboi/discord-common";
 import { StartTrackServerButton } from "./components/start-track";
 import { CommandComponent } from "../../command";
+import { logger } from "@serverboi/common";
 
 export class TrackCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "TrackServerCommand"});
   public static readonly identifier = "server-track";
   public static readonly data = {
     name: "track",
@@ -11,7 +13,7 @@ export class TrackCommand extends CommandComponent {
     type: ApplicationCommandOptionType.Subcommand,
   };
   async enact(context: InteractionContext, interaction: APIApplicationCommandInteraction) {
-    console.log("Enacting track command");
+    this.logger.debug("Enacting track command");
     await context.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {

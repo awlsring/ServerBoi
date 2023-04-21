@@ -2,8 +2,10 @@ import { InteractionResponseType } from "discord-interactions";
 import { InteractionContext } from "@serverboi/discord-common";
 import { ServerTrackInitialModal } from "./track-server-init";
 import { ButtonComponent } from "@serverboi/discord-common";
+import { logger } from "@serverboi/common";
 
 export class StartTrackServerButton extends ButtonComponent {
+  private readonly logger = logger.child({ name: "StartTrackServerButton"});
   public static readonly identifier = "start-track-server-request-button";
   protected static readonly style = 1;
   protected static readonly label = "Enter Server Info";
@@ -14,7 +16,7 @@ export class StartTrackServerButton extends ButtonComponent {
   };
 
   public async enact(context: InteractionContext, _: any) {
-    context.logger.info("Enacting start track server button");
+    this.logger.info("Enacting start track server button");
     context.response.send({
       type: InteractionResponseType.MODAL,
       data: ServerTrackInitialModal.toApiData(),

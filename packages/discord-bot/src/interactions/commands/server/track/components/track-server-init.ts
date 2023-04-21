@@ -4,12 +4,14 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { QuerySelectMenu } from "./query-select";
 import { ModalComponent } from "@serverboi/discord-common";
 import { ResubmitBaseInfoButton } from "./resubmit-base-info";
+import { logger } from "@serverboi/common";
 
 export interface ServerTrackInitialModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
 }
 
 export class ServerTrackInitialModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "ServerTrackInitialModal"});
   public static readonly identifier = "track-server-init";
   protected static readonly title = "Track Server";
   protected static readonly textInputs = [
@@ -59,6 +61,8 @@ export class ServerTrackInitialModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting server track initial modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
 
     let application: string | undefined = undefined
     let name: string | undefined = undefined
@@ -93,6 +97,7 @@ export class ServerTrackInitialModal extends ModalComponent {
     })
 
     if (errorMessage) {
+      this.logger.error(`Error validating the data: ${errorMessage}`)
       context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {
@@ -112,11 +117,11 @@ export class ServerTrackInitialModal extends ModalComponent {
     }
 
     if (!application || !name || !address || !interaction.member) {
-      context.logger.error("All required fields not provided.")
+      this.logger.error("All required fields not provided.")
       return
     }
 
-    context.logger.info(`Creating track server request: ${interaction.message?.interaction?.id} ${application}, ${name}, ${address}, ${interaction.member.user.id}`)
+    this.logger.info(`Creating track server request: ${interaction.message?.interaction?.id} ${application}, ${name}, ${address}, ${interaction.member.user.id}`)
     await this.requestDao.create({
       id: interaction.message!.interaction!.id,
       application: application,

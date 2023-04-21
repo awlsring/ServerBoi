@@ -4,6 +4,7 @@ import { TrackServerRequestRepo } from "../../../../../persistence/track-server-
 import { ServerBoiService } from "@serverboi/discord-common"
 import { InteractionContext } from "@serverboi/discord-common"
 import { SelectMenuComponent } from "@serverboi/discord-common"
+import { logger } from "@serverboi/common"
 
 export interface ChannelSelectMenuOptions {
   readonly serverBoiService: ServerBoiService
@@ -12,6 +13,7 @@ export interface ChannelSelectMenuOptions {
 }
 
 export class ChannelSelectMenu extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "ChannelSelectMenu" });
   public static readonly identifier = "channel-select";
   protected static readonly selectType = ComponentType.ChannelSelect;
   protected static readonly channelTypes = [ChannelType.GuildText];
@@ -31,9 +33,11 @@ export class ChannelSelectMenu extends SelectMenuComponent {
   }
 
   public async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug("Enacting channel select menu")
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction.data)}`)
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.debug(`Updating request ID ${interaction.message!.interaction!.id}`)
     const finalizedRequest = await this.trackServerDao.update(interaction.message!.interaction!.id, {
       channelId: selectedValue
     })
@@ -59,7 +63,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
         port: finalizedRequest.queryPort,
       }
     })
-    console.log(`Server: ${JSON.stringify(server)}`)
+    this.logger.debug(`Server: ${JSON.stringify(server)}`)
     
     await context.response.send({
       type: InteractionResponseType.UpdateMessage,
@@ -69,7 +73,7 @@ export class ChannelSelectMenu extends SelectMenuComponent {
       },
       flags: MessageFlags.Ephemeral
     })
-    console.log(`Sent response`)
+    this.logger.debug(`Sent response`)
 
     await this.serverCardService.createCard(selectedValue, server)
   }

@@ -3,6 +3,7 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
 import { CreateProviderNameInputPromptButton } from "./name-prompt-modal";
+import { logger } from "@serverboi/common";
 
 const API_KEY = "api-key";
 
@@ -11,6 +12,7 @@ export interface APIKeyAuthInformationModalOptions {
 }
 
 export class APIKeyAuthInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "APIKeyAuthInformationModal"});
   private readonly requestRepo: CreateProviderRequestRepo;
   public static readonly identifier = "api-key-auth-info";
   protected static readonly title = "API Key Auth Information";
@@ -32,6 +34,7 @@ export class APIKeyAuthInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting API Key auth information modal");
     let apiKey: string | undefined = undefined
 
     interaction.data.components.forEach(component => {

@@ -4,6 +4,7 @@ import { InteractionContext, ServerBoiService } from "@serverboi/discord-common"
 import { ModalComponent } from "@serverboi/discord-common";
 import { ChannelSelectMenu } from "./channel-select-menu";
 import { TrackServerSelectProvider } from "./select-provider-menu";
+import { logger } from "@serverboi/common";
 
 export interface HTTPQueryInformationModalOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -11,6 +12,7 @@ export interface HTTPQueryInformationModalOptions {
 }
 
 export class HTTPQueryInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "HTTPQueryInformationModal" });
   public static readonly identifier = "http-query-info";
   protected static readonly title = "HTTP Query Information";
   protected static readonly textInputs = [
@@ -36,6 +38,9 @@ export class HTTPQueryInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting HTTP query information modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
+    
     let queryAddress: string | undefined = undefined
 
     interaction.data.components.forEach(component => {

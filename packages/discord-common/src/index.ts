@@ -8,7 +8,6 @@ export * from "./interactions/components/menus/server-more-actions";
 export * from "./interactions/components/modals/modals";
 export * from "./interactions/components/component";
 export * from "./interactions/context";
-export * from "./logger/logger";
 export * from "./persistence/server-card-repo";
 export * from "./persistence/prisma-options";
 export * from "./dto/server-card-dto";

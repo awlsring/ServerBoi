@@ -1,12 +1,14 @@
 import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext, ServerBoiService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
+import { logger } from "@serverboi/common";
 
 export interface RemoveProviderCommandOptions {
   readonly serverBoiService: ServerBoiService
 }
 
 export class RemoveProviderCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "RemoveProviderCommand"});
   public static readonly identifier = "provider-remove";
   public static readonly data = {
     name: "remove",
@@ -30,6 +32,7 @@ export class RemoveProviderCommand extends CommandComponent {
   }
 
   async enact(context: InteractionContext, interaction: any) {
+    this.logger.debug("Enacting remove provider command");
     const name = interaction.data.options[0].options![0].value as string;
 
     try {
@@ -42,7 +45,7 @@ export class RemoveProviderCommand extends CommandComponent {
         }
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {

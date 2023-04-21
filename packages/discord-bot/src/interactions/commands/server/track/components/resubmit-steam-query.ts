@@ -1,8 +1,10 @@
 import { ButtonComponent, InteractionContext } from "@serverboi/discord-common";
 import { InteractionResponseType } from "discord-api-types/v10";
 import { SteamQueryInformationModal } from "./steam-query-info";
+import { logger } from "@serverboi/common";
 
 export class ResubmitQueryButton extends ButtonComponent {
+  private readonly logger = logger.child({ name: "ResubmitQueryButton"});
   public static readonly identifier = "resubmit-query-button";
   protected static readonly style = 1;
   protected static readonly label = "Resubmit";
@@ -13,6 +15,7 @@ export class ResubmitQueryButton extends ButtonComponent {
   };
 
   public async enact(context: InteractionContext, _: any) {
+    this.logger.debug("Enacting resubmit Steam query information button");
     context.response.send({
       type: InteractionResponseType.Modal,
       data: SteamQueryInformationModal.toApiData(),

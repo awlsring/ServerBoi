@@ -6,12 +6,14 @@ import { CreateProviderRequestRepo } from "../../../../../persistence/create-pro
 import { KubernetesProviderInformationModal } from "./k8s-info-modal"
 import { AWSProviderAuthPromptButton } from "./aws-ec2-auth-prompt"
 import { APIKeyAuthPromptButton } from "./api-key-auth-prompt"
+import { logger } from "@serverboi/common"
 
 export interface ProviderCreateMenuOptions {
   readonly createProviderRequestRepo: CreateProviderRequestRepo
 }
 
 export class ProviderCreateMenu extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "ProviderCreateMenu" });
   public static readonly identifier = "provider-type-select";
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly options = [
@@ -43,8 +45,10 @@ export class ProviderCreateMenu extends SelectMenuComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug(`Enacting ${this.constructor.name} for interaction ${interaction.id}`)
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction.data)}`)
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
-    context.logger.info(`Selected values: ${selectedValue}`)
+    this.logger.info(`Selected values: ${selectedValue}`)
 
     switch (selectedValue) {
       case `${ProviderType.AWS}-${ProviderSubtype.EC2}`:
@@ -135,7 +139,7 @@ export class ProviderCreateMenu extends SelectMenuComponent {
         return
     }
 
-    context.logger.info(`Creating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.info(`Creating request ID ${interaction.message!.interaction!.id}`)
     await this.createProviderRequestRepo.create({
       id: interaction.message!.interaction!.id,
       providerType: selectedValue

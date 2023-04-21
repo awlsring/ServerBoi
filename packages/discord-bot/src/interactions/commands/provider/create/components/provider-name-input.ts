@@ -2,8 +2,9 @@ import { APIModalSubmitInteraction, InteractionResponseType, MessageFlags } from
 import { InteractionContext, ServerBoiService } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
-import { ProviderSummary, ProviderType } from "@serverboi/client";
+import { ProviderSummary } from "@serverboi/client";
 import { CreateProviderNameInputPromptButton } from "./name-prompt-modal";
+import { logger } from "@serverboi/common";
 
 const NAME_INPUT = "provider-name-input";
 
@@ -13,6 +14,7 @@ export interface CreateProviderNameInputModalOptions {
 }
 
 export class CreateProviderNameInputModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "CreateProviderNameInputModal"});
   private readonly requestRepo: CreateProviderRequestRepo;
   private readonly serverBoiService: ServerBoiService
   public static readonly identifier = "provider-name-info";
@@ -52,6 +54,8 @@ ${this.toMarkdownBulletList(data)}
   }
   
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting provider name input modal");
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction)}`);
     let name: string | undefined = undefined
 
     interaction.data.components.forEach(component => {
@@ -81,7 +85,7 @@ ${this.toMarkdownBulletList(data)}
         }
       })
     } catch (e) {
-      console.error(e)
+      this.logger.error(e)
       await context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {

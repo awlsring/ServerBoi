@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext, ServerBoiService, ServerCardService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
+import { logger } from "@serverboi/common";
 
 export interface ListServerCommandOptions {
   readonly serverboiService: ServerBoiService
@@ -8,6 +9,7 @@ export interface ListServerCommandOptions {
 }
 
 export class ListServerCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "ListServerCommand"});
   public static readonly identifier = "server-list";
   public static readonly data = {
     name: "list",
@@ -25,7 +27,7 @@ export class ListServerCommand extends CommandComponent {
   }
 
   async enact(context: InteractionContext, interaction: any) {
-    console.log("Enacting list server command");
+    this.logger.debug(`Enacting list ${ListServerCommand.identifier}`);
     try {
       const servers = await this.serverboiService.listServers(context.user, interaction.guild_id);
       let serverBlobs: string[] = [];
@@ -37,6 +39,7 @@ export class ListServerCommand extends CommandComponent {
         serverBlobs.push(`> ${server.name} (${id})\n- Owner: <@${server.owner}>\n- Name: \`${server.name}\`\n- Application: \`${server.application}\`\n- Status: \`${server.status?.status}\``);
       });
 
+      this.logger.debug(`Sending server list for guild ${interaction.guild_id}`);
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
@@ -48,7 +51,7 @@ export class ListServerCommand extends CommandComponent {
         }
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {

@@ -3,6 +3,7 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
 import { CreateProviderNameInputPromptButton } from "./name-prompt-modal";
+import { logger } from "@serverboi/common";
 
 const PROVIDER_ACCESS_KEY = "aws-ec2-provider-access-key";
 const PROVIDER_SECRET_KEY = "aws-ec2-provider-secret-key";
@@ -12,6 +13,7 @@ export interface AWSProviderAuthInformationModalOptions {
 }
 
 export class AWSProviderAuthInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "AWSProviderAuthInformationModal"});
   private readonly requestRepo: CreateProviderRequestRepo;
   public static readonly identifier = "aws-ec2-provider-auth-info";
   protected static readonly title = "AWS Provider Auth Information";
@@ -42,6 +44,7 @@ export class AWSProviderAuthInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting AWS Provider auth information modal");
     let accessKey: string | undefined = undefined
     let secretKey: string | undefined = undefined
 

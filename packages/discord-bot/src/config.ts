@@ -1,4 +1,5 @@
 export class Config {
+  readonly logLevel: string;
   readonly server: {
     readonly port?: number;
   };
@@ -20,6 +21,7 @@ export class Config {
     readonly apiKey: string;
   };
   constructor(data: any) {
+    this.logLevel = data.logLevel;
     this.server = data.server;
     this.discord = data.discord;
     this.database = data.database;

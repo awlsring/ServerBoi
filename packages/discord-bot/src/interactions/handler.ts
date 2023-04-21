@@ -1,24 +1,22 @@
-import { Component, Logger, DiscordHttpClient, InteractionContext } from "@serverboi/discord-common";
+import { Component, DiscordHttpClient, InteractionContext } from "@serverboi/discord-common";
 import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
-
+import { logger } from "@serverboi/common";
 export interface InteractionHandlerOptions {
   token: string;
-  logger: Logger;
   components?: Component[];
   version?: string;
 }
 
 export class InteractionHandler {
+  private readonly logger = logger.child({ name: "InteractionHandler"});
   private readonly httpClient: DiscordHttpClient;
   private readonly components: Map<string, Component>;
-  private readonly log: Logger;
   constructor(options: InteractionHandlerOptions) {
     this.httpClient = new DiscordHttpClient({
       token: options.token,
       version: options.version ?? "v10",
     });
-    this.log = options.logger;
     this.components = new Map();
     this.components = this.registerComponents(options.components ?? [])
   }
@@ -32,10 +30,9 @@ export class InteractionHandler {
       registeredComponents.set(component.getIdentifier(), component);
     });
 
-    // log a list of all known components
-    this.log.info("Registered components:");
+    this.logger.info("Starting server with the following registered components:");
     for (const [identifier, component] of registeredComponents) {
-      console.log(`- ${identifier}`);
+      this.logger.info(`- ${identifier}`);
     }
 
     return registeredComponents;
@@ -50,7 +47,6 @@ export class InteractionHandler {
     return {
       http: this.httpClient,
       response: response,
-      logger: this.log,
       user: user,
     };
   }
@@ -94,31 +90,21 @@ export class InteractionHandler {
     }
   }
 
-  private async deferMessageResponse(interaction: APIInteraction, response: FastifyReply) {
-    console.log("Deferring message response")
-    response.send({
-      type: InteractionResponseType.DeferredChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.Ephemeral,
-      }
-    });
-  }
-
   async handle(interaction: APIInteraction, response: FastifyReply) {
-    console.log("Handling interaction")
-    console.log(`Interaction ID: ${interaction.id}`)
-    console.log(`Interaction: ${JSON.stringify(interaction)}`)
+    this.logger.debug("Handling interaction")
+    this.logger.debug(`Interaction ID: ${interaction.id}`)
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction)}`)
     const context = await this.formContext(interaction, response);
-    console.log("Routing request")
+    this.logger.debug("Routing request")
 
     const interactionName = await this.determineInteractionName(interaction);
-    console.log(`Interaction name: ${interactionName}`)
+    this.logger.debug(`Interaction name: ${interactionName}`)
     const component = this.components.get(interactionName);
     if (component) {
-      console.log(`Component found: ${component.getIdentifier()}. Enacting...`)
+      this.logger.debug(`Component found: ${component.getIdentifier()}. Enacting...`)
       await component.enact(context, interaction);
     } else {
-      console.log("No registered component found for interaction")
+      this.logger.debug("No registered component found for interaction")
     }
   }
 }

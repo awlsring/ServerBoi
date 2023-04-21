@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext, ServerBoiService, ServerCardService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
+import { logger } from "@serverboi/common";
 
 export interface GetProviderCommandOptions {
   readonly serverboiService: ServerBoiService
@@ -8,6 +9,7 @@ export interface GetProviderCommandOptions {
 }
 
 export class RemoveCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "RemoveServerCommand"});
   public static readonly identifier = "server-remove";
   public static readonly data = {
     name: "remove",
@@ -33,14 +35,14 @@ export class RemoveCommand extends CommandComponent {
   }
 
   async enact(context: InteractionContext, interaction: any) {
-    console.log("Enacting remove command");
+    this.logger.debug("Enacting remove server command");
     const id = interaction.data.options[0].options![0].value as string;
 
     try {
       const serverId = `${interaction.guild_id}-${id}`;
       await this.serverboiService.untrackServer(context.user, serverId);
       await this.cardService.deleteCard({ serverId: serverId });
-      console.log("Removed server")
+      this.logger.debug("Removed server")
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
@@ -49,7 +51,7 @@ export class RemoveCommand extends CommandComponent {
         }
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {

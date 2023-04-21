@@ -1,12 +1,14 @@
-import { APIApplicationCommandInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
+import { ApplicationCommandOptionType, InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionContext, ServerBoiService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
+import { logger } from "@serverboi/common";
 
 export interface GetProviderCommandOptions {
   readonly serverBoiService: ServerBoiService
 }
 
 export class GetProviderCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "GetProviderCommand"});
   public static readonly identifier = "provider-get";
   public static readonly data = {
     name: "get",
@@ -46,6 +48,7 @@ ${this.toMarkdownBulletList(data)}
   }
 
   async enact(context: InteractionContext, interaction: any) {
+    this.logger.debug("Enacting get provider command");
     const name = interaction.data.options[0].options![0].value as string;
 
     try {
@@ -62,6 +65,7 @@ ${this.createProviderDataString(provider.data)}
         }
       });
     } catch (e) {
+      this.logger.error(e)
       await context.response.send({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {

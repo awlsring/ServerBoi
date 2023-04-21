@@ -41,6 +41,7 @@ import { HetznerServerProviderInformationModal } from './interactions/commands/s
 import { ResubmitHetznerProviderInfoButton } from './interactions/commands/server/track/components/resubmit-hetzner-info-button';
 import { AWSEC2ServerProviderInformationModal } from './interactions/commands/server/track/components/aws-ec2-provider-modal';
 import { ResubmitAWSEC2ProviderInfoButton } from './interactions/commands/server/track/components/resubmit-aws-ec2-info-button';
+import { logger } from '@serverboi/common';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -49,15 +50,17 @@ function loadConfig(): Config {
 }
 
 async function main() {
-  const server = fastify({
-    logger: true,
-  });
+  const log = logger.child({ module: 'server' });
+  const server = fastify();
   
   await server.register(rawBody, {
     runFirst: true,
   });
   
   const cfg = loadConfig();
+  logger.level = cfg.logLevel ?? 'info';
+  log.debug(`Log level set to ${cfg.logLevel}`);
+
   const serverboi = new ServerBoiService(cfg.serverboi.endpoint, cfg.serverboi.apiKey);
   const requestDao = new TrackServerRequestRepo(cfg.database);
   const createProviderRequestRepo = new CreateProviderRequestRepo(cfg.database);
@@ -68,6 +71,7 @@ async function main() {
   });
   const serverCardService = new ServerCardService(cardRepo, discord);
 
+  log.debug('Registering interactions')
   const interactions = new InteractionHandler({
     token: cfg.discord.token,
     version: cfg.discord.apiVersion ?? 'v10',
@@ -112,11 +116,10 @@ async function main() {
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, serverCardService: serverCardService }),
     ],
-    logger: server.log,
   });
 
-  
   server.get('/ping', async => {
+    log.debug('Received ping request')
     return InteractionResponseType.Pong
   })
   
@@ -149,10 +152,10 @@ async function main() {
   
   server.listen({ port: cfg.server.port }, (err, address) => {
     if (err) {
-      console.error(err)
+      log.error(err)
       process.exit(1)
     }
-    console.log(`Server listening at ${address}`)
+    log.info(`Server listening at ${address}`)
   })
 
 }
@@ -160,9 +163,8 @@ async function main() {
 (async () => {
   try {
     await main();
-    console.log('Server started');
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     process.exit(1);
   }
 })();

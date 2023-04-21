@@ -6,6 +6,7 @@ import { KubernetesServerProviderInformationModal } from "./kubernetes-provider-
 import { ChannelSelectMenu } from "./channel-select-menu";
 import { AWSEC2ServerProviderInformationModal } from "./aws-ec2-provider-modal";
 import { HetznerServerProviderInformationModal } from "./hetzner-provider-modal";
+import { logger } from "@serverboi/common";
 
 export interface TrackServerSelectProviderOptions {
   readonly trackServerDao: TrackServerRequestRepo
@@ -14,6 +15,7 @@ export interface TrackServerSelectProviderOptions {
 
 // consider making a base "dynamic provider" class for this and provider-list.ts
 export class TrackServerSelectProvider extends SelectMenuComponent {
+  private readonly logger = logger.child({ name: "TrackServerSelectProvider" });
   public static readonly identifier = "track-server-provider-select";
   protected static readonly selectType = ComponentType.StringSelect;
   protected static readonly placeholder = "Select a provider";
@@ -62,8 +64,10 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIMessageComponentSelectMenuInteraction): Promise<void> {
+    this.logger.debug("Enacting TrackServerSelectProvider");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
     const selectedValue = (interaction.data as APIMessageSelectMenuInteractionData).values[0]
-    context.logger.info(`Selected values: ${selectedValue}`)
+    this.logger.info(`Selected values: ${selectedValue}`)
 
     if (selectedValue === "None") {
       await context.response.send({
@@ -79,7 +83,7 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
       return
     }
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.trackServerDao.update(interaction.message!.interaction!.id, {
       provider: selectedValue
     })
@@ -101,7 +105,7 @@ export class TrackServerSelectProvider extends SelectMenuComponent {
       }
 
     } catch (e) {
-      context.logger.error(e as string)
+      this.logger.error(e)
       await context.response.send({
         type: InteractionResponseType.UpdateMessage,
         data: {

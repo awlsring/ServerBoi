@@ -4,12 +4,14 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { ResubmitKubernetesProviderInfoButton } from "./resubmit-kubernetes-info-button";
 import { CapabilitySelectMenu } from "./set-capabilities";
+import { logger } from "@serverboi/common";
 
 export interface KubernetesServerProviderInformationModalOptions {
   readonly requestRepo: TrackServerRequestRepo
 }
 
 export class KubernetesServerProviderInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "KubernetesServerProviderInformationModal"});
   public static readonly identifier = "track-server-kubernetes-provider-info";
   protected static readonly title = "Kubernetes Provider Information";
   protected static readonly textInputs = [
@@ -50,6 +52,9 @@ export class KubernetesServerProviderInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting Kubernetes provider information modal");
+    this.logger.debug(`Interaction data: ${interaction.data}`)
+
     let deployment: string | undefined = undefined
     let namespace: string | undefined = undefined
     let replicas: string | undefined = undefined
@@ -94,11 +99,11 @@ export class KubernetesServerProviderInformationModal extends ModalComponent {
     }
 
     if (!deployment || !namespace || !replicas || !interaction.member) {
-      context.logger.error("All required fields not provided.")
+      this.logger.error("All required fields not provided.")
       return
     }
 
-    context.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
+    this.logger.info(`Updating request ID ${interaction.message!.interaction!.id}`)
     await this.requestRepo.update(interaction.message!.interaction!.id, {
       providerServerIdentifier: deployment,
       providerServerData: JSON.stringify({

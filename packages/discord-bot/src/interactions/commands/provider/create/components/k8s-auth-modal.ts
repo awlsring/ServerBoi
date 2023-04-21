@@ -3,6 +3,7 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CreateProviderRequestRepo } from "../../../../../persistence/create-provider-request-repo";
 import { CreateProviderNameInputPromptButton } from "./name-prompt-modal";
+import { logger } from "@serverboi/common";
 
 const PROVIDER_AUTH = "kubernetes-provider-auth";
 
@@ -11,6 +12,7 @@ export interface KubernetesProviderAuthInformationModalOptions {
 }
 
 export class KubernetesProviderAuthInformationModal extends ModalComponent {
+  private readonly logger = logger.child({ name: "KubernetesProviderAuthInformationModal"});
   private readonly requestRepo: CreateProviderRequestRepo;
   public static readonly identifier = "k8s-provider-auth-info";
   protected static readonly title = "Kubernetes Provider Auth Information";
@@ -32,6 +34,7 @@ export class KubernetesProviderAuthInformationModal extends ModalComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
+    this.logger.debug("Enacting Kubernetes Provider auth information modal");
     let token: string | undefined = undefined
 
     interaction.data.components.forEach(component => {

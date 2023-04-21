@@ -2,12 +2,14 @@ import { APIApplicationCommandInteraction, ApplicationCommandOptionType, Interac
 import { InteractionContext, ServerBoiService } from "@serverboi/discord-common";
 import { CommandComponent } from "../../command";
 import { UserProviderListMenu } from "./components/provider-list";
+import { logger } from "@serverboi/common";
 
 export interface DescribeProviderCommandOptions {
   readonly serverBoiService: ServerBoiService
 }
 
 export class DescribeProviderCommand extends CommandComponent {
+  private readonly logger = logger.child({ name: "DescribeProviderCommand"});
   public static readonly identifier = "provider-describe";
   public static readonly data = {
     name: "describe",
@@ -23,6 +25,8 @@ export class DescribeProviderCommand extends CommandComponent {
   }
 
   async enact(context: InteractionContext, interaction: APIApplicationCommandInteraction) {
+    this.logger.debug("Enacting describe provider command");
+    this.logger.debug(`Interaction: ${JSON.stringify(interaction)}`)
     let response: any
     try {
       const providers = await this.serverBoiService.listProviders(context.user);
@@ -47,7 +51,7 @@ export class DescribeProviderCommand extends CommandComponent {
         }
       }
     } catch (e) {
-      console.log(e)
+      this.logger.error(e)
       response = {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
