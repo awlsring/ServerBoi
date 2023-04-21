@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { Config } from './config';
 import { ServerBoiService, ServerCardRepo, ServerCardDto, DiscordHttpClient, formServerEmbedMessage, ServerCardService } from '@serverboi/discord-common';
 import { ResourceNotFoundError } from '@serverboi/client';
+import { logger } from '@serverboi/common';
 dotenv.config();
 
 function loadConfig(): Config {
@@ -14,6 +15,7 @@ function loadConfig(): Config {
 }
 
 class Refresher {
+  private logger = logger.child({ name: 'Refresher' })
   readonly serverBoi: ServerBoiService;
   readonly serverCard: ServerCardService;
 
@@ -22,9 +24,9 @@ class Refresher {
       const server = await this.serverBoi.getServer("refreshed", card.serverId);
       await this.serverCard.refreshCard(card, server)
     } catch (e) {
-      console.log(e)
+      this.logger.error(e)
       if (e instanceof ResourceNotFoundError) {
-        console.log(`Deleting card for server ${card.serverId} as it no longer exists`)
+        this.logger.info(`Deleting card for server ${card.serverId} as it no longer exists`)
         await this.serverCard.deleteCard({ serverId: card.serverId });
         return
       }
@@ -33,7 +35,7 @@ class Refresher {
 
   async refreshCards() {
     const cards = await this.serverCard.listCards();
-    console.log(`Refreshing ${cards.length} cards`)
+    this.logger.debug(`Refreshing ${cards.length} cards`)
     await Promise.all(cards.map(card => this.refreshEmbed(card)));
   }
 
@@ -49,18 +51,22 @@ class Refresher {
 }
 
 async function startRefresher() {
-  console.log('Starting refresher');
+  const log = logger.child({ name: 'EmbedRefresher' })
+  log.info('Starting refresher');
   const config = loadConfig();
+  logger.level = config.logLevel ?? 'info';
+  logger.debug(`Log level set to ${logger.level}`);
+
   const refresher = new Refresher(config);
 
-  console.log('Refreshing cards');
+  log.info('Refreshing cards');
   await refresher.refreshCards();
 
-  console.log(`Starting interval, waiting ${config.refresher.interval}ms between refreshes`);
+  log.info(`Starting interval, waiting ${config.refresher.interval}ms between refreshes`);
   for await (const _ of setInterval(config.refresher.interval)) {
-    console.log('Refreshing cards');
+    log.debug('Refreshing cards');
     await refresher.refreshCards();
-    console.log(`Refreshed cards`);
+    log.debug(`Refreshed cards`);
   }
 }
 

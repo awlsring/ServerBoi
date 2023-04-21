@@ -1,4 +1,5 @@
 export class Config {
+  readonly logLevel?: string;
   readonly refresher: {
     readonly interval: number;
   };
@@ -17,6 +18,7 @@ export class Config {
     readonly apiKey: string;
   };
   constructor(data: any) {
+    this.logLevel = data.logLevel;
     this.refresher = data.refresher;
     this.discord = data.discord;
     this.database = data.database;
