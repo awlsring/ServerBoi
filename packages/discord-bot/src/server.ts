@@ -37,6 +37,10 @@ import { RemoveCommand } from './interactions/commands/server/remove/remove-serv
 import { ListServerCommand } from './interactions/commands/server/list/list-server-command';
 import { APIKeyAuthInformationModal } from './interactions/commands/provider/create/components/api-key-info-modal';
 import { APIKeyAuthPromptButton } from './interactions/commands/provider/create/components/api-key-auth-prompt';
+import { HetznerServerProviderInformationModal } from './interactions/commands/server/track/components/hetzner-provider-modal';
+import { ResubmitHetznerProviderInfoButton } from './interactions/commands/server/track/components/resubmit-hetzner-info-button';
+import { AWSEC2ServerProviderInformationModal } from './interactions/commands/server/track/components/aws-ec2-provider-modal';
+import { ResubmitAWSEC2ProviderInfoButton } from './interactions/commands/server/track/components/resubmit-aws-ec2-info-button';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -91,6 +95,10 @@ async function main() {
       new ServerTrackInitialModal({ trackServerDao: requestDao }),
       new SteamQueryInformationModal({ trackServerDao: requestDao, serverboiService: serverboi }),
       new HTTPQueryInformationModal({ trackServerDao: requestDao, serverboiService: serverboi}),
+      new HetznerServerProviderInformationModal({ requestRepo: requestDao }),
+      new ResubmitHetznerProviderInfoButton(),
+      new AWSEC2ServerProviderInformationModal({ requestRepo: requestDao }),
+      new ResubmitAWSEC2ProviderInfoButton(),
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
       new ResubmitBaseInfoButton(),

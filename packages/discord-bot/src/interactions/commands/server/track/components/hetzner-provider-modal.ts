@@ -4,51 +4,55 @@ import { InteractionContext } from "@serverboi/discord-common";
 import { ModalComponent } from "@serverboi/discord-common";
 import { CapabilitySelectMenu } from "./set-capabilities";
 import { ResubmitAWSEC2ProviderInfoButton } from "./resubmit-aws-ec2-info-button";
+import { ResubmitHetznerProviderInfoButton } from "./resubmit-hetzner-info-button";
 
-export interface AWSEC2ServerProviderInformationModalOptions {
+export interface HetznerServerProviderInformationModalOptions {
   readonly requestRepo: TrackServerRequestRepo
 }
 
-export class AWSEC2ServerProviderInformationModal extends ModalComponent {
-  public static readonly identifier = "track-server-aws-ec2-provider-info";
-  protected static readonly title = "AWS EC2 Provider Information";
+export class HetznerServerProviderInformationModal extends ModalComponent {
+  public static readonly identifier = "track-server-hetzner-provider-info";
+  protected static readonly title = "Hetzner Provider Information";
   protected static readonly textInputs = [
     {
-      customId: "instance-id",
-      placeholder: "The instance's ID. (i-1234567890abcdef0)",
-      label: "Instance ID",
+      customId: "server-id",
+      placeholder: "The servers's ID. (00000000)",
+      label: "Server ID",
       style: 1,
-      minLength: 19,
+      minLength: 7,
       maxLength: 19,
       required: true,
     },
     {
-      customId: "region",
-      placeholder: "The region the instance is in. (us-west-2)",
-      label: "Region",
+      customId: "location",
+      placeholder: "The city the server is in. (Hillsboro, Nurmeburg, etc)",
+      label: "Location",
       style: 1,
-      minLength: 1,
-      maxLength: 16,
+      minLength: 7,
+      maxLength: 25,
       required: true,
     },
   ]
 
+  private validRegions = [
+    "nuremberg",
+    "hillsboro",
+    "falkenstein",
+    "helsinki",
+    "ashburn",
+  ];
+
   private readonly requestRepo: TrackServerRequestRepo;
 
-  constructor(options: AWSEC2ServerProviderInformationModalOptions) {
+  constructor(options: HetznerServerProviderInformationModalOptions) {
     super()
     this.requestRepo = options.requestRepo
   }
 
-  private async isValidAwsRegion(region: string): Promise<boolean> {
-    const url = 'https://ip-ranges.amazonaws.com/ip-ranges.json';
-    const response = await fetch(url);
-    const data = await response.json();
-    const regionRegexes = data.prefixes
-      .filter((p: any) => p.service === 'AMAZON')
-      .map((p: any) => new RegExp(`^(${p.region})$`));
-    return regionRegexes.some((r: RegExp) => r.test(region));
+  private validateHetznerRegion(region: string): boolean {
+    return this.validRegions.includes(region.toLocaleLowerCase());
   }
+
 
   async enact(context: InteractionContext, interaction: APIModalSubmitInteraction) {
     let id: string | undefined = undefined
@@ -56,17 +60,16 @@ export class AWSEC2ServerProviderInformationModal extends ModalComponent {
     let errorMessage = undefined
 
     interaction.data.components.forEach(component => {
-      component.components.forEach(async c => {
+      component.components.forEach(c => {
         switch (c.custom_id) {
-          case "instance-id":
+          case "server-id":
             id = c.value
             break;
-          case "region":
-            const valid = await this.isValidAwsRegion(c.value);
-            if (valid) {
-              region = c.value
+          case "location":
+            if (!this.validateHetznerRegion(c.value)) {
+              errorMessage = `Invalid location provided. Valid locations are: ${this.validRegions.join(", ")}`
             } else {
-              errorMessage = `\`${c.value}\` is an invalid AWS region.`
+              region = c.value.toLocaleLowerCase()
             }
             break;
         }
@@ -82,7 +85,7 @@ export class AWSEC2ServerProviderInformationModal extends ModalComponent {
             {
               type: 1,
               components: [
-                ResubmitAWSEC2ProviderInfoButton.toApiData()
+                ResubmitHetznerProviderInfoButton.toApiData()
               ],
             }
           ],
