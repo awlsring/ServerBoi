@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: serverboi
+  IMAGE_NAME: awlsring/serverboi
 
 jobs:
   ghcr-api-release:
