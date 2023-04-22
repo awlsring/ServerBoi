@@ -10,7 +10,7 @@ env:
 
 jobs:
   build-repo:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +19,14 @@ jobs:
           node-version: 18
 
       - run: npm run install
+
       - run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: .
 
   ghcr-api-release:
     runs-on: ubuntu-latest
@@ -29,8 +36,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: .
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -94,8 +104,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: .
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -159,8 +172,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: .
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -224,8 +240,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: .
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
