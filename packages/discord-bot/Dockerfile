@@ -7,7 +7,7 @@ RUN yarn install --frozen-lockfile --production --ignore-scripts --prefer-offlin
 
 COPY . .
 
-RUN yarn boostrap
+RUN yarn bootstrap
 
 FROM node:18-alpine as prod
 LABEL name "serverboi discord bot"
