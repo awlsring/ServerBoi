@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: 18
 
+      - run: npm run build
       - run: npm install
-
       - run: npm run build
 
       - name: Upload artifact
