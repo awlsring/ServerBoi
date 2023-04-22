@@ -7,6 +7,15 @@
     "prom-client": "^14.2.0",
     "winston": "^3.8.2"
   },
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "prettier": "^2.8.0",
+    "prisma": "^4.12.0",
+    "ts-node": "^10.9.1"
+  },
   "scripts": {
     "build": "tsc --build"
   },

@@ -7,7 +7,7 @@ RUN yarn install --frozen-lockfile --production --ignore-scripts --prefer-offlin
 
 COPY . .
 
-RUN yarn bootstrap
+RUN yarn build
 
 FROM node:18-alpine as prod
 LABEL name "discord embed refresher"
