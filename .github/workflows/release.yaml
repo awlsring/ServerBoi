@@ -53,6 +53,7 @@ jobs:
         continue-on-error: true 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/api/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -65,6 +66,7 @@ jobs:
         if: steps.build1.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/api/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -77,6 +79,7 @@ jobs:
         if: steps.build2.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/api/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -127,6 +130,7 @@ jobs:
         continue-on-error: true 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/discord-bot/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -139,6 +143,7 @@ jobs:
         if: steps.build1.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/discord-bot/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -151,6 +156,7 @@ jobs:
         if: steps.build2.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/discord-bot/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -201,6 +207,7 @@ jobs:
         continue-on-error: true 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/embed-refresher/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -213,6 +220,7 @@ jobs:
         if: steps.build1.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/embed-refresher/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -225,6 +233,7 @@ jobs:
         if: steps.build2.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/embed-refresher/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -275,6 +284,7 @@ jobs:
         continue-on-error: true 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/status-monitor/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -287,6 +297,7 @@ jobs:
         if: steps.build1.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/status-monitor/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
@@ -299,6 +310,7 @@ jobs:
         if: steps.build2.outcome=='failure' 
         uses: docker/build-push-action@v3
         with:
+          context: .
           file: packages/status-monitor/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
