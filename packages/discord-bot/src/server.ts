@@ -150,7 +150,7 @@ async function main() {
     await interactions.handle(interaction, response);
   });
   
-  server.listen({ port: cfg.server.port }, (err, address) => {
+  server.listen({ port: cfg.server.port, host: "::" }, (err, address) => {
     if (err) {
       log.error(err)
       process.exit(1)
