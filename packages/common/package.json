@@ -8,7 +8,7 @@
     "winston": "^3.8.2"
   },
   "scripts": {
-    "build": "yarn generate && tsc --build"
+    "build": "tsc --build"
   },
   "keywords": [],
   "author": "",

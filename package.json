@@ -5,10 +5,16 @@
   "private": true,
   "license": "Apache-2.0",
   "workspaces": [
+    "packages/client",
+    "packages/ssdk",
+    "packages/common",
+    "packages/backend-common",
+    "packages/discord-common",
     "packages/*"
   ],
   "scripts": {
     "build": "tsc --build --verbose",
+    "bootstrap": "yarn workspaces run build",
     "build:model": "cd models/api && gradle build && cd ./build/smithyprojections/api/typescript/typescript-ssdk-codegen && yarn install && yarn build",
     "package:embed-refresher:dev": "docker build -f packages/embed-refresher/Dockerfile -t awlsring/serverboi-embed-refresher:latest .",
     "package:api:dev": "docker build -f packages/api/Dockerfile -t awlsring/serverboi-api:latest .",
