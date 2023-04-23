@@ -4,10 +4,10 @@ import { ServerCardRepo } from "../../../../persistence/server-card-repo";
 import { ServerBoiService } from "../../../../service/serverboi";
 import { InteractionContext } from "../../../context";
 
-export class StartServerButton extends ServerButton {
-  public static readonly identifier = "server-action-start";
-  protected static readonly style = 1;
-  protected static readonly label = "Start";
+export class RebootServerButton extends ServerButton {
+  public static readonly identifier = "server-action-reboot";
+  protected static readonly style = 4;
+  protected static readonly label = "Reboot";
 
   private readonly serverboi: ServerBoiService
   private readonly serverCardRepo: ServerCardRepo
@@ -28,9 +28,9 @@ export class StartServerButton extends ServerButton {
     let message = "Unable to send request, try again later"
 
     if (card) {
-      await this.serverboi.startServer(card.ownerId, card.serverId)
+      await this.serverboi.rebootServer(card.ownerId, card.serverId)
       let serverShortId = card.serverId.split("-")[1]
-      message = `Starting server ${serverShortId}`
+      message = `Rebooting server ${serverShortId}`
     }
 
     await context.response.send({

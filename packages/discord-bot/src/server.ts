@@ -6,7 +6,7 @@ import { InteractionHandler } from './interactions/handler';
 import { Config } from './config';
 import fs from 'fs';
 import yaml from 'js-yaml';
-import { DiscordHttpClient, ServerBoiService, ServerCardRepo, ServerCardService, ServerMoreActionsMenu, StartServerButton, StopServerButton } from '@serverboi/discord-common';
+import { DiscordHttpClient, ServerBoiService, ServerCardRepo, ServerCardService, ServerMoreActionsMenu, StartServerButton, StopServerButton, RebootServerButton } from '@serverboi/discord-common';
 import { TrackServerRequestRepo } from './persistence/track-server-request-repo';
 import { TrackCommand } from './interactions/commands/server/track/track-server-command';
 import { QuerySelectMenu } from './interactions/commands/server/track/components/query-select';
@@ -114,6 +114,7 @@ async function main() {
       new CreateProviderNameInputModal({ serverBoiService: serverboi, requestRepo: createProviderRequestRepo }),
       new StartServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
+      new RebootServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, serverCardService: serverCardService }),
     ],
   });

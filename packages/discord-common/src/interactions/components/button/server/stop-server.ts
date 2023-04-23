@@ -25,10 +25,18 @@ export class StopServerButton extends ServerButton {
       return await this.unauthorizedResponse(context)
     }
 
+    let message = "Unable to send request, try again later"
+
+    if (card) {
+      await this.serverboi.stopServer(card.ownerId, card.serverId)
+      let serverShortId = card.serverId.split("-")[1]
+      message = `Stopping server ${serverShortId}`
+    }
+
     await context.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        content: "Not implemented",
+        content: message,
         flags: MessageFlags.Ephemeral,
       }
     })

@@ -3,6 +3,7 @@ import { EmbedType, RESTPostAPIChannelMessageJSONBody, APIActionRowComponent, AP
 import { StartServerButton } from "../interactions/components/button/server/start-server";
 import { StopServerButton } from "../interactions/components/button/server/stop-server";
 import { ServerMoreActionsMenu } from "../interactions/components/menus/server-more-actions";
+import { RebootServerButton } from "../interactions/components/button/server/reboot-button";
 
 export interface SteamStatusData {
   readonly name: string;
@@ -268,13 +269,19 @@ function generateControlButtons(summary: ServerSummary): APIActionRowComponent<A
     summary.capabilities.forEach(capability => {
       switch (capability) {
         case Capabilities.START:
-          startEnabled = true;
+          if (summary.status?.status == ServerStatus.STOPPED) {
+            startEnabled = true;
+          }
           break;
         case Capabilities.STOP:
-          stopEnabled = true;
+          if (summary.status?.status == ServerStatus.RUNNING || summary.status?.status == ServerStatus.UNREACHABLE_RUNNING) {
+            stopEnabled = true;
+          }
           break;
         case Capabilities.REBOOT:
-          rebootEnabled = true;
+          if (summary.status?.status == ServerStatus.RUNNING || summary.status?.status == ServerStatus.UNREACHABLE_RUNNING) {
+            rebootEnabled = true;
+          }
           break;
       }
     });
@@ -285,6 +292,7 @@ function generateControlButtons(summary: ServerSummary): APIActionRowComponent<A
     components: [
       StartServerButton.formButton(startEnabled),
       StopServerButton.formButton(stopEnabled),
+      RebootServerButton.formButton(rebootEnabled),
     ]
   }
 }
@@ -345,6 +353,6 @@ function setThumbnailUrl(application: string): string {
       case "valheim":
         return "https://preview.redd.it/f6nbziz4ghh61.gif?width=858&auto=webp&s=27ca2c36dc194caaa1a789f4a2547f9e716c95bf";
     default:
-      return "https://giphy.com/embed/ITRemFlr5tS39AzQUL";
+      return "https://cache.teia.rocks/media/raw/ipfs/bafybeicass6d3ftqyfigxciwfysnzm4aobfjuk4zvtueenvqqpjo3p75ju";
   }
 }

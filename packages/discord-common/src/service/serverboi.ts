@@ -1,4 +1,4 @@
-import { CreateProviderCommand, CreateProviderInput, DeleteProviderCommand, GetProviderCommand, GetServerCommand, ListProvidersCommand, ListServersCommand, ProviderSummary, ServerBoiClient, ServerSummary, TrackServerCommand, TrackServerInput, UntrackServerCommand } from "@serverboi/client";
+import { CreateProviderCommand, CreateProviderInput, DeleteProviderCommand, GetProviderCommand, GetServerCommand, ListProvidersCommand, ListServersCommand, ProviderSummary, RebootServerCommand, ServerBoiClient, ServerSummary, StartServerCommand, StopServerCommand, TrackServerCommand, TrackServerInput, UntrackServerCommand } from "@serverboi/client";
 import { LRUCache } from "../cache/lru-cache";
 import { logger } from '@serverboi/common';
 
@@ -109,6 +109,27 @@ export class ServerBoiService {
     this.logger.debug("untracking server", id)
     const client = await this.getClientForUser(user);
     const response = await client.send(new UntrackServerCommand({id}));
+    return response.success ?? false;
+  }
+
+  async startServer(user: string, id: string): Promise<boolean> {
+    this.logger.debug("starting server", id)
+    const client = await this.getClientForUser(user);
+    const response = await client.send(new StartServerCommand({id}));
+    return response.success ?? false;
+  }
+
+  async stopServer(user: string, id: string): Promise<boolean> {
+    this.logger.debug("stopping server", id)
+    const client = await this.getClientForUser(user);
+    const response = await client.send(new StopServerCommand({id}));
+    return response.success ?? false;
+  }
+
+  async rebootServer(user: string, id: string): Promise<boolean> {
+    this.logger.debug("rebooting server", id)
+    const client = await this.getClientForUser(user);
+    const response = await client.send(new RebootServerCommand({id}));
     return response.success ?? false;
   }
 }

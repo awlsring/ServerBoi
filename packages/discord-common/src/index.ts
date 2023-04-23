@@ -2,6 +2,7 @@ export * from "./embeds/server-embed";
 export * from "./interactions/components/button/server/stop-server";
 export * from "./interactions/components/button/server/start-server";
 export * from "./interactions/components/button/server/server-button";
+export * from "./interactions/components/button/server/reboot-button";
 export * from "./interactions/components/button/button";
 export * from "./interactions/components/menus/menu";
 export * from "./interactions/components/menus/server-more-actions";
