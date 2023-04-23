@@ -28,7 +28,7 @@ const metrics = new ApiServicePrometheusMetrics({
   app: "serverboi-api",
   prefix: "api",
   server: {
-    port: cfg.metrics.port ?? 9090,
+    port: cfg.metrics?.port ?? 9090,
   }
 });
 

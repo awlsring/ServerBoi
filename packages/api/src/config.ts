@@ -12,7 +12,7 @@ export class Config {
   readonly server: {
     readonly port?: number;
   };
-  readonly metrics: {
+  readonly metrics?: {
     readonly port?: number;
   }
   readonly database: {

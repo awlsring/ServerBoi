@@ -6,6 +6,9 @@ export class Config {
   readonly discord: {
     readonly token: string;
   };
+  readonly metrics?: {
+    readonly port?: number;
+  };
   readonly database: {
     readonly user: string;
     readonly password: string;
@@ -19,6 +22,7 @@ export class Config {
   };
   constructor(data: any) {
     this.logLevel = data.logLevel;
+    this.metrics = data.metrics;
     this.refresher = data.refresher;
     this.discord = data.discord;
     this.database = data.database;
