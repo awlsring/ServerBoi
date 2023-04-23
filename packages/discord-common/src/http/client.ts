@@ -1,4 +1,4 @@
-import { APIUser } from "discord-api-types/v10"
+import { APIChannel, APIUser, RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10"
 
 export interface DiscordHttpClientOptions {
   readonly token: string;
@@ -171,10 +171,23 @@ export class DiscordHttpClient {
     return await response.json();
   }
 
-  async createMessage(channelId: string, body: Record<string, any>,) {
+  async createMessage(channelId: string, message: RESTPostAPIChannelMessageJSONBody,) {
     const response = await this.request(`/channels/${channelId}/messages`, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(message),
+    });
+    return await response.json();
+  }
+
+  async replyToMessage(channelId: string, messageId: string, message: RESTPostAPIChannelMessageJSONBody,) {
+    let msg = message;
+    msg.message_reference = {
+      message_id: messageId,
+    };
+
+    const response = await this.request(`/channels/${channelId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(msg),
     });
     return await response.json();
   }
@@ -201,6 +214,18 @@ export class DiscordHttpClient {
     } catch (error) {
       console.error('Error deleting message:', error);
     }
+  }
+
+  async messageUser(userId: string, message: RESTPostAPIChannelMessageJSONBody,) {
+    const resp = await this.request(`/users/@me/channels`, {
+      method: 'POST',
+      body: JSON.stringify({
+        recipient_id: userId,
+      }),
+    });
+
+    const channel = await resp.json() as APIChannel
+    await this.createMessage(channel.id, message);
   }
 
   async getUser(userId: string): Promise<APIUser> {

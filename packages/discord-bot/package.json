@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "start:dev": "export CONFIG_PATH='./config.yaml' && node dist/server.js",
     "commands:deregister": "ts-node --project tsconfig.json scripts/deregister-commands.ts",
-    "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts"
+    "commands:register": "ts-node --project tsconfig.json scripts/register-commands.ts",
+    "commands:register-guild": "ts-node --project tsconfig.json scripts/register-guild-commands.ts"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",

@@ -42,6 +42,8 @@ import { ResubmitHetznerProviderInfoButton } from './interactions/commands/serve
 import { AWSEC2ServerProviderInformationModal } from './interactions/commands/server/track/components/aws-ec2-provider-modal';
 import { ResubmitAWSEC2ProviderInfoButton } from './interactions/commands/server/track/components/resubmit-aws-ec2-info-button';
 import { logger } from '@serverboi/common';
+import { NoUUserCommand } from './interactions/commands/nou/user';
+import { NoUMessageCommand } from './interactions/commands/nou/message';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -116,6 +118,9 @@ async function main() {
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new RebootServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, serverCardService: serverCardService }),
+
+      new NoUUserCommand(cfg.discord.applicationId),
+      new NoUMessageCommand(cfg.discord.applicationId)
     ],
   });
 

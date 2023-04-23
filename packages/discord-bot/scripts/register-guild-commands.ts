@@ -1,25 +1,29 @@
 import dotenv from 'dotenv';
 
-import { ServerCommandGroup } from "../src/interactions/commands/server/group";
-import { ProviderCommandGroup } from "../src/interactions/commands/provider/group";
-import { NoUUserCommand } from '../src/interactions/commands/nou/user';
-import { NoUMessageCommand } from '../src/interactions/commands/nou/message';
+import { NoUUserCommand } from "../src/interactions/commands/nou/user";
+import { NoUMessageCommand } from "../src/interactions/commands/nou/message";
 
 dotenv.config();
 
 const token = process.env.DISCORD_TOKEN
 const applicationId = process.env.APPLICATION_ID
 
+const scope = process.argv[2];
+if (scope === undefined) {
+  console.error("No scope provided");
+  process.exit(1);
+}
+
 console.log("Registering slash commands...");
 const response = fetch(
-  `https://discord.com/api/v10/applications/${applicationId}/commands`,
+  `https://discord.com/api/v10/applications/${applicationId}/guilds/${scope}/commands`,
   {
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bot ${token}`,
     },
     method: "PUT",
-    body: JSON.stringify([ServerCommandGroup, ProviderCommandGroup, NoUUserCommand.data, NoUMessageCommand.data]),
+    body: JSON.stringify([NoUUserCommand.data, NoUMessageCommand.data]),
   }
 );
 
