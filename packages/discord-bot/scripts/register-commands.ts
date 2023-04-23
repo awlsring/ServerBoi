@@ -8,6 +8,7 @@ dotenv.config();
 const token = process.env.DISCORD_TOKEN
 const applicationId = process.env.APPLICATION_ID
 
+console.log("Registering slash commands...");
 const response = fetch(
   `https://discord.com/api/v10/applications/${applicationId}/commands`,
   {
