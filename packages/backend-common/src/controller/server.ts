@@ -234,6 +234,9 @@ export class ServerController {
     }
     const provider = await this.getProvider(server);
 
+    await this.serverDao.updateStatus(server.scopeId, server.serverId, {
+      status: ServerStatus.STARTING,
+    });
     await provider.startServer(server.providerServerData);
   }
 
@@ -244,6 +247,9 @@ export class ServerController {
     }
     const provider = await this.getProvider(server);
 
+    await this.serverDao.updateStatus(server.scopeId, server.serverId, {
+      status: ServerStatus.STOPPING,
+    });
     await provider.stopServer(server.providerServerData);
   }
 
@@ -254,6 +260,9 @@ export class ServerController {
     }
     const provider = await this.getProvider(server);
 
+    await this.serverDao.updateStatus(server.scopeId, server.serverId, {
+      status: ServerStatus.REBOOTING,
+    });
     await provider.rebootServer(server.providerServerData);
   }
 
