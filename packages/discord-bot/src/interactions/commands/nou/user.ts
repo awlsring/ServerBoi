@@ -17,29 +17,51 @@ export class NoUUserCommand extends CommandComponent {
     super();
   }
 
+  private determineOrigin(interaction: APIUserApplicationCommandInteraction): string {
+    if (interaction.member?.user.id) {
+      return interaction.member.user.id;
+    }
+    if (interaction.user?.id) {
+      return interaction.user?.id;
+    }
+    throw new Error("Could not determine origin of no u command");
+  }
+
   async enact(context: InteractionContext, interaction: APIUserApplicationCommandInteraction) {
     this.logger.debug("Enacting no u user command");
     this.logger.debug(JSON.stringify(interaction.data));
 
-    let target = interaction.data.target_id;
-    let message = `<@${interaction.member?.user.id}> wanted me to let you know,`;
-    if (interaction.data.target_id === this.appId) {
-      target = interaction.member?.user.id ?? "";
-      message = "Me?";
-    }
-
-    message = `${message} ${createNoU(interaction.data.target_id)}.`
-
-    await context.response.send({
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        content: `I've no u'ed <@${interaction.data.target_id}>`,
-        flags: MessageFlags.Ephemeral,
+    try {
+      const user = this.determineOrigin(interaction);
+      let target = interaction.data.target_id;
+      let message = `<@${user}> wanted me to let you know,`;
+      if (interaction.data.target_id === this.appId) {
+        target = user;
+        message = `Me? ${createNoU(user)}`;
+      } else {
+        message = `${message} ${createNoU(interaction.data.target_id)}.`
       }
-    });
-
-    await context.http.messageUser(target, {
-      content: message,
-    });
+  
+      await context.response.send({
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          content: `I've no u'ed <@${interaction.data.target_id}>`,
+          flags: MessageFlags.Ephemeral,
+        }
+      });
+  
+      await context.http.messageUser(target, {
+        content: message,
+      });
+    } catch (e) {
+      this.logger.error(e);
+      await context.response.send({
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          content: `I had an issue sending that no u :(, please try again later)`,
+          flags: MessageFlags.Ephemeral,
+        }
+      });
+    }
   }
 }
