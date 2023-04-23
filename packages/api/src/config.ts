@@ -12,6 +12,9 @@ export class Config {
   readonly server: {
     readonly port?: number;
   };
+  readonly metrics: {
+    readonly port?: number;
+  }
   readonly database: {
     readonly user: string;
     readonly password: string;
@@ -21,6 +24,7 @@ export class Config {
   };
   constructor(data: any) {
     this.logLevel = data.logLevel;
+    this.metrics = data.metrics;
     this.server = data.server;
     this.database = data.database;
   }

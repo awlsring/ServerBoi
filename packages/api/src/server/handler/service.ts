@@ -30,7 +30,7 @@ import { StartServerOperation } from "../operations/server/start-server";
 import { UpdateServerOperation } from "../operations/server/update-server";
 
 export class ServiceHandler implements ServerBoiService<ServiceContext> {
-  Health = (input: HealthServerInput, context: ServiceContext) => HealthOperation(input, context);
+  Health = (input: HealthServerInput, context: any) => HealthOperation(input, context);
   
   GetProvider = (input: GetProviderServerInput, context: ServiceContext) => GetProviderOperation(input, context);
   ListProviders = (input: ListProvidersServerInput, context: ServiceContext) => ListProvidersOperation(input, context);

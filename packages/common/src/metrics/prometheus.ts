@@ -1,11 +1,17 @@
+import { createServer } from 'http';
 import { Registry, Metric, Gauge, collectDefaultMetrics, Counter, Histogram } from 'prom-client';
+import { logger } from '../logger/logger';
 
 export interface PrometheusMetricControllerOptions {
   readonly app: string;
   readonly prefix: string;
+  readonly server?: {
+    readonly port?: number;
+  };
 }
 
 export abstract class PrometheusMetricController {
+  readonly logger = logger.child({ name: "PrometheusMetricController" });
   readonly registry: Registry;
   readonly metrics: Map<string, Metric>;
   readonly contentType: string;
@@ -20,6 +26,11 @@ export abstract class PrometheusMetricController {
     this.contentType = this.registry.contentType;
 
     collectDefaultMetrics({ register: this.registry });
+
+    if (options.server) {
+      this.logger.info(`Starting metrics server on port ${options.server.port ?? 9090}`, );
+      this.createServer(options.server.port ?? 9090);
+    }
   }
 
   protected createCounter(name: string, help: string, labels?: string[]): Counter {
@@ -64,6 +75,20 @@ export abstract class PrometheusMetricController {
 
   async dump() {
     return await this.registry.metrics();
+  }
+
+  private async createServer(port: number) {
+    const server = createServer(async (req, res) => {
+      if (req.url === "/metrics") {
+        const metricsDump = await this.dump();
+        res.writeHead(200, {
+          "Content-Type": this.contentType,
+        }).end(metricsDump);
+        return;
+      }
+    });
+
+    server.listen(port);
   }
 
 }

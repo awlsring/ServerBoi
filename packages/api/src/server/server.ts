@@ -15,6 +15,7 @@ import { logger } from "@serverboi/common";
 
 const serviceHandler = getServerBoiServiceHandler(new ServiceHandler());
 const cfg = loadConfig();
+const log = logger.child({ name: "Server" });
 
 const controllerContext: ControllerContext = {
   server: new ServerController(cfg.database),
@@ -26,9 +27,10 @@ const userController = new UserAuthController(cfg.database);
 const metrics = new ApiServicePrometheusMetrics({
   app: "serverboi-api",
   prefix: "api",
-})
-
-const log = logger.child({ name: "Server" });
+  server: {
+    port: cfg.metrics.port ?? 9090,
+  }
+});
 
 async function getUserFromHeaders(headers: IncomingHttpHeaders): Promise<string> {
   if (!headers["x-serverboi-user"]) {
@@ -68,13 +70,9 @@ export const server = createServer(async function (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage> & { req: IncomingMessage }
 ) {
-  
-  if (req.url === "/metrics") {
-    log.debug("Received metrics request, dumping metrics");
-    const metricsDump = await metrics.dump();
-    res.writeHead(200, {
-      "Content-Type": metrics.contentType,
-    }).end(metricsDump);
+  if (req.url === "/health") {
+    log.debug("Received health request, returning 200");
+    res.writeHead(200).end(JSON.stringify({ success: true }));
     return;
   }
 
