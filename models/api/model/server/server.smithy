@@ -8,9 +8,10 @@ resource Server {
     read: GetServer,
     list: ListServers,
     update: UpdateServer,
-    create: TrackServer,
-    delete: UntrackServer,
+    create: CreateServer,
+    delete: DeleteServer,
     operations: [
+        UntrackServer,
         StartServer,
         StopServer,
         RebootServer,
