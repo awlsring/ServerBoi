@@ -1,4 +1,4 @@
-import { ServerDto, ServerStatusDto, SteamStatusData } from "@serverboi/backend-common";
+import { ServerDto, ServerStatusDto } from "@serverboi/backend-common";
 import { ServerStatus, ServerStatusSummary, ServerSummary } from "@serverboi/ssdk";
 
 export function serverToSummary(server: ServerDto): ServerSummary {

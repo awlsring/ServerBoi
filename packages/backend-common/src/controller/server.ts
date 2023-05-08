@@ -240,6 +240,19 @@ export class ServerController {
     await provider.startServer(server.providerServerData);
   }
 
+  async deleteServer(id: string): Promise<void> {
+    throw new Error("Method not implemented.");
+    const server = await this.getServer(id);
+    if (!server.providerServerData) {
+      throw new Error("Server has no provider data");
+    }
+    const provider = await this.getProvider(server);
+
+    // await provider.deleteServer(server.providerServerData);
+    await this.serverDao.delete(server.scopeId, server.serverId);
+
+  }
+
   async stopServer(id: string): Promise<void> {
     const server = await this.getServer(id);
     if (!server.providerServerData) {

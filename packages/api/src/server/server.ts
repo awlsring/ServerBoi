@@ -8,7 +8,7 @@ import { ServiceHandler } from "./handler/service";
 import { convertRequest, writeResponse } from "@aws-smithy/server-node";
 import { ControllerContext, ServiceContext } from "./handler/context";
 import { loadConfig } from "../config";
-import { ProviderController, ServerController } from "@serverboi/backend-common";
+import { ExecutionController, ProviderController, ServerController } from "@serverboi/backend-common";
 import { UserAuthController } from "../controller/user-auth-controller";
 import { HttpResponse } from "@aws-sdk/protocol-http";
 import { logger } from "@serverboi/common";
@@ -20,6 +20,7 @@ const log = logger.child({ name: "Server" });
 const controllerContext: ControllerContext = {
   server: new ServerController(cfg.database),
   provider: new ProviderController(cfg.database),
+  execution: new ExecutionController(cfg.database),
 }
 
 const userController = new UserAuthController(cfg.database);

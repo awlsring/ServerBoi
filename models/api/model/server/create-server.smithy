@@ -29,6 +29,9 @@ structure CreateServerInput {
     providerOptions: CreateServerProviderOptions
 
     @required
+    templateOptions: CreateServerTemplateOptions
+
+    @required
     capabilities: ServerCapabilities
 }
 
@@ -39,6 +42,40 @@ structure CreateServerProviderOptions {
     location: String
 
     data: Document
+}
+
+structure CreateServerTemplateOptions {
+    @required
+    variables: CreateServerApplicationVariables
+
+    @required
+    ports: CreateServerApplicationPorts
+
+    templateVersion: String
+}
+
+structure CreateServerApplicationVariable {
+    @required
+    name: String
+
+    @required
+    value: String
+}
+
+list CreateServerApplicationVariables {
+    member: CreateServerApplicationVariable
+}
+
+structure CreateServerApplicationPort {
+    @required
+    host: Integer
+
+    @required
+    container: Integer
+}
+
+list CreateServerApplicationPorts {
+    member: CreateServerApplicationPort
 }
 
 @output

@@ -29,6 +29,8 @@ structure ExecutionSummary {
 
     currentStep: String,
 
+    updatedAt: Long,
+
     endedAt: Long,
 
     output: Document

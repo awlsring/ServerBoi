@@ -90,7 +90,25 @@ model ProviderServerData {
   identifier String
   location String?
   data String?
-} 
+}
+
+// Executions
+model Execution {
+  id String @unique
+  scope String
+  user String
+  workflowType String
+  status String
+  input String
+  runnerType String
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+  endedAt DateTime?
+  currentStep String?
+  output String?
+  errorType String?
+  errorMesage String?
+}
 
 // Discord specific
 model TrackServer {

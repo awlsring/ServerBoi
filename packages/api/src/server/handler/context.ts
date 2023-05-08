@@ -1,10 +1,10 @@
-import { ProviderController, ServerController } from "@serverboi/backend-common";
-import { Config } from "../../config";
+import { ExecutionController, ProviderController, ServerController } from "@serverboi/backend-common";
 import { MetricsController } from "../../metrics/metrics-controller";
 
 export interface ControllerContext {
   readonly server: ServerController;
   readonly provider: ProviderController;
+  readonly execution: ExecutionController;
 }
 
 export interface ServiceContext {
