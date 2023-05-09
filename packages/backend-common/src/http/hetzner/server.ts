@@ -1,3 +1,35 @@
+import { Action } from "./server-action";
+
+export interface CreateServerRequest {
+  readonly automount?: boolean;
+  readonly datacenter?: string;
+  readonly firewalls?: {
+    readonly firewall: number;
+  }[];
+  readonly image: string;
+  readonly labels?: Record<string, string>;
+  readonly location: string;
+  readonly name: string;
+  readonly networks?: string[];
+  readonly placement_group?: string;
+  readonly public_net?: {
+    readonly enable_ipv4?: boolean;
+    readonly enable_ipv6?: boolean;
+  };
+  readonly server_type: string;
+  readonly ssh_keys?: string[];
+  readonly volumes?: number[];
+  readonly user_data?: string;
+  readonly start_after_create?: boolean;
+}
+
+export interface CreateServerResponse {
+  readonly action: Action;
+  readonly next_actions: Action[];
+  readonly root_password?: string;
+  readonly server: Server;
+}
+
 export interface GetServerResponse {
   server: Server;
 }

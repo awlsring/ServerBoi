@@ -6,6 +6,18 @@ import { Provider } from "./provider";
 import { HetznerHttpClient } from "../http/hetzner/client";
 import { ServerStatus } from "../http/hetzner/server";
 
+export interface HetznerProviderCreateServerOptions {
+  readonly id: string;
+  readonly architecture: string;
+  readonly location: string;
+  readonly image: string;
+  readonly serverType: string;
+  readonly userData: string;
+  readonly name: string;
+  readonly allowedPorts: { port: number, protcol: string}[];
+  readonly labels: { [key: string]: string };
+}
+
 export class HetznerProvider implements Provider {
   private logger = logger.child({ name: "HetznerProvider" });
   private readonly client: HetznerHttpClient
@@ -36,6 +48,71 @@ export class HetznerProvider implements Provider {
       default:
         return ProviderServerStatus.STOPPED;
     }
+  }
+
+  async createServer(request: HetznerProviderCreateServerOptions): Promise<ProviderServerDataDto> {
+    this.logger.debug(`Creating server with name ${request.name}`);
+
+    let architecture: "x86" | "arm"
+    switch (request.architecture) {
+      case "x86_64":
+        architecture = "x86";
+        break;
+      case "arm64":
+        architecture = "arm";
+        break;
+      default:
+        throw new Error(`Unknown architecture ${request.architecture}`);
+    }
+
+    const images = await this.client.listImages({
+      architecture: architecture,
+      type: "system",
+    })
+  
+    const ubuntu22 = images.images.find((image) => image.os_flavor === "ubuntu" && image.os_version === "22.04")
+
+    if (!ubuntu22) {
+      throw new Error("Could not find ubuntu 22.04 image");
+    }
+
+    const response = await this.client.createServer({
+      name: request.name,
+      server_type: request.serverType,
+      image: ubuntu22?.id.toString(),
+      location: request.location,
+      labels: request.labels,
+      start_after_create: true,
+      user_data: request.userData,
+      public_net: { enable_ipv4: true, enable_ipv6: true }
+    });
+    this.logger.debug(`Created server with name ${request.name}`);
+
+    this.logger.debug(`Applying firewall to server ${response.server.id}`);
+    await this.client.createFirewall({
+      name: `serverboi-${request.id}`,
+      apply_to: [{
+        server: { id: response.server.id },
+        type: "server",
+      }],
+      rules: request.allowedPorts.map((port) => ({
+        direction: "in",
+        protocol: port.protcol,
+        port: port.port.toString(),
+        source_ips: ["0.0.0.0/0", "::/0"]
+      })),
+    });
+
+    return {
+      identifier: response.server.id.toString(),
+      location: request.location,
+    };
+  }
+
+  async deleteServer(serverData: ProviderServerDataDto): Promise<void> {
+    this.logger.debug(`Deleting server ${serverData.identifier}`);
+    await this.client.deleteServer(serverData.identifier);
+    this.logger.debug(`Deleted server ${serverData.identifier}`);
   }
 
   async startServer(serverData: ProviderServerDataDto): Promise<void> {
