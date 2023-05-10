@@ -3,7 +3,7 @@ import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
-import { Provider } from "./provider";
+import { CreateServerInput, Provider } from "./provider";
 
 export interface KubernetesProviderOptions {
   readonly endpoint: string;
@@ -100,7 +100,7 @@ export class KubernetesProvider implements Provider {
     }
   }
 
-  async createServer(options: any): Promise<ProviderServerDataDto> {
+  async createServer(input: CreateServerInput): Promise<ProviderServerDataDto> {
     throw new Error("Method not implemented.");
   }
 

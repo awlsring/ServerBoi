@@ -3,18 +3,7 @@ import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
-import { Provider } from "./provider";
-
-export interface AwsEc2ProviderCreateServerOptions {
-  readonly id: string;
-  readonly architecture: string;
-  readonly name: string;
-  readonly region: string;
-  readonly instanceType: string;
-  readonly size: number;
-  readonly allowedPorts: { port: number, protcol: string}[];
-  readonly tags: Record<string, string>;
-}
+import { CreateServerInput, Provider } from "./provider";
 
 export class AwsEc2Provider implements Provider {
   private logger = logger.child({ name: "AwsEc2Provider" });
@@ -75,10 +64,10 @@ export class AwsEc2Provider implements Provider {
     }
   }
 
-  async createServer(options: AwsEc2ProviderCreateServerOptions): Promise<ProviderServerDataDto> {
-    const client = await this.getClient(options.region);
+  async createServer(input: CreateServerInput): Promise<ProviderServerDataDto> {
+    const client = await this.getClient(input.location);
 
-    this.logger.debug(`Selecting image for ${options.id}`);
+    this.logger.debug(`Selecting image for ${input.id}`);
     const amis = await client.send(new DescribeImagesCommand({
       Filters: [
         {
@@ -87,7 +76,7 @@ export class AwsEc2Provider implements Provider {
         },
         {
           Name: "architecture",
-          Values: [options.architecture]
+          Values: [input.architecture]
         },
         {
           Name: "owner-alias",
@@ -115,16 +104,16 @@ export class AwsEc2Provider implements Provider {
       throw new Error("No AMI found");
     }
     
-    this.logger.debug(`Creating security group for ${options.id}`);
+    this.logger.debug(`Creating security group for ${input.id}`);
     const securityGroup = await client.send(new CreateSecurityGroupCommand({
-      Description: `ServerBoi security group for ${options.id}`,
-      GroupName: `${options.name}-${options.id}-sg`,
+      Description: `ServerBoi security group for ${input.id}`,
+      GroupName: `${input.name}-${input.id}-sg`,
     }));
 
     this.logger.debug(`Allowing ingress for deesired ports on security group ${securityGroup.GroupId}`);
     await client.send(new AuthorizeSecurityGroupIngressCommand({
       GroupId: securityGroup.GroupId!,
-      IpPermissions: options.allowedPorts.map(port => ({
+      IpPermissions: input.allowedPorts.map(port => ({
         FromPort: port.port,
         ToPort: port.port,
         IpProtocol: port.protcol,
@@ -135,21 +124,22 @@ export class AwsEc2Provider implements Provider {
 
     const tags = {
       "SecurityGroup": securityGroup.GroupId!,
-      ...options.tags,
+      ...input.tags,
     }
-    this.logger.debug(`Creating instance for ${options.id}`);
+    this.logger.debug(`Creating instance for ${input.id}`);
     const instance = await client.send(new RunInstancesCommand({
       ImageId: amis.Images[0].ImageId,
-      InstanceType: options.instanceType,
+      InstanceType: input.serverType,
       MaxCount: 1,
       MinCount: 1,
+      UserData: input.cloudInit,
       SecurityGroupIds: [securityGroup.GroupId!],
       BlockDeviceMappings: [{
         DeviceName: "/dev/sda1",
         VirtualName: "root",
         Ebs: {
           DeleteOnTermination: true,
-          VolumeSize: options.size,
+          VolumeSize: input.diskSize,
           VolumeType: "gp2"
         }
       }],
@@ -161,7 +151,7 @@ export class AwsEc2Provider implements Provider {
 
     return {
       identifier: instance.Instances![0].InstanceId!,
-      location: options.region,
+      location: input.location,
     }
   }
 

@@ -2,21 +2,9 @@ import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
-import { Provider } from "./provider";
+import { CreateServerInput, Provider } from "./provider";
 import { HetznerHttpClient } from "../http/hetzner/client";
 import { ServerStatus } from "../http/hetzner/server";
-
-export interface HetznerProviderCreateServerOptions {
-  readonly id: string;
-  readonly architecture: string;
-  readonly location: string;
-  readonly image: string;
-  readonly serverType: string;
-  readonly userData: string;
-  readonly name: string;
-  readonly allowedPorts: { port: number, protcol: string}[];
-  readonly labels: { [key: string]: string };
-}
 
 export class HetznerProvider implements Provider {
   private logger = logger.child({ name: "HetznerProvider" });
@@ -50,7 +38,7 @@ export class HetznerProvider implements Provider {
     }
   }
 
-  async createServer(request: HetznerProviderCreateServerOptions): Promise<ProviderServerDataDto> {
+  async createServer(request: CreateServerInput): Promise<ProviderServerDataDto> {
     this.logger.debug(`Creating server with name ${request.name}`);
 
     let architecture: "x86" | "arm"
@@ -81,9 +69,9 @@ export class HetznerProvider implements Provider {
       server_type: request.serverType,
       image: ubuntu22?.id.toString(),
       location: request.location,
-      labels: request.labels,
+      labels: request.tags,
       start_after_create: true,
-      user_data: request.userData,
+      user_data: request.cloudInit,
       public_net: { enable_ipv4: true, enable_ipv6: true }
     });
     this.logger.debug(`Created server with name ${request.name}`);
