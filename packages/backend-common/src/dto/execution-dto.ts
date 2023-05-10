@@ -48,4 +48,6 @@ export interface CreateServerApplicationVariableDto {
 export interface CreateServerApplicationPortDto {
   readonly host: number;
   readonly container: number;
+  readonly protocol: string;
+  readonly name: string;
 }

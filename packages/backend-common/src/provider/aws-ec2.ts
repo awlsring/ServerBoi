@@ -1,9 +1,20 @@
-import { DescribeInstancesCommand, EC2Client, RebootInstancesCommand, StartInstancesCommand, StopInstancesCommand } from "@aws-sdk/client-ec2";
+import { AuthorizeSecurityGroupIngressCommand, CreateSecurityGroupCommand, DeleteSecurityGroupCommand, DescribeImagesCommand, DescribeInstancesCommand, EC2Client, RebootInstancesCommand, RunInstancesCommand, StartInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } from "@aws-sdk/client-ec2";
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
 import { ProviderServerDataDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
 import { Provider } from "./provider";
+
+export interface AwsEc2ProviderCreateServerOptions {
+  readonly id: string;
+  readonly architecture: string;
+  readonly name: string;
+  readonly region: string;
+  readonly instanceType: string;
+  readonly size: number;
+  readonly allowedPorts: { port: number, protcol: string}[];
+  readonly tags: Record<string, string>;
+}
 
 export class AwsEc2Provider implements Provider {
   private logger = logger.child({ name: "AwsEc2Provider" });
@@ -62,6 +73,124 @@ export class AwsEc2Provider implements Provider {
       default:
         return ProviderServerStatus.STOPPED // unknown;
     }
+  }
+
+  async createServer(options: AwsEc2ProviderCreateServerOptions): Promise<ProviderServerDataDto> {
+    const client = await this.getClient(options.region);
+
+    this.logger.debug(`Selecting image for ${options.id}`);
+    const amis = await client.send(new DescribeImagesCommand({
+      Filters: [
+        {
+          Name: "name",
+          Values: ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"]
+        },
+        {
+          Name: "architecture",
+          Values: [options.architecture]
+        },
+        {
+          Name: "owner-alias",
+          Values: ["amazon"]
+        },
+        {
+          Name: "hypervisor",
+          Values: ["xen"]
+        },
+        {
+          Name: "root-device-type",
+          Values: ["ebs"]
+        },
+        {
+          Name: "virtualization-type",
+          Values: ["hvm"]
+        },
+        {
+          Name: "image-type",
+          Values: ["machine"]
+        },
+      ]
+    }));
+    if (!amis.Images || amis.Images.length === 0) {
+      throw new Error("No AMI found");
+    }
+    
+    this.logger.debug(`Creating security group for ${options.id}`);
+    const securityGroup = await client.send(new CreateSecurityGroupCommand({
+      Description: `ServerBoi security group for ${options.id}`,
+      GroupName: `${options.name}-${options.id}-sg`,
+    }));
+
+    this.logger.debug(`Allowing ingress for deesired ports on security group ${securityGroup.GroupId}`);
+    await client.send(new AuthorizeSecurityGroupIngressCommand({
+      GroupId: securityGroup.GroupId!,
+      IpPermissions: options.allowedPorts.map(port => ({
+        FromPort: port.port,
+        ToPort: port.port,
+        IpProtocol: port.protcol,
+        IpRanges: [{ CidrIp: "0.0.0.0/0"}],
+        Ipv6Ranges: [{ CidrIpv6: "::/0"}],
+      }))
+    }));
+
+    const tags = {
+      "SecurityGroup": securityGroup.GroupId!,
+      ...options.tags,
+    }
+    this.logger.debug(`Creating instance for ${options.id}`);
+    const instance = await client.send(new RunInstancesCommand({
+      ImageId: amis.Images[0].ImageId,
+      InstanceType: options.instanceType,
+      MaxCount: 1,
+      MinCount: 1,
+      SecurityGroupIds: [securityGroup.GroupId!],
+      BlockDeviceMappings: [{
+        DeviceName: "/dev/sda1",
+        VirtualName: "root",
+        Ebs: {
+          DeleteOnTermination: true,
+          VolumeSize: options.size,
+          VolumeType: "gp2"
+        }
+      }],
+      TagSpecifications: [{
+        ResourceType: "instance",
+        Tags: Object.entries(tags).map(([key, value]) => ({ Key: key, Value: value }))
+      }]
+    }));
+
+    return {
+      identifier: instance.Instances![0].InstanceId!,
+      location: options.region,
+    }
+  }
+
+  async deleteServer(serverData: ProviderServerDataDto): Promise<void> {
+    const client = await this.getClient(serverData.location);
+
+    this.logger.debug(`Describing instance ${serverData.identifier}`);
+    const describeResponse = await client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }));
+    if (!describeResponse.Reservations || describeResponse.Reservations.length === 0) {
+      throw new Error("No instance found");
+    }
+    if (!describeResponse.Reservations[0].Instances || describeResponse.Reservations[0].Instances.length === 0) {
+      throw new Error("No instance found");
+    }
+    const instance = describeResponse.Reservations[0].Instances[0];
+
+    this.logger.debug(`Check if security group is on instance ${serverData.identifier}`);
+    const securityGroup = instance.Tags?.find(tag => tag.Key === "SecurityGroup");
+    if (securityGroup) {
+      this.logger.debug(`Deleting security group ${securityGroup.Value}`);
+      try {
+        await client.send(new DeleteSecurityGroupCommand({ GroupId: securityGroup.Value }));
+      } catch (e) {
+        this.logger.warn(`Failed to delete security group ${securityGroup.Value}`, e);
+      }
+    }
+
+    this.logger.debug(`Terminating instance ${serverData.identifier}`);
+    await client.send(new TerminateInstancesCommand({ InstanceIds: [serverData.identifier] }));
   }
 
   async startServer(serverData: ProviderServerDataDto): Promise<void> {

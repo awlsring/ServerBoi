@@ -100,6 +100,14 @@ export class KubernetesProvider implements Provider {
     }
   }
 
+  async createServer(options: any): Promise<ProviderServerDataDto> {
+    throw new Error("Method not implemented.");
+  }
+
+  async deleteServer(serverData: ProviderServerDataDto): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   async startServer(serverData: ProviderServerDataDto): Promise<void> {
     const data = this.loadData(serverData);
     const deployment = await this.apps.readNamespacedDeployment(data.identifier, data.namespace);
