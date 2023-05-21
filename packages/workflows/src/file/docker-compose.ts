@@ -12,7 +12,7 @@ export interface ServiceConfig {
   readonly environment?: string[];
 }
 
-export class DockerComposeBuilder {
+export class DockerCompose {
   private services: { [serviceName: string]: ServiceConfig };
   private version: string;
 

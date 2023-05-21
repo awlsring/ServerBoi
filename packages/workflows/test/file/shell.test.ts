@@ -1,5 +1,6 @@
 import { ShellScriptBuilder } from "../../src/file/shell";
-import { DockerComposeBuilder } from "../../src/file/docker-compose";
+import { DockerCompose } from "../../src/file/docker-compose";
+import { writeFileSync } from "fs";
 
 describe('ShellScriptBuilder', () => {
   it('should build a script', () => {
@@ -16,7 +17,7 @@ describe('ShellScriptBuilder', () => {
     scriptBuilder.addCommand('cat > docker-compose.yml << EOF');
     scriptBuilder.addCommand('');
 
-    const composeBuilder = new DockerComposeBuilder();
+    const composeBuilder = new DockerCompose();
     composeBuilder.addService('web', {
       image: 'nginx',
       ports: ['80:80'],

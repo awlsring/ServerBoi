@@ -5,7 +5,8 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc --build",
-    "test": "jest"
+    "test": "jest",
+    "tmp:local-runner": "ts-node tmp/local-runner.ts"
   },
   "dependencies": {
     "@serverboi/backend-common": "^1.0.0",
