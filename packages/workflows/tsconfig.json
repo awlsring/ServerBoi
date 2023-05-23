@@ -13,5 +13,5 @@
         "outDir": "./dist",
         "composite": true
     },
-    "exclude": ["scripts/**/*", "node_modules", "dist", "src/@types", "test/*", "jest.config.ts"]
+    "exclude": ["tmp/*", "scripts/**/*", "node_modules", "dist", "src/@types", "test/*", "jest.config.ts"]
 }

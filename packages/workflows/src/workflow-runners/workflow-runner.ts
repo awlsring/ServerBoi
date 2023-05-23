@@ -19,6 +19,6 @@ export interface WorkflowMetadata {
 
 export interface WorkflowRunner {
   getWorkflowStatus(executionId: string): Promise<WorkflowMetadata>;
-  launchCreateServerWorkflow(executionId: string, input: CreateServerWorkflowInput): Promise<WorkflowMetadata>;
-  launchDebugWorkflow(executionId: string, input: { message: string}): Promise<WorkflowMetadata>;
+  launchCreateServerWorkflow(input: CreateServerWorkflowInput): Promise<WorkflowMetadata>;
+  launchDebugWorkflow(input: { message: string}): Promise<WorkflowMetadata>;
 }

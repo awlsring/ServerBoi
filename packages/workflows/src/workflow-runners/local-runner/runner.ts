@@ -1,8 +1,11 @@
 import { randomUUID } from "crypto";
 import { logger } from "@serverboi/common";
 import { LRUCache } from "@serverboi/backend-common";
+import { LocalWorkflowRunnerContext } from "./context";
 
-type WorkflowFunction = (input: any) => any;
+type WorkflowFunction = (input: any, context: LocalWorkflowRunnerContext) => any;
+
+type ContextClass = new (executionMetadata: ExecutionMetadata) => LocalWorkflowRunnerContext;
 
 export interface RunWorkflowInput {
   readonly workflowName: string;
@@ -18,12 +21,12 @@ export enum ExecutionStatus {
 export interface ExecutionMetadata {
   readonly status: ExecutionStatus;
   readonly startedAt: Date;
-  readonly currentStep?: string;
   readonly finishedAt?: Date;
   readonly executionId: string;
   readonly workflowName: string;
   readonly input: any;
-  readonly output?: any;
+  currentStep?: string;
+  output?: any;
 }
 
 export class LocalWorkflowRunner{
@@ -55,7 +58,7 @@ export class LocalWorkflowRunner{
     return metadata;
   }
 
-  async runWorkflow(input: RunWorkflowInput, workflow: WorkflowFunction): Promise<ExecutionMetadata> {
+  async runWorkflow(input: RunWorkflowInput, contextClass: ContextClass, workflow: WorkflowFunction): Promise<ExecutionMetadata> {
     const executionId = this.generateExecutionId();
     const metadata = {
       status: ExecutionStatus.RUNNING,
@@ -65,12 +68,13 @@ export class LocalWorkflowRunner{
       input: input.input,
     }
     this.providerCache.set(executionId, metadata);
+    const context = new contextClass(metadata);
 
-    this.runWorkflowInBackground(executionId, input, workflow);
+    this.runWorkflowInBackground(executionId, input, context, workflow);
     return metadata;
   }
   
-  private async runWorkflowInBackground(executionId: string, input: any, workflow: WorkflowFunction): Promise<void> {
+  private async runWorkflowInBackground(executionId: string, input: any, context: LocalWorkflowRunnerContext, workflow: WorkflowFunction): Promise<void> {
     this.logger.debug('Starting background workflow execution');
     
     const metadata = this.providerCache.get(executionId);
@@ -80,7 +84,7 @@ export class LocalWorkflowRunner{
 
     let status = metadata.status;
     try {
-      await workflow(input)
+      await workflow(input, context)
       this.providerCache.set(executionId, {
         status: ExecutionStatus.COMPLETED,
         startedAt: metadata.startedAt,
@@ -88,6 +92,7 @@ export class LocalWorkflowRunner{
         executionId: executionId,
         workflowName: input.workflowName,
         input: input.input,
+        output: metadata.output,
       });
       status = ExecutionStatus.COMPLETED;
     } catch (error) {
@@ -95,6 +100,7 @@ export class LocalWorkflowRunner{
       this.providerCache.set(executionId, {
         status: ExecutionStatus.FAILED,
         startedAt: metadata.startedAt,
+        currentStep: metadata.currentStep,
         finishedAt: new Date(),
         executionId: executionId,
         workflowName: input.workflowName,
