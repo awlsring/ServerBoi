@@ -9,19 +9,9 @@ import { ProviderDto } from "../dto/provider-dto";
 import { ProviderRepo } from "../persistence/provider-repo";
 import { ProviderServerStatus, QueryServerStatus, ServerQueryType, ServerStatus } from '@serverboi/ssdk';
 import { LRUCache } from "../cache/lru-cache";
-import { Provider } from "../provider/provider";
-import { AwsEc2Provider } from "../provider/aws-ec2";
+import { Provider, loadProvider } from "../provider/provider";
 import { ProviderAuthRepo } from "../persistence/provider-auth-repo";
-import { KubernetesProvider, KubernetesProviderOptions } from "../provider/kubernetes";
 import { logger } from "@serverboi/common";
-import { HetznerProvider } from "../provider/hetzner";
-
-export interface ListServerInput {
-  readonly user: string;
-  readonly scopeId?: string;
-  readonly amount?: number;
-  readonly skip?: number;
-}
 
 export class ServerController {
   private logger = logger.child({ name: "ServerController" });
@@ -164,6 +154,46 @@ export class ServerController {
     return { scopeId, serverId };
   }
 
+  async registerServer(input: RegisterServerInput): Promise<ServerDto> {
+    const location = await this.determineLocation(input.address);
+
+    let provider: ProviderDto | undefined = undefined;
+    if (input.providerName) {
+      provider = await this.providerDao.find(input.providerName, input.owner) ?? undefined;
+    }
+
+    const serverDto = await this.serverDao.create({
+      scopeId: input.scopeId,
+      serverId: input.serverId,
+      name: input.name,
+      application: input.application,
+      address: input.address,
+      port: input.port,
+      capabilities: input.capabilities,
+      owner: input.owner,
+      location: {
+        city: location.city,
+        country: location.country,
+        region: location.region,
+        emoji: location.emoji,
+      },
+      status: {
+        status: ServerStatus.UNKNOWN,
+      },
+      query: {
+        type: input.query.type,
+        address: input.query.address,
+        port: input.query.port,
+      },
+      provider: provider,
+      providerServerData: input.providerServerData,
+    });
+
+    const status = await this.getServerStatus(serverDto);
+    return await this.serverDao.updateStatus(serverDto.scopeId, serverDto.serverId, status) ?? serverDto;
+  }
+
+
   async trackServer(input: TrackServerInput): Promise<ServerDto> {
     const location = await this.determineLocation(input.address);
 
@@ -242,15 +272,6 @@ export class ServerController {
 
   async deleteServer(id: string): Promise<void> {
     throw new Error("Method not implemented.");
-    const server = await this.getServer(id);
-    if (!server.providerServerData) {
-      throw new Error("Server has no provider data");
-    }
-    const provider = await this.getProvider(server);
-
-    // await provider.deleteServer(server.providerServerData);
-    await this.serverDao.delete(server.scopeId, server.serverId);
-
   }
 
   async stopServer(id: string): Promise<void> {
@@ -293,36 +314,8 @@ export class ServerController {
     if (!auth) {
       throw new Error("Missing provider auth");
     }
-    
-    switch (provider.type) {
-      case "AWS":
-        if (!server.provider.subType) {
-          throw new Error("Missing AWS subtype");
-        }
-        if (!server.providerServerData.location) {
-          throw new Error("Missing location data");
-        }
-        switch (server.provider.subType) {
-          case "EC2":
-            return new AwsEc2Provider(auth);
-          default:
-            throw new Error(`Unknown AWS subtype ${server.provider.subType}`);
-        }
-      case "KUBERNETES":
-        if (!provider.data) {
-          throw new Error("Provider has no needed kubernetes data");
-        }
-        const data = provider.data as unknown as KubernetesProviderOptions
-        const k8sCfg: KubernetesProviderOptions = {
-          endpoint: data.endpoint,
-          allowUnsecure: true,
-        }
-        return new KubernetesProvider(k8sCfg, auth);
-      case "HETZNER":
-        return new HetznerProvider(auth);
-      default:
-        throw new Error(`Unknown provider type ${provider.type}`);
-    }
+
+    return loadProvider(provider, auth);
   }
 
   private async getProvider(server: ServerDto): Promise<Provider> {
@@ -336,7 +329,6 @@ export class ServerController {
   }
 }
 
-
 export interface TrackServerInput {
   readonly scopeId: string;
   readonly name: string;
@@ -349,4 +341,25 @@ export interface TrackServerInput {
   readonly query: ServerQueryDto;
   readonly owner: string;
   readonly location?: string;
+}
+
+export interface RegisterServerInput {
+  readonly scopeId: string;
+  readonly serverId: string;
+  readonly name: string;
+  readonly application: string;
+  readonly address: string;
+  readonly port: number;
+  readonly capabilities: string[];
+  readonly providerName?: string;
+  readonly providerServerData?: ProviderServerDataDto;
+  readonly query: ServerQueryDto;
+  readonly owner: string;
+}
+
+export interface ListServerInput {
+  readonly user: string;
+  readonly scopeId?: string;
+  readonly amount?: number;
+  readonly skip?: number;
 }

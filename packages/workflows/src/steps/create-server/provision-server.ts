@@ -15,6 +15,7 @@ export interface ProvisionServerInput {
 
 export interface ProvisionServerOutput {
   readonly identifier: string;
+  readonly location: string;
 }
 
 export async function ProvisionServer(input: ProvisionServerInput): Promise<ProvisionServerOutput> {
@@ -40,6 +41,7 @@ export async function ProvisionServer(input: ProvisionServerInput): Promise<Prov
 
   return {
     identifier: server.identifier,
+    location: input.serverOptions.location,
   };
 }
 

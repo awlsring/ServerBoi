@@ -1,4 +1,4 @@
-import { ApplicationTemplate, CreateServerTemplateOptionsDto, ProviderAuthDto, ProviderDto } from "@serverboi/backend-common";
+import { ApplicationTemplate, CreateServerTemplateOptionsDto, PrismaRepoOptions, ProviderAuthDto, ProviderDto } from "@serverboi/backend-common";
 
 export interface CreateServerWorkflowInput {
   readonly serverId: string;
@@ -7,6 +7,7 @@ export interface CreateServerWorkflowInput {
   readonly applicationTemplate: ApplicationTemplate;
   readonly templateOptions: CreateServerTemplateOptionsDto;
   readonly providerData: ProvisionServerProviderOptions;
+  readonly persistenceCfg: PrismaRepoOptions;
 }
 
 export interface ServerOptions {

@@ -1,4 +1,4 @@
-import { ApplicationTemplateHealthCheckProtocol, Connectivity, HttpQuerent, Provider, ProviderAuthDto, ProviderDto, ProviderServerDataDto, Querent, SteamQuerent } from "@serverboi/backend-common";
+import { ApplicationTemplateHealthCheckProtocol, Connectivity, CreateServerTemplateOptionsDto, HttpQuerent, Provider, ProviderAuthDto, ProviderDto, ProviderServerDataDto, Querent, SteamQuerent } from "@serverboi/backend-common";
 import { loadProvider } from "@serverboi/backend-common";
 import { ProviderServerStatus } from "@serverboi/ssdk";
 
@@ -16,19 +16,28 @@ export interface ServerOptions {
 export interface WaitForConnectivityInput {
   readonly identifier: string;
   readonly location: string;
-  readonly applicationHealthCeck: ApplicationTemplateHealthCheckProtocol;
-  readonly port: number;
+  readonly applicationHealthCheck: ApplicationTemplateHealthCheckProtocol;
+  readonly templateOptions: CreateServerTemplateOptionsDto;
   readonly providerData: ProvisionServerProviderOptions;
 }
 
 export interface WaitForConnectivityOutput {
   readonly serverConnectivity: boolean;
   readonly applicationConnectivity: boolean;
+  readonly connectivity: boolean;
   readonly ipAddress?: string;
+  readonly port?: number;
 }
 
 export async function WaitForConnectivity(input: WaitForConnectivityInput): Promise<WaitForConnectivityOutput> {
   const provider = await loadProvider(input.providerData.provider, input.providerData.auth);
+
+  const queryPortName = input.applicationHealthCheck.portName
+  const queryPort = input.templateOptions.ports.find(p => p.name === queryPortName)
+  if (!queryPort) {
+    const msg = `Port with name ${queryPortName} not found`
+    throw new Error(msg)
+  }
 
   const serverDto = {
     identifier: input.identifier,
@@ -40,6 +49,7 @@ export async function WaitForConnectivity(input: WaitForConnectivityInput): Prom
     return {
       serverConnectivity: false,
       applicationConnectivity: false,
+      connectivity: false,
     };
   }
   
@@ -51,15 +61,18 @@ export async function WaitForConnectivity(input: WaitForConnectivityInput): Prom
     return {
       serverConnectivity: false,
       applicationConnectivity: false,
+      connectivity: false,
     };
   }
 
-  const applicationIsRunning = await isApplicationRunning(input.applicationHealthCeck.protocol, server.publicIpAddressV4, input.port);
+  const applicationIsRunning = await isApplicationRunning(input.applicationHealthCheck.protocol, server.publicIpAddressV4, queryPort.host);
 
   return {
     serverConnectivity: serverIsRunning,
     applicationConnectivity: applicationIsRunning,
     ipAddress: server.publicIpAddressV4,
+    port: queryPort.host,
+    connectivity: serverIsRunning && applicationIsRunning,
   };
 }
 

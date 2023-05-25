@@ -7,8 +7,20 @@ export interface ApplicationTemplate {
   readonly name: string;
   readonly image: string;
   readonly variables: ApplicationTemplateVariables[];
+  readonly healthCheck: ApplicationTemplateHealthCheckProtocol;
+  readonly connectivity: ApplicationTemplateConnectivityProtocol;
   readonly volumes: ApplicationTemplateVolumes[];
   readonly ports: ApplicationTemplatePorts[];
+}
+
+export interface ApplicationTemplateHealthCheckProtocol {
+  readonly protocol: string;
+  readonly portName: string;
+}
+
+export interface ApplicationTemplateConnectivityProtocol {
+  readonly protocol: string;
+  readonly portName: string;
 }
 
 export interface ApplicationTemplateVariables {

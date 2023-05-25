@@ -31,6 +31,12 @@ export interface ProviderServerDataDto {
   readonly data?: any;
 }
 
+export interface ProviderServerDescriptionDto extends ProviderServerDataDto {
+  readonly state?: string;
+  readonly publicIpAddressV4?: string;
+  readonly tags?: Record<string, string>;
+}
+
 export interface ServerQueryDto {
   readonly type: string;
   readonly address?: string;
