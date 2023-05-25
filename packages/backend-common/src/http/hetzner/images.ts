@@ -6,7 +6,7 @@ export interface ListImagesRequest {
   readonly bound_to?: string;
   readonly include_deprecated?: boolean;
   readonly label_selector?: string;
-  readonly architecture?: "x86" | "arm"
+  readonly architecture?: string;
   readonly page?: number;
   readonly per_page?: number;
 }

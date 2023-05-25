@@ -1,6 +1,6 @@
 import { CreateFirewallRequest, CreateFirewallResponse } from "./firewall";
 import { ListImagesRequest, ListImagesResponse } from "./images";
-import { CreateServerRequest, CreateServerResponse, GetServerResponse } from "./server";
+import { CreateServerRequest, CreateServerResponse, GetServerResponse, GetServerTypeResponse } from "./server";
 import { ServerActionResponse } from "./server-action";
 import { ListLocationsResponse } from "./location";
 
@@ -66,6 +66,11 @@ export class HetznerHttpClient {
       throw new Error(`Request failed: ${response.statusText}\nMessage ${error?.message}`);
     }
     return response;
+  }
+
+  async getServerType(serverType: string): Promise<GetServerTypeResponse> {
+    const response = await this.request(`/server_types/${serverType}`);
+    return await response.json();
   }
 
   async createFirewall(request: CreateFirewallRequest): Promise<CreateFirewallResponse> {

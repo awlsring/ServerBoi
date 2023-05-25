@@ -173,7 +173,12 @@ export interface DnsPtr {
   ip: string;
 }
 
+export interface GetServerTypeResponse {
+  server_type: ServerType;
+}
+
 export interface ServerType {
+  architecture: string;
   cores: number;
   cpu_type: string;
   deprecated: boolean;
