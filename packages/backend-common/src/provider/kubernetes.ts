@@ -104,6 +104,10 @@ export class KubernetesProvider implements Provider {
     throw new Error("Method not implemented.");
   }
 
+  async describeServer(serverData: ProviderServerDataDto): Promise<ProviderServerDataDto> {
+    throw new Error("Method not implemented.");
+  }
+
   async deleteServer(serverData: ProviderServerDataDto): Promise<void> {
     throw new Error("Method not implemented.");
   }

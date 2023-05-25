@@ -1,6 +1,6 @@
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
-import { ProviderServerDataDto } from "../dto/server-dto";
+import { ProviderServerDataDto, ProviderServerDescriptionDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
 import { CreateServerInput, Provider } from "./provider";
 import { HetznerHttpClient } from "../http/hetzner/client";
@@ -41,18 +41,9 @@ export class HetznerProvider implements Provider {
   async createServer(request: CreateServerInput): Promise<ProviderServerDataDto> {
     this.logger.debug(`Creating server with name ${request.name}`);
 
-    let architecture: "x86" | "arm"
-    switch (request.architecture) {
-      case "x86_64":
-        architecture = "x86";
-        break;
-      case "arm64":
-        architecture = "arm";
-        break;
-      default:
-        throw new Error(`Unknown architecture ${request.architecture}`);
-    }
+    const serverTypeSpecs = await this.client.getServerType(request.serverType);
 
+    const architecture = serverTypeSpecs.server_type.architecture;
     const images = await this.client.listImages({
       architecture: architecture,
       type: "system",
@@ -85,7 +76,7 @@ export class HetznerProvider implements Provider {
       }],
       rules: request.allowedPorts.map((port) => ({
         direction: "in",
-        protocol: port.protcol,
+        protocol: port.protocol,
         port: port.port.toString(),
         source_ips: ["0.0.0.0/0", "::/0"]
       })),
@@ -94,6 +85,21 @@ export class HetznerProvider implements Provider {
     return {
       identifier: response.server.id.toString(),
       location: request.location,
+    };
+  }
+
+  async describeServer(serverData: ProviderServerDataDto): Promise<ProviderServerDescriptionDto> {
+    this.logger.debug(`Describing server ${serverData.identifier}`);
+
+    const response = await this.client.getServer(serverData.identifier);
+
+    this.logger.debug(`Described server ${serverData.identifier}`);
+
+    return {
+      identifier: response.server.id.toString(),
+      location: response.server.datacenter.location.name,
+      publicIpAddressV4: response.server.public_net.ipv4.ip,
+      state: response.server.status,
     };
   }
 

@@ -1,5 +1,5 @@
 import { ProviderServerStatus } from "@serverboi/ssdk";
-import { ProviderServerDataDto } from "../dto/server-dto";
+import { ProviderServerDataDto, ProviderServerDescriptionDto } from "../dto/server-dto";
 import { ProviderAuthDto, ProviderDto } from "../dto/provider-dto";
 import { AwsEc2Provider } from "./aws-ec2";
 import { KubernetesProvider, KubernetesProviderOptions } from "./kubernetes";
@@ -8,11 +8,10 @@ import { HetznerProvider } from "./hetzner";
 export interface CreateServerInput {
   readonly id: string;
   readonly name: string;
-  readonly architecture: string;
   readonly location: string;
   readonly serverType: string;
   readonly diskSize: number;
-  readonly allowedPorts: { port: number, protcol: string}[];
+  readonly allowedPorts: { port: number, protocol: string}[];
   readonly tags: Record<string, string>;
   readonly cloudInit: string;
   readonly providerData?: any;
@@ -21,6 +20,7 @@ export interface CreateServerInput {
 export interface Provider {
   getServerStatus(serverData: ProviderServerDataDto): Promise<ProviderServerStatus>;
   createServer(input: CreateServerInput): Promise<ProviderServerDataDto>;
+  describeServer(serverData: ProviderServerDataDto): Promise<ProviderServerDescriptionDto>;
   deleteServer(serverData: ProviderServerDataDto): Promise<void>;
   startServer(serverData: ProviderServerDataDto): Promise<void>;
   stopServer(serverData: ProviderServerDataDto): Promise<void>;

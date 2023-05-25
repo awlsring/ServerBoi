@@ -1,7 +1,7 @@
-import { AuthorizeSecurityGroupIngressCommand, CreateSecurityGroupCommand, DeleteSecurityGroupCommand, DescribeImagesCommand, DescribeInstancesCommand, EC2Client, RebootInstancesCommand, RunInstancesCommand, StartInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } from "@aws-sdk/client-ec2";
+import { AuthorizeSecurityGroupIngressCommand, CreateSecurityGroupCommand, DeleteSecurityGroupCommand, DescribeImagesCommand, DescribeInstanceTypesCommand, DescribeInstancesCommand, EC2Client, RebootInstancesCommand, RunInstancesCommand, StartInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } from "@aws-sdk/client-ec2";
 import { ProviderServerStatus } from "@serverboi/ssdk";
 import { ProviderAuthDto } from "../dto/provider-dto";
-import { ProviderServerDataDto } from "../dto/server-dto";
+import { ProviderServerDataDto, ProviderServerDescriptionDto } from "../dto/server-dto";
 import { logger } from "@serverboi/common";
 import { CreateServerInput, Provider } from "./provider";
 
@@ -67,6 +67,15 @@ export class AwsEc2Provider implements Provider {
   async createServer(input: CreateServerInput): Promise<ProviderServerDataDto> {
     const client = await this.getClient(input.location);
 
+    const types = await client.send(new DescribeInstanceTypesCommand({ InstanceTypes: [input.serverType] }))
+    if (!types.InstanceTypes || types.InstanceTypes.length === 0) {
+      throw new Error("Invalid instance type");
+    }
+    const architecture = types.InstanceTypes[0].ProcessorInfo?.SupportedArchitectures?.[0];
+    if (!architecture) {
+      throw new Error("Invalid instance type");
+    }
+
     this.logger.debug(`Selecting image for ${input.id}`);
     const amis = await client.send(new DescribeImagesCommand({
       Filters: [
@@ -76,7 +85,7 @@ export class AwsEc2Provider implements Provider {
         },
         {
           Name: "architecture",
-          Values: [input.architecture]
+          Values: [architecture]
         },
         {
           Name: "owner-alias",
@@ -116,7 +125,7 @@ export class AwsEc2Provider implements Provider {
       IpPermissions: input.allowedPorts.map(port => ({
         FromPort: port.port,
         ToPort: port.port,
-        IpProtocol: port.protcol,
+        IpProtocol: port.protocol,
         IpRanges: [{ CidrIp: "0.0.0.0/0"}],
         Ipv6Ranges: [{ CidrIpv6: "::/0"}],
       }))
@@ -152,6 +161,33 @@ export class AwsEc2Provider implements Provider {
     return {
       identifier: instance.Instances![0].InstanceId!,
       location: input.location,
+    }
+  }
+
+  async describeServer(serverData: ProviderServerDataDto): Promise<ProviderServerDescriptionDto> {
+    const client = await this.getClient(serverData.location);
+
+    this.logger.debug(`Describing instance ${serverData.identifier}`);
+    const describeResponse = await client.send(new DescribeInstancesCommand({ InstanceIds: [serverData.identifier] }));
+    if (!describeResponse.Reservations || describeResponse.Reservations.length === 0) {
+      throw new Error("No instance found");
+    }
+    if (!describeResponse.Reservations[0].Instances || describeResponse.Reservations[0].Instances.length === 0) {
+      throw new Error("No instance found");
+    }
+
+    const instance = describeResponse.Reservations[0].Instances[0];
+
+    const tags: Record<string, string> = {};
+    instance.Tags?.forEach(tag => {
+      tags[tag.Key!] = tag.Value!;
+    });
+
+    return {
+      identifier: instance.InstanceId!,
+      state: instance.State?.Name,
+      publicIpAddressV4: instance.PublicIpAddress,
+      tags: tags,
     }
   }
 
