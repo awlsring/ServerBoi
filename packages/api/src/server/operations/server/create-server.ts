@@ -24,7 +24,7 @@ export const CreateServerOperation: Operation<CreateServerServerInput, CreateSer
       },
       template: {
         variables: input.templateOptions!.variables?.map(v => ({ name: v.name!, value: v.value! })) ?? [],
-        ports: input.templateOptions!.ports?.map(p => ({ host: p.host!, container: p.container! })) ?? []
+        ports: input.templateOptions!.ports?.map(p => ({ host: p.host!, container: p.container!, protocol: "TCP", name: "" })) ?? []
       }
     });
 

@@ -34,6 +34,8 @@ const metrics = new ApiServicePrometheusMetrics({
 });
 
 async function getUserFromHeaders(headers: IncomingHttpHeaders): Promise<string> {
+  log.debug("Getting user from headers")
+  log.debug(`Headers: ${JSON.stringify(headers)}`)
   if (!headers["x-serverboi-user"]) {
     throw new Error("No user header");
   }
