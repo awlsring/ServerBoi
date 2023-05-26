@@ -8,32 +8,33 @@ import { ExecutionStatus } from "@serverboi/ssdk";
 export class ExecutionController {
   private logger = logger.child({ name: "ExecutionController" });
   private readonly executionRepo: ExecutionRepo;
-  private readonly workflowRunner: WorkflowRunner;
+  // private readonly workflowRunner: WorkflowRunner;
 
   constructor(cfg: PrismaRepoOptions) {
     this.executionRepo = new ExecutionRepo(cfg);
-    this.workflowRunner = createRunner();
+    // this.workflowRunner = createRunner();
   }
 
   async runCreateServerExecution(request: CreateServerExecutionDto): Promise<ExecutionDto> {
-    this.logger.debug(`Running create server execution`);
+    throw Error("Not implemented");
+    // this.logger.debug(`Running create server execution`);
 
-    this.logger.debug("Forming execution request")
-    const executionRequest: ExecutionDto = {
-      id: `create-server-${uuidv4()}`,
-      scope: request.scope,
-      user: request.user,
-      workflowType: "create-server",
-      status: ExecutionStatus.RUNNING,
-      input: {},
-      runnerType: this.workflowRunner.getRunnerType(),
-    }
+    // this.logger.debug("Forming execution request")
+    // const executionRequest: ExecutionDto = {
+    //   id: `create-server-${uuidv4()}`,
+    //   scope: request.scope,
+    //   user: request.user,
+    //   workflowType: "create-server",
+    //   status: ExecutionStatus.RUNNING,
+    //   input: {},
+    //   runnerType: this.workflowRunner.getRunnerType(),
+    // }
 
-    this.logger.debug(`Starting workflow`);
-    await this.workflowRunner.startWorkflow(executionRequest);
-    const execution = await this.executionRepo.create(executionRequest);
+    // this.logger.debug(`Starting workflow`);
+    // await this.workflowRunner.startWorkflow(executionRequest);
+    // const execution = await this.executionRepo.create(executionRequest);
 
-    return execution;
+    // return execution;
   }
 
   async getExecution(id: string, user: string): Promise<ExecutionDto> {
