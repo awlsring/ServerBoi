@@ -1,5 +1,5 @@
 import { Component, DiscordHttpClient, InteractionContext } from "@serverboi/discord-common";
-import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10";
+import { APIChatInputApplicationCommandInteraction, APIInteraction,  ApplicationCommandOptionType, InteractionResponseType, InteractionType } from "discord-api-types/v10";
 import { FastifyReply } from "fastify";
 import { logger } from "@serverboi/common";
 export interface InteractionHandlerOptions {
@@ -39,9 +39,20 @@ export class InteractionHandler {
   }
 
   private async formContext(interaction: APIInteraction, response: FastifyReply): Promise<InteractionContext> {
+    logger.debug(`Forming context for interaction ${interaction.id}`);
+    logger.debug(`Determining user for interaction ${interaction.id}`);
     let user = "";
     if (interaction.member) {
+      logger.debug(`Get user from member.`);
       user = interaction.member.user.id;
+    }
+    if (interaction.user) {
+      logger.debug(`Got user from user`);
+      user = interaction.user.id;
+    }
+    if (user == "") {
+      logger.error(`Unable to determine user for interaction ${interaction.id}`);
+      throw new Error(`Unable to determine user for interaction ${interaction.id}`);
     }
 
     return {

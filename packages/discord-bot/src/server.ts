@@ -118,7 +118,6 @@ async function main() {
       new StopServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new RebootServerButton({ serverBoiService: serverboi, ServerCardRepo: cardRepo }),
       new ServerMoreActionsMenu({ serverBoiService: serverboi, serverCardService: serverCardService }),
-
       new NoUUserCommand(cfg.discord.applicationId),
       new NoUMessageCommand(cfg.discord.applicationId)
     ],
