@@ -107,12 +107,7 @@ export class ProviderCreateMenu extends SelectMenuComponent {
         await context.response.send({
           type: InteractionResponseType.UpdateMessage,
           data: {
-            content: `To access your instance, I'll need an API Key with read and write permissions.
-    
-    You can follow this Hetzner documentation to create an API token https://docs.hetzner.com/cloud/api/getting-started/generating-api-token/
-    
-    One you have the API key, you can enter it by hitting the button below.
-    `,
+            content: `To access your instance, I'll need an API Key with read and write permissions.\n\nYou can follow the Hetzner documentation to create an API key https://docs.hetzner.com/cloud/api/getting-started/generating-api-token/\n\nOne you have the API key created, you can enter it by hitting the button below.`,
             components: [
               {
                 type: 1,

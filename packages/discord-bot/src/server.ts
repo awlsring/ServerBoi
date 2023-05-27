@@ -44,6 +44,8 @@ import { ResubmitAWSEC2ProviderInfoButton } from './interactions/commands/server
 import { logger } from '@serverboi/common';
 import { NoUUserCommand } from './interactions/commands/nou/user';
 import { NoUMessageCommand } from './interactions/commands/nou/message';
+import { AWSProviderAuthPromptButton } from './interactions/commands/provider/create/components/aws-ec2-auth-prompt';
+import { AWSProviderAuthInformationModal } from './interactions/commands/provider/create/components/aws-ec2-auth-info-modal';
 
 function loadConfig(): Config {
   const configPath = process.env.CONFIG_PATH ?? './config/config.yaml';
@@ -108,6 +110,8 @@ async function main() {
       new StartTrackServerButton(),
       new ResubmitQueryButton(),
       new ResubmitBaseInfoButton(),
+      new AWSProviderAuthPromptButton(),
+      new AWSProviderAuthInformationModal({ requestRepo: createProviderRequestRepo} ),
       new CreateProviderNameInputPromptButton(),
       new ProviderCreateMenu({ createProviderRequestRepo }),
       new KubernetesProviderAuthPromptButton(),
